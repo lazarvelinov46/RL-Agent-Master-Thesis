@@ -3,6 +3,7 @@
 #include <iostream>
 #include <time.h>
 #include <vector>
+#include <stack>
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
 #include <SFML/Audio.hpp>

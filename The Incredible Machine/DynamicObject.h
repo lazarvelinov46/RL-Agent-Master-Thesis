@@ -9,5 +9,6 @@ public:
 	DynamicObject(float x, float y, const sf::Texture& texture);
 	void update();
 	void render(sf::RenderTarget& target);
+	void move(const sf::Vector2f& force);
 };
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "State.h"
+#include "Game.h"
 
 
 enum MenuOption{PLAYER,AI,LEVEL,QUIT};
@@ -13,6 +13,7 @@ private:
 	sf::Text title;
 	std::vector<sf::Text> options;
 	MenuOption selectedOption;
+	State* nextState;
 
 	void initFont();
 	void initText();
@@ -23,5 +24,6 @@ public:
 	void handleInput(sf::RenderWindow& window)override;
 	void update()override;
 	void render(sf::RenderTarget& target)override;
+	State* getNextState()override;
 };
 

@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "Menu.h"
 
+
 void playHuman(sf::RenderWindow& window) {
 	while (window.isOpen()) {
 		sf::Event ev;
@@ -47,6 +48,21 @@ int main()
 {
 	sf::RenderWindow window(sf::VideoMode(1200, 800), "The Incredible Machine", sf::Style::Close | sf::Style::Titlebar);
 	window.setFramerateLimit(60);
+	State* state = new Menu();
+	while (window.isOpen()) {
+		state->handleInput(window);
+		state->update();
+		state->render(window);
+		State* nextState = state->getNextState();
+		if (nextState) {
+			delete state;
+			state = nextState;
+		}
+		window.display();
+	}
+	delete state;
+	return 0;
+	/*
 	Menu menu;
 	while (window.isOpen()) {
 		menu.handleInput(window);
@@ -75,5 +91,6 @@ int main()
 		}
 		window.display();
 	}
+	*/
 }
 

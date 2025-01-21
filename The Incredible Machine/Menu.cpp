@@ -34,6 +34,7 @@ void Menu::initText()
 
 Menu::Menu()
 {
+	this->nextState = nullptr;
 	this->initFont();
 	this->initText();
 }
@@ -55,8 +56,20 @@ void Menu::handleInput(sf::RenderWindow& window)
 				this->selectedOption = static_cast<MenuOption>((this->selectedOption + 1) % this->options.size());
 			}
 			else if (ev.key.code == sf::Keyboard::Enter) {
-				if (this->selectedOption == MenuOption::QUIT) {
+				switch (selectedOption)
+				{
+				case PLAYER:
+					this->nextState = new Game();
+					break;
+				case AI:
+					break;
+				case LEVEL:
+					break;
+				case QUIT:
 					window.close();
+					break;
+				default:
+					break;
 				}
 			}
 		}
@@ -78,4 +91,9 @@ void Menu::render(sf::RenderTarget& target)
 		target.draw(option);
 	}
 	
+}
+
+State* Menu::getNextState()
+{
+	return this->nextState;
 }

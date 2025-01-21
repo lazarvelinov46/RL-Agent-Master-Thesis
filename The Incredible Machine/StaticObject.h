@@ -7,7 +7,7 @@ private:
 	sf::RectangleShape object;
 
 public:
-	StaticObject(float x, float y, float width, float height);
+	StaticObject(float x, float y, float width, float height,sf::Color color);
 	void render(sf::RenderTarget& target);
 };
 
