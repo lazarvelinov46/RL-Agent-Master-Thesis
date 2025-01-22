@@ -4,10 +4,7 @@
 #include "Menu.h"
 
 /*
-std::vector<sf::Sprite> resources;
-sf::Texture beltTexture;
-sf::Texture gearTexture;
-sf::Sprite selectedResource;
+
 */
 class Game : public State
 {

@@ -13,7 +13,7 @@ void Game::initText()
 	this->playButtonText.setFont(font);
 	this->playButtonText.setString("PLAY");
 	this->playButtonText.setCharacterSize(24);
-	this->playButtonText.setPosition(975, 50);
+	this->playButtonText.setPosition(1050, 50);
 
 }
 
@@ -23,8 +23,8 @@ void Game::initPanel()
 	this->panel.setPosition(sf::Vector2f(1000, 0));
 	this->panel.setFillColor(sf::Color::White);
 
-	this->playButton.setSize(sf::Vector2f(200, 50));
-	this->playButton.setPosition(sf::Vector2f(950, 50));
+	this->playButton.setSize(sf::Vector2f(100, 50));
+	this->playButton.setPosition(sf::Vector2f(1050, 50));
 	this->playButton.setFillColor(sf::Color::Green);
 }
 
@@ -47,7 +47,16 @@ void Game::handleInput(sf::RenderWindow& window)
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
 			this->nextState = new Menu();
 		}
+
+		if (ev.type == sf::Event::MouseButtonPressed && ev.mouseButton.button == sf::Mouse::Left) {
+			sf::Vector2f position(ev.mouseButton.x, ev.mouseButton.y);
+
+			if (playButton.getGlobalBounds().contains(position)) {
+				std::cout << "PLAY pressed " << std::endl;
+			}
+		}
 	}
+	//handle input on level side
 }
 
 void Game::update()
@@ -58,13 +67,13 @@ void Game::update()
 void Game::render(sf::RenderTarget& target)
 {
 	target.clear();
-	this->level.render(target);
 	target.draw(this->panel);
+	this->level.render(target);
 	target.draw(this->playButton);
 	target.draw(this->playButtonText);
 }
 
 State* Game::getNextState()
 {
-	return nullptr;
+	return this->nextState;
 }
