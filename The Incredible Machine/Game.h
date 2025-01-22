@@ -2,11 +2,27 @@
 #include "State.h"
 #include "Level.h"
 #include "Menu.h"
+
+/*
+std::vector<sf::Sprite> resources;
+sf::Texture beltTexture;
+sf::Texture gearTexture;
+sf::Sprite selectedResource;
+*/
 class Game : public State
 {
 private:
+	sf::RectangleShape panel;
+	sf::RectangleShape playButton;
+	sf::Font font;
+	sf::Text playButtonText;
+
 	Level level;
 	State* nextState;
+
+	void initFont();
+	void initText();
+	void initPanel();
 public:
 	Game();
 	void handleInput(sf::RenderWindow& window)override;

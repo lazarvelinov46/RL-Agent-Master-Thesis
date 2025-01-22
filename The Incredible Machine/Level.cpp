@@ -13,8 +13,9 @@ void Level::initLevel()
 	this->staticObjects.push_back(new StaticObject(300, 500, 150, 20, sf::Color::Blue));
 	this->staticObjects.push_back(new StaticObject(600, 300, 150, 20, sf::Color::Blue));
 
-	this->staticObjects.push_back(new StaticObject(800, 100, 20, 200, sf::Color::Red));
-	this->staticObjects.push_back(new StaticObject(820, 100, 80, 20, sf::Color::Red));
+	this->staticObjects.push_back(new StaticObject(850, 400, 20, 40, sf::Color::Green));
+	this->staticObjects.push_back(new StaticObject(850, 440, 140, 20, sf::Color::Green));
+	this->staticObjects.push_back(new StaticObject(970, 400, 20, 40, sf::Color::Green));
 }
 
 void Level::render(sf::RenderTarget& target)
