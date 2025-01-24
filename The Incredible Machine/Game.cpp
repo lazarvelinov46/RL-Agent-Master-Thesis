@@ -28,10 +28,18 @@ void Game::initPanel()
 	this->playButton.setFillColor(sf::Color::Green);
 }
 
+void Game::initGameScreen()
+{
+	this->gameScreen.setSize(sf::Vector2f(1000, 800));
+	this->gameScreen.setPosition(sf::Vector2f(0, 0));
+	this->gameScreen.setFillColor(sf::Color(128,128,128));
+}
+
 Game::Game()
 {
 	this->initFont();
 	this->initText();
+	this->initGameScreen();
 	this->initPanel();
 	this->level.initLevel();
 	this->nextState = nullptr;
@@ -41,6 +49,8 @@ void Game::handleInput(sf::RenderWindow& window)
 {
 	sf::Event ev;
 	while (window.pollEvent(ev)) {
+
+		level.handleInput(window);
 		if (ev.type == sf::Event::Closed) {
 			window.close();
 		}
@@ -54,6 +64,8 @@ void Game::handleInput(sf::RenderWindow& window)
 			if (playButton.getGlobalBounds().contains(position)) {
 				std::cout << "PLAY pressed " << std::endl;
 			}
+
+			level.handleClick(position);
 		}
 	}
 	//handle input on level side
@@ -68,6 +80,7 @@ void Game::render(sf::RenderTarget& target)
 {
 	target.clear();
 	target.draw(this->panel);
+	target.draw(this->gameScreen);
 	this->level.render(target);
 	target.draw(this->playButton);
 	target.draw(this->playButtonText);

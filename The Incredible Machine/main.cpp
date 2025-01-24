@@ -50,6 +50,7 @@ int main()
 	window.setFramerateLimit(60);
 	State* state = new Menu();
 	while (window.isOpen()) {
+		
 		state->handleInput(window);
 		state->update();
 		state->render(window);

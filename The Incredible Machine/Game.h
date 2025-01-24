@@ -13,6 +13,7 @@ private:
 	sf::RectangleShape playButton;
 	sf::Font font;
 	sf::Text playButtonText;
+	sf::RectangleShape gameScreen;
 
 	Level level;
 	State* nextState;
@@ -20,6 +21,7 @@ private:
 	void initFont();
 	void initText();
 	void initPanel();
+	void initGameScreen();
 public:
 	Game();
 	void handleInput(sf::RenderWindow& window)override;
