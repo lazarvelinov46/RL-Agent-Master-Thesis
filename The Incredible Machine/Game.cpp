@@ -71,9 +71,9 @@ void Game::handleInput(sf::RenderWindow& window)
 	//handle input on level side
 }
 
-void Game::update()
+void Game::update(float deltaTime)
 {
-	//dynamic objects
+	this->level.update(deltaTime);
 }
 
 void Game::render(sf::RenderTarget& target)

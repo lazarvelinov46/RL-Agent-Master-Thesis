@@ -26,3 +26,8 @@ void StaticObject::render(sf::RenderTarget& target)
 {
 	target.draw(this->object);
 }
+
+sf::FloatRect StaticObject::getGlobalBounds()const
+{
+	return this->object.getGlobalBounds();
+}

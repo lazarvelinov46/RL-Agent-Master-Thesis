@@ -11,5 +11,7 @@ public:
 	StaticObject(const StaticObject& object);
 	StaticObject(const sf::Sprite& sprite);
 	void render(sf::RenderTarget& target);
+	
+	sf::FloatRect getGlobalBounds()const;
 };
 

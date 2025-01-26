@@ -49,10 +49,12 @@ int main()
 	sf::RenderWindow window(sf::VideoMode(1200, 800), "The Incredible Machine", sf::Style::Close | sf::Style::Titlebar);
 	window.setFramerateLimit(60);
 	State* state = new Menu();
+	sf::Clock clock;
 	while (window.isOpen()) {
 		
 		state->handleInput(window);
-		state->update();
+		float deltaTime = clock.restart().asSeconds();
+		state->update(deltaTime);
 		state->render(window);
 		State* nextState = state->getNextState();
 		if (nextState) {

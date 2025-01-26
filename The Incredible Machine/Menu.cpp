@@ -76,7 +76,7 @@ void Menu::handleInput(sf::RenderWindow& window)
 	}
 }
 
-void Menu::update()
+void Menu::update(float deltaTime)
 {
 	for (size_t i = 0; i < this->options.size(); i++) {
 		this->options[i].setFillColor(i == this->selectedOption ? sf::Color::Blue : sf::Color::White);

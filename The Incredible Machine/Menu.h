@@ -22,7 +22,7 @@ public:
 	//getters
 	const MenuOption getSelectedOption()const { return this->selectedOption; }
 	void handleInput(sf::RenderWindow& window)override;
-	void update()override;
+	void update(float deltaTime=0)override;
 	void render(sf::RenderTarget& target)override;
 	State* getNextState()override;
 };

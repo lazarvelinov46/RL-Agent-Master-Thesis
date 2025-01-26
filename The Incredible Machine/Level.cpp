@@ -32,6 +32,14 @@ void Level::initStaticObjects()
 	this->staticObjects.push_back(new StaticObject(970, 400, 20, 40, sf::Color::Green));
 }
 
+void Level::initDynamicObjects()
+{
+	this->dynamicObjects.push_back(new DynamicObject(25, 500, 25, sf::Color::Cyan));
+	this->dynamicObjects.push_back(new DynamicObject(100, 550, 25, sf::Color::Cyan));
+	this->dynamicObjects.push_back(new DynamicObject(300, 450, 25, sf::Color::Cyan));
+	this->dynamicObjects.push_back(new DynamicObject(600, 250, 25, sf::Color::Magenta));
+}
+
 void Level::initResources()
 {
 	int beltNum = 4;
@@ -74,6 +82,29 @@ void Level::initResources()
 	}
 }
 
+bool Level::checkOverlaping(const sf::Sprite& newObject)
+{
+	std::cout << "TO PLACE X: " << newObject.getGlobalBounds().left
+		<< "; Y: " << newObject.getGlobalBounds().top
+		<< "; W: " << newObject.getGlobalBounds().width
+		<< "; H: " << newObject.getGlobalBounds().height << std::endl;
+	for (size_t i = 0; i < this->staticObjects.size(); i++) {
+		std::cout << "STAT X: " << this->staticObjects[i]->getGlobalBounds().left
+			<< "; Y: " << this->staticObjects[i]->getGlobalBounds().top
+			<< "; W: " << this->staticObjects[i]->getGlobalBounds().width
+			<< "; H: " << this->staticObjects[i]->getGlobalBounds().height << std::endl;
+		if (newObject.getGlobalBounds().intersects(this->staticObjects[i]->getGlobalBounds())) {
+			return false;
+		}
+	}
+	for (size_t i = 0; i < this->dynamicObjects.size(); i++) {
+		if (newObject.getGlobalBounds().intersects(this->dynamicObjects[i]->getGlobalBounds())) {
+			return false;
+		}
+	}
+	return true;
+}
+
 const Resource* Level::getResourceById(int id) const
 {
 	for (size_t i = 0;i < this->resources.size();i++) {
@@ -90,6 +121,34 @@ const sf::Vector2f& Level::alignToGrid(const sf::Vector2f& pos) const
 	return sf::Vector2f(x, y);
 }
 
+void Level::updateBalls(float deltaTime)
+{
+	for (size_t i = 0; i < this->dynamicObjects.size(); i++) {
+		this->dynamicObjects[i]->setVelocity(sf::Vector2f(this->dynamicObjects[i]->getVelocity().x,
+			this->dynamicObjects[i]->getVelocity().y + this->gravity * deltaTime));
+
+		sf::Vector2f newPosition = this->dynamicObjects[i]->getPosition()+this->dynamicObjects[i]->getVelocity();
+
+		bool collision = false;
+		for (const StaticObject* object : this->staticObjects) {
+			if (this->dynamicObjects[i]->getShape().getGlobalBounds().intersects(object->getGlobalBounds())) {
+				collision = true;
+
+				float staticObjectY = object->getGlobalBounds().top;
+				float ballHeight = this->dynamicObjects[i]->getShape().getGlobalBounds().height;
+
+				newPosition.y = staticObjectY - ballHeight;
+
+				this->dynamicObjects[i]->setVelocity(sf::Vector2f(this->dynamicObjects[i]->getVelocity().x, 0.f));
+				break;
+			}
+		}
+		if (!collision) {
+			this->dynamicObjects[i]->getShape().setPosition(newPosition);
+		}
+	}
+}
+
 Level::Level()
 {
 }
@@ -101,6 +160,8 @@ void Level::initLevel()
 	this->initTextures();
 
 	this->initStaticObjects();
+
+	this->initDynamicObjects();
 
 	this->initResources();
 }
@@ -132,23 +193,28 @@ void Level::handleClick(sf::Vector2f& mousePosition)
 	}
 	else {
 		sf::Vector2f alignedPosition = this->alignToGrid(mousePosition);
-		if (alignedPosition.x < 900 && alignedPosition.y < 700) {
-			this->selectedResource->setPosition(alignedPosition);
-			this->staticObjects.push_back(new StaticObject(*this->selectedResource));
-			this->resourceNumbersText[this->selectedResoureceIndex].setString(std::to_string(--this->resourceNumbers[this->selectedResoureceIndex]));
+
+		this->selectedResource->setPosition(alignedPosition);
+		if (this->checkOverlaping(*this->selectedResource)) {
+
+			if (alignedPosition.x < 900 && alignedPosition.y < 700) {
+				this->staticObjects.push_back(new StaticObject(*this->selectedResource));
+				this->resourceNumbersText[this->selectedResoureceIndex].setString(std::to_string(--this->resourceNumbers[this->selectedResoureceIndex]));
+			}
+			this->clickedResource = false;
+			this->selectedResoureceIndex = -1;
+			std::cout << "STAVLJENO " << this->selectedResource->getGlobalBounds().left << this->selectedResource->getGlobalBounds().top
+				<< this->selectedResource->getGlobalBounds().height << this->selectedResource->getGlobalBounds().width << std::endl;
+
 		}
-		this->clickedResource = false;
-		this->selectedResoureceIndex = -1;
-		std::cout << "STAVLJENO " << this->selectedResource->getGlobalBounds().left << this->selectedResource->getGlobalBounds().top
-			<< this->selectedResource->getGlobalBounds().height << this->selectedResource->getGlobalBounds().width << std::endl;
-		
 	}
 }
 
-void Level::update()
+void Level::update(float deltaTime)
 {
-
+	this->updateBalls(deltaTime);
 }
+
 
 void Level::render(sf::RenderTarget& target)
 {
@@ -158,6 +224,9 @@ void Level::render(sf::RenderTarget& target)
 	}
 	for (Resource* res : this->resources) {
 		target.draw(*res->sprite);
+	}
+	for (DynamicObject* object : this->dynamicObjects) {
+		object->render(target);
 	}
 	for (sf::Text t : this->resourceNumbersText) {
 		target.draw(t);
@@ -180,5 +249,8 @@ Level::~Level()
 	for (size_t i = 0; i < this->resources.size(); i++) {
 		delete this->resources[i]->sprite;
 		delete this->resources[i];
+	}
+	for (size_t i = 0; i < this->dynamicObjects.size(); i++) {
+		delete this->dynamicObjects[i];
 	}
 }
