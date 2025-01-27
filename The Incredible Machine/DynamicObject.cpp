@@ -38,6 +38,11 @@ void DynamicObject::setVelocity(sf::Vector2f velocity)
     this->velocity = velocity;
 }
 
+void DynamicObject::setPosition(sf::Vector2f position)
+{
+    this->shape.setPosition(position);
+}
+
 const sf::FloatRect& DynamicObject::getGlobalBounds()
 {
     return this->sprite.getGlobalBounds();

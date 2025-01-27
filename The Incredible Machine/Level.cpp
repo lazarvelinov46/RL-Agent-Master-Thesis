@@ -21,15 +21,22 @@ void Level::initTextures()
 
 void Level::initStaticObjects()
 {
-	this->staticObjects.push_back(new StaticObject(0, 760, 1200, 40, sf::Color::Red));
+	this->staticObjects.push_back(new StaticObject(0, 760, 1200, 40, sf::Color::Red,StaticObjectType::PLATFORM));
 
-	this->staticObjects.push_back(new StaticObject(100, 600, 150, 20, sf::Color::Blue));
-	this->staticObjects.push_back(new StaticObject(300, 500, 150, 20, sf::Color::Blue));
-	this->staticObjects.push_back(new StaticObject(600, 300, 150, 20, sf::Color::Blue));
+	this->staticObjects.push_back(new StaticObject(100, 600, 150, 20, sf::Color::Blue, StaticObjectType::PLATFORM));
+	this->staticObjects.push_back(new StaticObject(300, 500, 150, 20, sf::Color::Blue, StaticObjectType::PLATFORM));
+	this->staticObjects.push_back(new StaticObject(600, 300, 150, 20, sf::Color::Blue, StaticObjectType::PLATFORM));
 
-	this->staticObjects.push_back(new StaticObject(850, 400, 20, 40, sf::Color::Green));
-	this->staticObjects.push_back(new StaticObject(850, 440, 140, 20, sf::Color::Green));
-	this->staticObjects.push_back(new StaticObject(970, 400, 20, 40, sf::Color::Green));
+	this->staticObjects.push_back(new StaticObject(850, 400, 20, 40, sf::Color::Green, StaticObjectType::PLATFORM));
+	this->staticObjects.push_back(new StaticObject(850, 440, 140, 20, sf::Color::Green, StaticObjectType::PLATFORM));
+	this->staticObjects.push_back(new StaticObject(970, 400, 20, 40, sf::Color::Green, StaticObjectType::PLATFORM));
+}
+
+void Level::initStaticWheels()
+{
+	this->staticWheels.push_back(new StaticWheel(200, 610.f, 10.f, sf::Color::Yellow));
+	this->staticWheels.push_back(new StaticWheel(400, 510.f, 10.f, sf::Color::Yellow));
+	this->staticWheels.push_back(new StaticWheel(700, 310.f, 10.f, sf::Color::Yellow));
 }
 
 void Level::initDynamicObjects()
@@ -125,7 +132,7 @@ void Level::updateBalls(float deltaTime)
 {
 	for (size_t i = 0; i < this->dynamicObjects.size(); i++) {
 		this->dynamicObjects[i]->setVelocity(sf::Vector2f(this->dynamicObjects[i]->getVelocity().x,
-			this->dynamicObjects[i]->getVelocity().y + this->gravity * deltaTime));
+			this->dynamicObjects[i]->getVelocity().y + this->gravity*deltaTime));
 
 		sf::Vector2f newPosition = this->dynamicObjects[i]->getPosition()+this->dynamicObjects[i]->getVelocity();
 
@@ -140,11 +147,12 @@ void Level::updateBalls(float deltaTime)
 				newPosition.y = staticObjectY - ballHeight;
 
 				this->dynamicObjects[i]->setVelocity(sf::Vector2f(this->dynamicObjects[i]->getVelocity().x, 0.f));
+				this->dynamicObjects[i]->setPosition(newPosition);
 				break;
 			}
 		}
 		if (!collision) {
-			this->dynamicObjects[i]->getShape().setPosition(newPosition);
+			this->dynamicObjects[i]->setPosition(newPosition);
 		}
 	}
 }
@@ -160,6 +168,8 @@ void Level::initLevel()
 	this->initTextures();
 
 	this->initStaticObjects();
+
+	this->initStaticWheels();
 
 	this->initDynamicObjects();
 
@@ -192,13 +202,42 @@ void Level::handleClick(sf::Vector2f& mousePosition)
 		}
 	}
 	else {
+		if (this->selectedResoureceIndex == 0) {
+			//placing belt first time
+			
+			for (const StaticWheel* wheel : this->staticWheels) {
+				if (wheel->getGlobalBounds().contains(mousePosition)) {
+					this->activeBeltPlacement = true;
+					this->beltStart = sf::Vector2f(wheel->getGlobalBounds().left, wheel->getGlobalBounds().top);
+					this->endPointsBelt[0].position = this->beltStart;
+					this->endPointsBelt[1].position = mousePosition;
+					this->endPointsBelt[0].color = sf::Color::Yellow;
+					this->endPointsBelt[1].color = sf::Color::Yellow;
+					std::cout << "jea" << std::endl;
+					break;
+				}
+			}
+			for (const StaticObject* object : this->staticObjects) {
+				if (object->getGlobalBounds().contains(mousePosition)&&object->getObjectType()==StaticObjectType::GEAR) {
+					this->activeBeltPlacement = true;
+					this->beltStart = sf::Vector2f(object->getGlobalBounds().left, object->getGlobalBounds().top);
+					this->endPointsBelt[0].position = this->beltStart;
+					this->endPointsBelt[1].position = mousePosition;
+					this->endPointsBelt[0].color = sf::Color::Yellow;
+					this->endPointsBelt[1].color = sf::Color::Yellow;
+					std::cout << "jea" << std::endl;
+					break;
+				}
+			}
+
+		}
 		sf::Vector2f alignedPosition = this->alignToGrid(mousePosition);
 
 		this->selectedResource->setPosition(alignedPosition);
 		if (this->checkOverlaping(*this->selectedResource)) {
 
 			if (alignedPosition.x < 900 && alignedPosition.y < 700) {
-				this->staticObjects.push_back(new StaticObject(*this->selectedResource));
+				this->staticObjects.push_back(new StaticObject(*this->selectedResource,this->selectedResoureceIndex==1?StaticObjectType::GEAR:StaticObjectType::PLATFORM));
 				this->resourceNumbersText[this->selectedResoureceIndex].setString(std::to_string(--this->resourceNumbers[this->selectedResoureceIndex]));
 			}
 			this->clickedResource = false;
@@ -213,13 +252,18 @@ void Level::handleClick(sf::Vector2f& mousePosition)
 void Level::update(float deltaTime)
 {
 	this->updateBalls(deltaTime);
+	if (this->activeBeltPlacement) {
+		
+	}
 }
 
 
 void Level::render(sf::RenderTarget& target)
 {
-	
 	for (StaticObject* object : this->staticObjects) {
+		object->render(target);
+	}
+	for (StaticWheel* object : this->staticWheels) {
 		object->render(target);
 	}
 	for (Resource* res : this->resources) {
@@ -233,6 +277,11 @@ void Level::render(sf::RenderTarget& target)
 	}
 	if (this->clickedResource) {
 		target.draw(*this->selectedResource);
+	}
+	if (this->activeBeltPlacement) {
+		
+		this->endPointsBelt[1].position = target.mapPixelToCoords(sf::Mouse::getPosition(target));
+		target.draw(this->endPointsBelt, 2, sf::Lines);
 	}
 }
 
@@ -252,5 +301,8 @@ Level::~Level()
 	}
 	for (size_t i = 0; i < this->dynamicObjects.size(); i++) {
 		delete this->dynamicObjects[i];
+	}
+	for (size_t i = 0;i < this->staticWheels.size();i++) {
+		delete this->staticWheels[i];
 	}
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include "StaticObject.h"
 #include "DynamicObject.h"
+#include "StaticWheel.h"
 
 typedef struct Resource {
 	sf::Sprite* sprite;
@@ -19,23 +20,30 @@ class Level
 private:
 	std::vector<StaticObject*> staticObjects;
 	std::vector<DynamicObject*> dynamicObjects;
+	std::vector<StaticWheel*> staticWheels;
 
 	std::vector<Resource*> resources;
 	sf::Texture beltTexture;
 	sf::Texture gearTexture;
 	sf::Sprite* selectedResource;
 	sf::Font font;	
+
+	sf::Vector2f beltStart;
+	sf::Vertex endPointsBelt[2];
 	
 	std::vector<int> resourceNumbers;
 	std::vector<sf::Text> resourceNumbersText;
 
 	bool clickedResource = false;
+	bool activeBeltPlacement = false;
+	bool validBeltPlacement = false;
 	int selectedResoureceIndex = -1;
-	float gravity = 10.f;
+	float gravity = 30.f;
 
 	void initFont();
 	void initTextures();
 	void initStaticObjects();
+	void initStaticWheels();
 	void initDynamicObjects();
 	void initResources();
 
