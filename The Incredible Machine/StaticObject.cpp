@@ -30,6 +30,12 @@ void StaticObject::render(sf::RenderTarget& target)
 	target.draw(this->object);
 }
 
+void StaticObject::move(float speed)
+{
+	this->moving = true;
+	this->speed = speed;
+}
+
 sf::FloatRect StaticObject::getGlobalBounds()const
 {
 	return this->object.getGlobalBounds();

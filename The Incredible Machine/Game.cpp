@@ -63,6 +63,8 @@ void Game::handleInput(sf::RenderWindow& window)
 
 			if (playButton.getGlobalBounds().contains(position)) {
 				std::cout << "PLAY pressed " << std::endl;
+				this->isPlaying = true;
+				level.setIsPlaying(this->isPlaying);
 			}
 
 			level.handleClick(position);

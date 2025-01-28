@@ -41,6 +41,8 @@ private:
 	int selectedResoureceIndex = -1;
 	int selectedResourceListPosition = -1;
 	float gravity = 30.f;
+	float drag = 0.95f;
+	float velocityMinX = 0.5f;
 
 	bool isPlaying = false;
 
@@ -51,7 +53,10 @@ private:
 	void initDynamicObjects();
 	void initResources();
 
+	void startPlatform(const StaticObject* object);
+	bool hasWheel(const StaticObject* object);
 	bool checkOverlaping(const sf::Sprite& newObject);
+	void applyDrag(DynamicObject* object);
 
 	const Resource* getResourceById(const int id)const;
 
@@ -68,6 +73,7 @@ public:
 	void render(sf::RenderTarget& target);
 
 	const sf::FloatRect& getBouds()const;
+	void setIsPlaying(bool playing);
 	virtual ~Level();
 };
 

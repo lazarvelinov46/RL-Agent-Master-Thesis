@@ -21,7 +21,7 @@ void Level::initTextures()
 
 void Level::initStaticObjects()
 {
-	this->staticObjects.push_back(new StaticObject(0, 760, 1200, 40, sf::Color::Red,StaticObjectType::PLATFORM));
+	this->staticObjects.push_back(new StaticObject(0, 760, 1200, 40, sf::Color::Red,StaticObjectType::FLOOR));
 
 	this->staticObjects.push_back(new StaticObject(100, 600, 150, 20, sf::Color::Blue, StaticObjectType::PLATFORM));
 	this->staticObjects.push_back(new StaticObject(300, 500, 150, 20, sf::Color::Blue, StaticObjectType::PLATFORM));
@@ -89,6 +89,25 @@ void Level::initResources()
 	}
 }
 
+void Level::startPlatform(const StaticObject* object)
+{
+	for (const std::vector<sf::Vertex>& belt : this->belts) {
+		if (object->getGlobalBounds().contains(belt[0].position)) {
+			for (StaticObject* platform : this->staticObjects) {
+				if (platform->getObjectType() == StaticObjectType::PLATFORM &&
+					platform->getGlobalBounds().contains(belt[1].position)) {
+					platform->move(10.f);
+				}
+			}
+		}
+	}
+}
+
+bool Level::hasWheel(const StaticObject* object)
+{
+	return false;
+}
+
 bool Level::checkOverlaping(const sf::Sprite& newObject)
 {
 	std::cout << "TO PLACE X: " << newObject.getGlobalBounds().left
@@ -110,6 +129,15 @@ bool Level::checkOverlaping(const sf::Sprite& newObject)
 		}
 	}
 	return true;
+}
+
+void Level::applyDrag(DynamicObject* object)
+{
+	if (object->getVelocity().x > 0) {
+		std::cout << "KARUZ" << std::endl;
+	}
+	float newVelocity = object->getVelocity().x * this->drag < this->velocityMinX ? 0.f : object->getVelocity().x * this->drag;
+	object->setVelocity(sf::Vector2f(newVelocity, object->getVelocity().y));
 }
 
 const Resource* Level::getResourceById(int id) const
@@ -141,19 +169,30 @@ void Level::updateBalls(float deltaTime)
 		for (const StaticObject* object : this->staticObjects) {
 			if (this->dynamicObjects[i]->getShape().getGlobalBounds().intersects(object->getGlobalBounds())) {
 				collision = true;
-
+				std::cout << "KURCINA" << std::endl;
 				float staticObjectY = object->getGlobalBounds().top;
 				float ballHeight = this->dynamicObjects[i]->getShape().getGlobalBounds().height;
 
 				newPosition.y = staticObjectY - ballHeight;
 
-				this->dynamicObjects[i]->setVelocity(sf::Vector2f(this->dynamicObjects[i]->getVelocity().x, 0.f));
+				if (object->getObjectType() == StaticObjectType::GEAR) {
+					this->startPlatform(object);
+				}
+				
+				if (object->getMoving() && this->dynamicObjects[i]->getVelocity().x == 0.f) {
+					this->dynamicObjects[i]->setVelocity(sf::Vector2f(object->getSpeed(), 0.f));
+				}
+				else {
+					this->dynamicObjects[i]->setVelocity(sf::Vector2f(this->dynamicObjects[i]->getVelocity().x, 0.f));
+				}
+				
 				this->dynamicObjects[i]->setPosition(newPosition);
 				break;
 			}
 		}
 		if (!collision) {
 			this->dynamicObjects[i]->setPosition(newPosition);
+			this->applyDrag(this->dynamicObjects[i]);
 		}
 	}
 }
@@ -332,6 +371,11 @@ void Level::render(sf::RenderTarget& target)
 const sf::FloatRect& Level::getBouds() const
 {
 	return sf::FloatRect(0,0,1000,800);
+}
+
+void Level::setIsPlaying(bool playing)
+{
+	this->isPlaying = playing;
 }
 
 Level::~Level()
