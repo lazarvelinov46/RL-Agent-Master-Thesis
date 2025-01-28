@@ -67,7 +67,7 @@ void Game::handleInput(sf::RenderWindow& window)
 
 			level.handleClick(position);
 		}
-		if (ev.type == sf::Event::MouseButtonPressed && ev.mouseButton.button == sf::Mouse::Left) {
+		if (ev.type == sf::Event::MouseButtonPressed && ev.mouseButton.button == sf::Mouse::Right) {
 			level.handleRightClick();
 		}
 	}
@@ -81,7 +81,7 @@ void Game::update(float deltaTime)
 
 void Game::render(sf::RenderTarget& target)
 {
-	target.clear();
+	target.clear(sf::Color::White);
 	target.draw(this->panel);
 	target.draw(this->gameScreen);
 	this->level.render(target);

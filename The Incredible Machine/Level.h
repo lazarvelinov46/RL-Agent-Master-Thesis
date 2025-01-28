@@ -21,6 +21,7 @@ private:
 	std::vector<StaticObject*> staticObjects;
 	std::vector<DynamicObject*> dynamicObjects;
 	std::vector<StaticWheel*> staticWheels;
+	std::vector<std::vector<sf::Vertex>> belts;
 
 	std::vector<Resource*> resources;
 	sf::Texture beltTexture;
@@ -38,7 +39,10 @@ private:
 	bool activeBeltPlacement = false;
 	bool validBeltPlacement = false;
 	int selectedResoureceIndex = -1;
+	int selectedResourceListPosition = -1;
 	float gravity = 30.f;
+
+	bool isPlaying = false;
 
 	void initFont();
 	void initTextures();

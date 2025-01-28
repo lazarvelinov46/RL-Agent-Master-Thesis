@@ -130,6 +130,7 @@ const sf::Vector2f& Level::alignToGrid(const sf::Vector2f& pos) const
 
 void Level::updateBalls(float deltaTime)
 {
+	if (!isPlaying)return;
 	for (size_t i = 0; i < this->dynamicObjects.size(); i++) {
 		this->dynamicObjects[i]->setVelocity(sf::Vector2f(this->dynamicObjects[i]->getVelocity().x,
 			this->dynamicObjects[i]->getVelocity().y + this->gravity*deltaTime));
@@ -197,6 +198,7 @@ void Level::handleClick(sf::Vector2f& mousePosition)
 				this->selectedResource = this->resources[i]->sprite;
 				this->clickedResource = true;
 				this->selectedResoureceIndex = this->resources[i]->id;
+				this->selectedResourceListPosition = i;
 				break;
 			}
 		}
@@ -236,23 +238,20 @@ void Level::handleClick(sf::Vector2f& mousePosition)
 			this->validBeltPlacement = false;
 			for (const StaticWheel* wheel : this->staticWheels) {
 				if (wheel->getGlobalBounds().contains(mousePosition)) {
-					this->endPointsBelt[0].color = sf::Color::Green;
-					this->endPointsBelt[1].color = sf::Color::Green;
-					std::cout << "jea" << std::endl;
+					this->validBeltPlacement = true;
 					break;
 				}
 			}
-			for (const StaticObject* object : this->staticObjects) {
-				if (object->getGlobalBounds().contains(mousePosition) && object->getObjectType() == StaticObjectType::GEAR) {
-					this->activeBeltPlacement = true;
-					this->beltStart = sf::Vector2f(object->getGlobalBounds().left, object->getGlobalBounds().top);
-					this->endPointsBelt[0].position = this->beltStart;
-					this->endPointsBelt[1].position = mousePosition;
-					this->endPointsBelt[0].color = sf::Color::Yellow;
-					this->endPointsBelt[1].color = sf::Color::Yellow;
-					std::cout << "jea" << std::endl;
-					break;
-				}
+			if (this->validBeltPlacement) {
+				this->belts.push_back({ this->beltStart,mousePosition });
+				this->belts.push_back({ sf::Vector2f(mousePosition.x + this->staticWheels[0]->getGlobalBounds().width,mousePosition.y + this->staticWheels[0]->getGlobalBounds().height),
+					sf::Vector2f(this->beltStart.x + this->staticWheels[0]->getGlobalBounds().width,this->beltStart.y + this->staticWheels[0]->getGlobalBounds().height) });
+				this->activeBeltPlacement = false;
+				this->resourceNumbersText[this->selectedResoureceIndex].setString(std::to_string(--this->resourceNumbers[this->selectedResoureceIndex]));
+				this->clickedResource = false;
+				this->selectedResoureceIndex = -1;
+				this->resources.erase(this->resources.begin()+this->selectedResourceListPosition);
+				this->selectedResourceListPosition = 0;
 			}
 
 		}
@@ -277,11 +276,15 @@ void Level::handleClick(sf::Vector2f& mousePosition)
 	}
 }
 
+void Level::handleRightClick()
+{
+	this->activeBeltPlacement = false;
+}
+
 void Level::update(float deltaTime)
 {
 	this->updateBalls(deltaTime);
 	if (this->activeBeltPlacement) {
-
 		for (const StaticWheel* wheel : this->staticWheels) {
 			if (wheel->getGlobalBounds().contains(this->endPointsBelt[1].position)) {
 				this->endPointsBelt[0].color = sf::Color::Green;
@@ -301,6 +304,10 @@ void Level::render(sf::RenderTarget& target)
 	for (StaticWheel* object : this->staticWheels) {
 		object->render(target);
 	}
+	for (size_t i = 0;i < this->belts.size();i++) {
+		sf::Vertex line[] = { this->belts[i][0],this->belts[i][1]};
+		target.draw(line, 2, sf::Lines);
+	}
 	for (Resource* res : this->resources) {
 		target.draw(*res->sprite);
 	}
@@ -310,9 +317,11 @@ void Level::render(sf::RenderTarget& target)
 	for (sf::Text t : this->resourceNumbersText) {
 		target.draw(t);
 	}
+	/*
 	if (this->clickedResource) {
 		target.draw(*this->selectedResource);
 	}
+	*/
 	if (this->activeBeltPlacement) {
 		sf::Vector2f mousePosition = target.mapPixelToCoords(sf::Mouse::getPosition(*dynamic_cast<sf::RenderWindow*>(&target)));
 		this->endPointsBelt[1].position = mousePosition;

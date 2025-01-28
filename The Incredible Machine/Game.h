@@ -18,6 +18,8 @@ private:
 	Level level;
 	State* nextState;
 
+	bool isPlaying = false;
+
 	void initFont();
 	void initText();
 	void initPanel();
