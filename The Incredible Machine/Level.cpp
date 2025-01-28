@@ -202,7 +202,7 @@ void Level::handleClick(sf::Vector2f& mousePosition)
 		}
 	}
 	else {
-		if (this->selectedResoureceIndex == 0) {
+		if (this->selectedResoureceIndex == 0&&!this->activeBeltPlacement) {
 			//placing belt first time
 			
 			for (const StaticWheel* wheel : this->staticWheels) {
@@ -231,21 +231,49 @@ void Level::handleClick(sf::Vector2f& mousePosition)
 			}
 
 		}
-		sf::Vector2f alignedPosition = this->alignToGrid(mousePosition);
-
-		this->selectedResource->setPosition(alignedPosition);
-		if (this->checkOverlaping(*this->selectedResource)) {
-
-			if (alignedPosition.x < 900 && alignedPosition.y < 700) {
-				this->staticObjects.push_back(new StaticObject(*this->selectedResource,this->selectedResoureceIndex==1?StaticObjectType::GEAR:StaticObjectType::PLATFORM));
-				this->resourceNumbersText[this->selectedResoureceIndex].setString(std::to_string(--this->resourceNumbers[this->selectedResoureceIndex]));
+		else if (this->selectedResoureceIndex == 0 && this->activeBeltPlacement) {
+			//placing belt second time
+			this->validBeltPlacement = false;
+			for (const StaticWheel* wheel : this->staticWheels) {
+				if (wheel->getGlobalBounds().contains(mousePosition)) {
+					this->endPointsBelt[0].color = sf::Color::Green;
+					this->endPointsBelt[1].color = sf::Color::Green;
+					std::cout << "jea" << std::endl;
+					break;
+				}
 			}
-			this->clickedResource = false;
-			this->selectedResoureceIndex = -1;
-			std::cout << "STAVLJENO " << this->selectedResource->getGlobalBounds().left << this->selectedResource->getGlobalBounds().top
-				<< this->selectedResource->getGlobalBounds().height << this->selectedResource->getGlobalBounds().width << std::endl;
+			for (const StaticObject* object : this->staticObjects) {
+				if (object->getGlobalBounds().contains(mousePosition) && object->getObjectType() == StaticObjectType::GEAR) {
+					this->activeBeltPlacement = true;
+					this->beltStart = sf::Vector2f(object->getGlobalBounds().left, object->getGlobalBounds().top);
+					this->endPointsBelt[0].position = this->beltStart;
+					this->endPointsBelt[1].position = mousePosition;
+					this->endPointsBelt[0].color = sf::Color::Yellow;
+					this->endPointsBelt[1].color = sf::Color::Yellow;
+					std::cout << "jea" << std::endl;
+					break;
+				}
+			}
 
 		}
+		else {
+			sf::Vector2f alignedPosition = this->alignToGrid(mousePosition);
+
+			this->selectedResource->setPosition(alignedPosition);
+			if (this->checkOverlaping(*this->selectedResource)) {
+
+				if (alignedPosition.x < 900 && alignedPosition.y < 700) {
+					this->staticObjects.push_back(new StaticObject(*this->selectedResource, this->selectedResoureceIndex == 1 ? StaticObjectType::GEAR : StaticObjectType::PLATFORM));
+					this->resourceNumbersText[this->selectedResoureceIndex].setString(std::to_string(--this->resourceNumbers[this->selectedResoureceIndex]));
+				}
+				this->clickedResource = false;
+				this->selectedResoureceIndex = -1;
+				std::cout << "STAVLJENO " << this->selectedResource->getGlobalBounds().left << this->selectedResource->getGlobalBounds().top
+					<< this->selectedResource->getGlobalBounds().height << this->selectedResource->getGlobalBounds().width << std::endl;
+
+			}
+		}
+		
 	}
 }
 
@@ -253,7 +281,14 @@ void Level::update(float deltaTime)
 {
 	this->updateBalls(deltaTime);
 	if (this->activeBeltPlacement) {
-		
+
+		for (const StaticWheel* wheel : this->staticWheels) {
+			if (wheel->getGlobalBounds().contains(this->endPointsBelt[1].position)) {
+				this->endPointsBelt[0].color = sf::Color::Green;
+				this->endPointsBelt[1].color = sf::Color::Green;
+				break;
+			}
+		}
 	}
 }
 
@@ -279,8 +314,8 @@ void Level::render(sf::RenderTarget& target)
 		target.draw(*this->selectedResource);
 	}
 	if (this->activeBeltPlacement) {
-		
-		this->endPointsBelt[1].position = target.mapPixelToCoords(sf::Mouse::getPosition(target));
+		sf::Vector2f mousePosition = target.mapPixelToCoords(sf::Mouse::getPosition(*dynamic_cast<sf::RenderWindow*>(&target)));
+		this->endPointsBelt[1].position = mousePosition;
 		target.draw(this->endPointsBelt, 2, sf::Lines);
 	}
 }

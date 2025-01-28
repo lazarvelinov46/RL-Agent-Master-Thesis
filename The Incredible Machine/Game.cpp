@@ -67,6 +67,9 @@ void Game::handleInput(sf::RenderWindow& window)
 
 			level.handleClick(position);
 		}
+		if (ev.type == sf::Event::MouseButtonPressed && ev.mouseButton.button == sf::Mouse::Left) {
+			level.handleRightClick();
+		}
 	}
 	//handle input on level side
 }

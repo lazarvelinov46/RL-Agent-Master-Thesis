@@ -59,6 +59,7 @@ public:
 	void initLevel();
 	void handleInput(sf::RenderWindow& window);
 	void handleClick(sf::Vector2f& mousePosition);
+	void handleRightClick();
 	void update(float deltaTime=0);
 	void render(sf::RenderTarget& target);
 
