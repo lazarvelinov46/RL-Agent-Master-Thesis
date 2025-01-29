@@ -40,8 +40,9 @@ private:
 	bool validBeltPlacement = false;
 	int selectedResoureceIndex = -1;
 	int selectedResourceListPosition = -1;
+	int levelWidth = 1000;
 	float gravity = 30.f;
-	float drag = 0.95f;
+	float drag = 0.98f;
 	float velocityMinX = 0.5f;
 
 	bool isPlaying = false;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Game.h"
+#include "GameAI.h"
 
 
 enum MenuOption{PLAYER,AI,LEVEL,QUIT};

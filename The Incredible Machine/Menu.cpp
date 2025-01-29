@@ -62,6 +62,7 @@ void Menu::handleInput(sf::RenderWindow& window)
 					this->nextState = new Game();
 					break;
 				case AI:
+					this->nextState = new GameAI();
 					break;
 				case LEVEL:
 					break;

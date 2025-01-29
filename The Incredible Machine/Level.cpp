@@ -27,9 +27,9 @@ void Level::initStaticObjects()
 	this->staticObjects.push_back(new StaticObject(300, 500, 150, 20, sf::Color::Blue, StaticObjectType::PLATFORM));
 	this->staticObjects.push_back(new StaticObject(600, 300, 150, 20, sf::Color::Blue, StaticObjectType::PLATFORM));
 
-	this->staticObjects.push_back(new StaticObject(850, 400, 20, 40, sf::Color::Green, StaticObjectType::PLATFORM));
-	this->staticObjects.push_back(new StaticObject(850, 440, 140, 20, sf::Color::Green, StaticObjectType::PLATFORM));
-	this->staticObjects.push_back(new StaticObject(970, 400, 20, 40, sf::Color::Green, StaticObjectType::PLATFORM));
+	this->staticObjects.push_back(new StaticObject(830, 400, 20, 40, sf::Color::Green, StaticObjectType::WALL));
+	this->staticObjects.push_back(new StaticObject(830, 440, 160, 20, sf::Color::Green, StaticObjectType::PLATFORM));
+	this->staticObjects.push_back(new StaticObject(970, 400, 20, 40, sf::Color::Green, StaticObjectType::WALL));
 }
 
 void Level::initStaticWheels()
@@ -94,9 +94,9 @@ void Level::startPlatform(const StaticObject* object)
 	for (const std::vector<sf::Vertex>& belt : this->belts) {
 		if (object->getGlobalBounds().contains(belt[0].position)) {
 			for (StaticObject* platform : this->staticObjects) {
-				if (platform->getObjectType() == StaticObjectType::PLATFORM &&
+				if (!platform->getMoving()&&platform->getObjectType() == StaticObjectType::PLATFORM &&
 					platform->getGlobalBounds().contains(belt[1].position)) {
-					platform->move(10.f);
+					platform->move(5.f);
 				}
 			}
 		}
@@ -133,10 +133,7 @@ bool Level::checkOverlaping(const sf::Sprite& newObject)
 
 void Level::applyDrag(DynamicObject* object)
 {
-	if (object->getVelocity().x > 0) {
-		std::cout << "KARUZ" << std::endl;
-	}
-	float newVelocity = object->getVelocity().x * this->drag < this->velocityMinX ? 0.f : object->getVelocity().x * this->drag;
+	float newVelocity = std::abs(object->getVelocity().x * this->drag) < this->velocityMinX ? 0.f : object->getVelocity().x * this->drag;
 	object->setVelocity(sf::Vector2f(newVelocity, object->getVelocity().y));
 }
 
@@ -160,39 +157,76 @@ void Level::updateBalls(float deltaTime)
 {
 	if (!isPlaying)return;
 	for (size_t i = 0; i < this->dynamicObjects.size(); i++) {
-		this->dynamicObjects[i]->setVelocity(sf::Vector2f(this->dynamicObjects[i]->getVelocity().x,
-			this->dynamicObjects[i]->getVelocity().y + this->gravity*deltaTime));
+		DynamicObject* ball = this->dynamicObjects[i];
 
-		sf::Vector2f newPosition = this->dynamicObjects[i]->getPosition()+this->dynamicObjects[i]->getVelocity();
+		sf::Vector2f newPosition = ball->getPosition()+ ball->getVelocity();
+		sf::FloatRect ballBounds = ball->getShape().getGlobalBounds();
+		float ballBottom = ballBounds.top + ballBounds.height;
+		float ballRight = ballBounds.left + ballBounds.width;
 
 		bool collision = false;
 		for (const StaticObject* object : this->staticObjects) {
-			if (this->dynamicObjects[i]->getShape().getGlobalBounds().intersects(object->getGlobalBounds())) {
+			sf::FloatRect objectBounds = object->getGlobalBounds();
+			if (ballBounds.intersects(objectBounds)) {
 				collision = true;
-				std::cout << "KURCINA" << std::endl;
-				float staticObjectY = object->getGlobalBounds().top;
-				float ballHeight = this->dynamicObjects[i]->getShape().getGlobalBounds().height;
+				float objectBottom = objectBounds.top+objectBounds.height;
+				float objectRight = objectBounds.left + objectBounds.width;
 
-				newPosition.y = staticObjectY - ballHeight;
+				float topCollision = ballBottom - objectBounds.top;
+				float bottomCollision = objectBottom - ballBounds.top;
+				float leftCollision = ballRight - objectBounds.left;
+				float rightCollision = objectRight - ballBounds.left;
+				
+				if (topCollision <leftCollision && topCollision<rightCollision) {
+					//top collision
+					newPosition.y = objectBounds.top - ballBounds.height;
+					ball->setVelocity(sf::Vector2f(ball->getVelocity().x, 0.f));
+				}
+
+				else if (bottomCollision<leftCollision && bottomCollision<rightCollision) {
+					//bottom collision
+					newPosition.y = objectBottom;
+					ball->setVelocity(sf::Vector2f(ball->getVelocity().x, -ball->getVelocity().y));
+				}
+				else if (leftCollision<topCollision && leftCollision<bottomCollision) {
+					//left collision
+					newPosition.x = objectBounds.left - ballBounds.width;
+					ball->setVelocity(sf::Vector2f(ball->getVelocity().x*-0.9f, ball->getVelocity().y));
+				}
+				else if (rightCollision<topCollision&& rightCollision<bottomCollision) {
+					//left collision
+					newPosition.x = objectRight;
+					ball->setVelocity(sf::Vector2f(ball->getVelocity().x * -0.9f, ball->getVelocity().y));
+				}
 
 				if (object->getObjectType() == StaticObjectType::GEAR) {
 					this->startPlatform(object);
 				}
 				
-				if (object->getMoving() && this->dynamicObjects[i]->getVelocity().x == 0.f) {
-					this->dynamicObjects[i]->setVelocity(sf::Vector2f(object->getSpeed(), 0.f));
+				if (object->getMoving() && ball->getVelocity().x == 0.f) {
+					ball->setVelocity(sf::Vector2f(object->getSpeed(), 0.f));
 				}
 				else {
-					this->dynamicObjects[i]->setVelocity(sf::Vector2f(this->dynamicObjects[i]->getVelocity().x, 0.f));
+					ball->setVelocity(sf::Vector2f(ball->getVelocity().x, 0.f));
 				}
 				
-				this->dynamicObjects[i]->setPosition(newPosition);
+				ball->setPosition(newPosition);
 				break;
 			}
 		}
+
+		ball->setVelocity(sf::Vector2f(ball->getVelocity().x, ball->getVelocity().y + this->gravity * deltaTime));
+		if (newPosition.x < 0) {
+			newPosition.x = 0;
+			ball->setVelocity(sf::Vector2f(-0.9f*ball->getVelocity().x, ball->getVelocity().y));
+		}
+		else if (newPosition.x + ball->getGlobalBounds().width > this->levelWidth) {
+			newPosition.x = this->levelWidth - ball->getGlobalBounds().width;
+			ball->setVelocity(sf::Vector2f(-0.9f*ball->getVelocity().x, ball->getVelocity().y));
+		}
 		if (!collision) {
-			this->dynamicObjects[i]->setPosition(newPosition);
-			this->applyDrag(this->dynamicObjects[i]);
+			ball->setPosition(newPosition);
+			this->applyDrag(ball);
 		}
 	}
 }
@@ -254,7 +288,6 @@ void Level::handleClick(sf::Vector2f& mousePosition)
 					this->endPointsBelt[1].position = mousePosition;
 					this->endPointsBelt[0].color = sf::Color::Yellow;
 					this->endPointsBelt[1].color = sf::Color::Yellow;
-					std::cout << "jea" << std::endl;
 					break;
 				}
 			}
@@ -266,7 +299,6 @@ void Level::handleClick(sf::Vector2f& mousePosition)
 					this->endPointsBelt[1].position = mousePosition;
 					this->endPointsBelt[0].color = sf::Color::Yellow;
 					this->endPointsBelt[1].color = sf::Color::Yellow;
-					std::cout << "jea" << std::endl;
 					break;
 				}
 			}
