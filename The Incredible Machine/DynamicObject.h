@@ -20,6 +20,6 @@ public:
 	void setVelocity(sf::Vector2f velocity);
 	void setPosition(sf::Vector2f position);
 
-	const sf::FloatRect& getGlobalBounds();
+	sf::FloatRect getGlobalBounds()const;
 };
 

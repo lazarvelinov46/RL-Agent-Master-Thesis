@@ -4,6 +4,7 @@
 #include <time.h>
 #include <vector>
 #include <stack>
+#include <unordered_map>
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
 #include <SFML/Audio.hpp>

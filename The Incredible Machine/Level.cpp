@@ -21,7 +21,7 @@ void Level::initTextures()
 
 void Level::initStaticObjects()
 {
-	this->staticObjects.push_back(new StaticObject(0, 760, 1200, 40, sf::Color::Red,StaticObjectType::FLOOR));
+	this->staticObjects.push_back(new StaticObject(0, 760, 1200, 50, sf::Color::Red,StaticObjectType::FLOOR));
 
 	this->staticObjects.push_back(new StaticObject(100, 600, 150, 20, sf::Color::Blue, StaticObjectType::PLATFORM));
 	this->staticObjects.push_back(new StaticObject(300, 500, 150, 20, sf::Color::Blue, StaticObjectType::PLATFORM));
@@ -62,7 +62,7 @@ void Level::initResources()
 	resNum++;
 	for (size_t i = 0;i < gearNum;i++) {
 		sf::Sprite* gearSprite = new sf::Sprite(this->gearTexture);
-		gearSprite->setScale(0.2f, 0.2f);
+		gearSprite->setScale(0.19531f, 0.19531f);
 		gearSprite->setPosition(1050, 350);
 
 		sf::Text gearText;
@@ -124,6 +124,10 @@ bool Level::checkOverlaping(const sf::Sprite& newObject)
 		}
 	}
 	for (size_t i = 0; i < this->dynamicObjects.size(); i++) {
+		std::cout << "DYN X: " << this->dynamicObjects[i]->getGlobalBounds().left
+			<< "; DYN: " << this->dynamicObjects[i]->getGlobalBounds().top
+			<< "; DYN: " << this->dynamicObjects[i]->getGlobalBounds().width
+			<< "; DYN: " << this->dynamicObjects[i]->getGlobalBounds().height << std::endl;
 		if (newObject.getGlobalBounds().intersects(this->dynamicObjects[i]->getGlobalBounds())) {
 			return false;
 		}
@@ -148,8 +152,8 @@ const Resource* Level::getResourceById(int id) const
 
 const sf::Vector2f& Level::alignToGrid(const sf::Vector2f& pos) const
 {
-	float x = (float)(pos.x - (int)pos.x % 20);
-	float y = (float)(pos.y - (int)pos.y % 20);
+	float x = (float)(pos.x - (int)pos.x % 50);
+	float y = (float)(pos.y - (int)pos.y % 50);
 	return sf::Vector2f(x, y);
 }
 
@@ -398,6 +402,57 @@ void Level::render(sf::RenderTarget& target)
 		this->endPointsBelt[1].position = mousePosition;
 		target.draw(this->endPointsBelt, 2, sf::Lines);
 	}
+}
+
+bool Level::tryGearPlacement(sf::Vector2f position)
+{
+	this->selectedResource = this->resources.back()->sprite;
+	sf::Vector2f alignedPosition = this->alignToGrid(position);
+	this->selectedResource->setPosition(alignedPosition);
+	if (this->checkOverlaping(*this->selectedResource)) {
+		if (alignedPosition.x < 900 && alignedPosition.y < 700) {
+			this->staticObjects.push_back(new StaticObject(*this->selectedResource, StaticObjectType::GEAR ));
+			this->resourceNumbersText[1].setString(std::to_string(--this->resourceNumbers[1]));
+			this->resources.pop_back();
+		}
+		std::cout << "STAVLJENO " << this->selectedResource->getGlobalBounds().left << this->selectedResource->getGlobalBounds().top
+			<< this->selectedResource->getGlobalBounds().height << this->selectedResource->getGlobalBounds().width << std::endl;
+		return true;
+	}
+	else {
+		this->selectedResource->setPosition(1050, 350);
+		return false;
+	}
+}
+
+int Level::getNumberOfGears()
+{
+	return this->resourceNumbers[1];
+}
+
+std::vector<StaticObject*> Level::getStaticObjects()
+{
+	return this->staticObjects;
+}
+
+std::vector<StaticWheel*> Level::getStaticWheels()
+{
+	return this->staticWheels;
+}
+
+int Level::getNumberOfBelts()
+{
+	return this->resourceNumbers[0];
+}
+
+void Level::placeBelt(sf::Vector2f start, sf::Vector2f end)
+{
+	this->belts.push_back({start,end });
+	this->belts.push_back({ sf::Vector2f(end.x + this->staticWheels[0]->getGlobalBounds().width,end.y + this->staticWheels[0]->getGlobalBounds().height),
+		sf::Vector2f(start.x + this->staticWheels[0]->getGlobalBounds().width,start.y + this->staticWheels[0]->getGlobalBounds().height) });
+	//this->activeBeltPlacement = false;
+	this->resourceNumbersText[0].setString(std::to_string(--this->resourceNumbers[0]));
+	this->resources.erase(this->resources.begin());
 }
 
 const sf::FloatRect& Level::getBouds() const

@@ -73,8 +73,20 @@ public:
 	void update(float deltaTime=0);
 	void render(sf::RenderTarget& target);
 
+
+
 	const sf::FloatRect& getBouds()const;
 	void setIsPlaying(bool playing);
 	virtual ~Level();
+
+	//AI Game functions 
+	bool tryGearPlacement(sf::Vector2f position);
+	int getNumberOfGears();
+	std::vector<StaticObject*> getStaticObjects();
+	std::vector<StaticWheel*> getStaticWheels();
+
+	int getNumberOfBelts();
+	void placeBelt(sf::Vector2f start, sf::Vector2f end);
+
 };
 

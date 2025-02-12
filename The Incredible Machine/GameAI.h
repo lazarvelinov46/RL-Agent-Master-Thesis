@@ -3,6 +3,8 @@
 #include "State.h"
 #include "Level.h"
 #include "Menu.h"
+#include "AgentRL.h"
+
 class GameAI : public State
 {
 private:
@@ -14,6 +16,7 @@ private:
 
 	Level level;
 	State* nextState;
+	AgentRL* agent;
 
 	bool isPlaying = false;
 

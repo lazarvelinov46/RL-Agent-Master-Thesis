@@ -43,32 +43,20 @@ GameAI::GameAI()
 	this->initPanel();
 	this->level.initLevel();
 	this->nextState = nullptr;
+	this->agent=new AgentRL();
 }
 
 void GameAI::handleInput(sf::RenderWindow& window)
 {
-	while (!this->isPlaying) {
-		level.handleInput(window);
+	
+		//level.handleInput(window);
+	sf::Event ev;
+	while (window.pollEvent(ev)) {
 		if (ev.type == sf::Event::Closed) {
 			window.close();
 		}
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
 			this->nextState = new Menu();
-		}
-
-		if (ev.type == sf::Event::MouseButtonPressed && ev.mouseButton.button == sf::Mouse::Left) {
-			sf::Vector2f position(ev.mouseButton.x, ev.mouseButton.y);
-
-			if (playButton.getGlobalBounds().contains(position)) {
-				std::cout << "PLAY pressed " << std::endl;
-				this->isPlaying = true;
-				level.setIsPlaying(this->isPlaying);
-			}
-
-			level.handleClick(position);
-		}
-		if (ev.type == sf::Event::MouseButtonPressed && ev.mouseButton.button == sf::Mouse::Right) {
-			level.handleRightClick();
 		}
 	}
 	//handle input on level side
@@ -76,6 +64,30 @@ void GameAI::handleInput(sf::RenderWindow& window)
 
 void GameAI::update(float deltaTime)
 {
+	if (!this->isPlaying) {
+		this->agent->generateAction();
+		switch (this->agent->getAction())
+		{
+		case AgentAction::PLACE_GEAR:
+			do {
+				this->agent->generateGearPosition();
+			} while (level.getNumberOfGears() > 0 && level.tryGearPlacement(this->agent->getGearPosition()));
+			break;
+		case AgentAction::PLACE_BELT:
+			this->agent->generateBeltStart(level.getStaticObjects(), level.getStaticWheels());
+			this->agent->generateBeltEnd(level.getStaticWheels());
+			if (level.getNumberOfBelts() > 0) {
+				level.placeBelt(this->agent->getBeltStartPosition(), this->agent->getBeltEndPosition());
+			}
+			break;
+		case AgentAction::START:
+			this->isPlaying = true;
+			level.setIsPlaying(this->isPlaying);
+			break;
+		default:
+			break;
+		}
+	}
 	this->level.update(deltaTime);
 }
 

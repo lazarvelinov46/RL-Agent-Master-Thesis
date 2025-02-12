@@ -43,7 +43,7 @@ void DynamicObject::setPosition(sf::Vector2f position)
     this->shape.setPosition(position);
 }
 
-const sf::FloatRect& DynamicObject::getGlobalBounds()
+sf::FloatRect DynamicObject::getGlobalBounds()const
 {
-    return this->sprite.getGlobalBounds();
+    return this->shape.getGlobalBounds();
 }

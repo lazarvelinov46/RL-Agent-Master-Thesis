@@ -48,6 +48,15 @@
     <ClCompile Include="AgentRL.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="StateRL.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ActionRL.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="QTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -78,6 +87,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AgentRL.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StateRL.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ActionRL.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="QTable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
