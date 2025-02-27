@@ -35,6 +35,19 @@ void GameAI::initGameScreen()
 	this->gameScreen.setFillColor(sf::Color(128, 128, 128));
 }
 
+void GameAI::selectAction()
+{
+	if (this->stateId != this->nextStateId) {
+		this->actionId = this->table.getAction(this->stateId, 0.1);
+		this->stateId = this->nextStateId;
+	}
+}
+
+void GameAI::updateState()
+{
+	//get state changed
+}
+
 GameAI::GameAI()
 {
 	this->initFont();
@@ -64,6 +77,7 @@ void GameAI::handleInput(sf::RenderWindow& window)
 
 void GameAI::update(float deltaTime)
 {
+	/*
 	if (!this->isPlaying) {
 		this->agent->generateAction();
 		switch (this->agent->getAction())
@@ -88,7 +102,10 @@ void GameAI::update(float deltaTime)
 			break;
 		}
 	}
+	*/
+	this->selectAction();
 	this->level.update(deltaTime);
+	this->updateState();
 }
 
 void GameAI::render(sf::RenderTarget& target)

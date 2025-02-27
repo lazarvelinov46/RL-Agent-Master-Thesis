@@ -4,6 +4,7 @@
 #include "Level.h"
 #include "Menu.h"
 #include "AgentRL.h"
+#include "QTable.h"
 
 class GameAI : public State
 {
@@ -20,10 +21,18 @@ private:
 
 	bool isPlaying = false;
 
+	int stateId;
+	int nextStateId;
+	int actionId;
+	QTable table;
+
 	void initFont();
 	void initText();
 	void initPanel();
 	void initGameScreen();
+
+	void selectAction();
+	void updateState();
 public:
 	GameAI();
 	void handleInput(sf::RenderWindow& window)override;

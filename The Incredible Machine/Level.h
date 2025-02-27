@@ -2,6 +2,7 @@
 #include "StaticObject.h"
 #include "DynamicObject.h"
 #include "StaticWheel.h"
+#include "StateRL.h"
 
 typedef struct Resource {
 	sf::Sprite* sprite;
@@ -44,8 +45,11 @@ private:
 	float gravity = 30.f;
 	float drag = 0.98f;
 	float velocityMinX = 0.5f;
+	float velocityMinY = 1.0f;
 
 	bool isPlaying = false;
+	//AI
+	StateRL state;
 
 	void initFont();
 	void initTextures();
@@ -87,6 +91,6 @@ public:
 
 	int getNumberOfBelts();
 	void placeBelt(sf::Vector2f start, sf::Vector2f end);
-
+	StateRL getStatusChange();
 };
 
