@@ -48,9 +48,12 @@ private:
 	float velocityMinY = 1.0f;
 
 	bool isPlaying = false;
+	
 	//AI
 	StateRL state;
+	bool stateChanged;
 
+	void initState();
 	void initFont();
 	void initTextures();
 	void initStaticObjects();
@@ -92,5 +95,6 @@ public:
 	int getNumberOfBelts();
 	void placeBelt(sf::Vector2f start, sf::Vector2f end);
 	StateRL getStatusChange();
+	bool getStateChanged();
 };
 

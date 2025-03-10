@@ -28,11 +28,13 @@ public:
 	bool getWheelStarted(int wheelId)const;
 	bool getGearStarted(int gearId)const;
 	bool getBallMoving(int ballId)const;
+	bool getTargetHit()const;
 	int getStateId() const;
 
 	void setWheelStarted(int wheelId,bool started);
 	void setGearStarted(int gearId,bool started);
 	void setBallMoving(int ballId,bool moving);
-
+	void setTargetHit(bool hit);
+	void setInitialState();
 };
 

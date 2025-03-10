@@ -3,7 +3,6 @@
 
 StateRL::StateRL()
 {
-
     this->ballsMoving.push_back(true);
     for (int i = 0;i < 3;i++) {
         this->ballsMoving.push_back(false);
@@ -30,6 +29,11 @@ bool StateRL::getGearStarted(int gearId) const
 bool StateRL::getBallMoving(int ballId) const
 {
     return this->ballsMoving[ballId];
+}
+
+bool StateRL::getTargetHit() const
+{
+    return this->targetHit;
 }
 
 int StateRL::getStateId() const
@@ -62,4 +66,20 @@ void StateRL::setGearStarted(int gearId,bool started)
 void StateRL::setBallMoving(int ballId,bool moving)
 {
     this->ballsMoving[ballId] = moving;
+}
+
+void StateRL::setInitialState()
+{
+
+    this->ballsMoving.at(0) = true;
+    for (int i = 1;i < 4;i++) {
+        this->ballsMoving.at(i)=false;
+    }
+    for (int i = 0;i < 3;i++) {
+        this->gearsStarted.at(i) = false;
+    }
+    for (int i = 0;i < 3;i++) {
+        this->wheelsStarted.at(i) = false;
+    }
+    this->targetHit = false;
 }
