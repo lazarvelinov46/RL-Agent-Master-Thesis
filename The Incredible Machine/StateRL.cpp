@@ -68,9 +68,13 @@ void StateRL::setBallMoving(int ballId,bool moving)
     this->ballsMoving[ballId] = moving;
 }
 
+void StateRL::setTargetHit(bool hit)
+{
+    this->targetHit = hit;
+}
+
 void StateRL::setInitialState()
 {
-
     this->ballsMoving.at(0) = true;
     for (int i = 1;i < 4;i++) {
         this->ballsMoving.at(i)=false;

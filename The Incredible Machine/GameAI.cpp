@@ -37,6 +37,12 @@ void GameAI::initGameScreen()
 
 void GameAI::selectAction()
 {
+	if (this->stateId == -1) {
+		this->isPlaying = true;
+		level.setIsPlaying(this->isPlaying);
+		this->stateId = 1;
+		return;
+	}
 	if (this->stateId != this->nextStateId) {
 		this->actionId = this->table.getAction(this->stateId, 0.1);
 		this->stateId = this->nextStateId;
@@ -46,17 +52,31 @@ void GameAI::selectAction()
 void GameAI::updateState()
 {
 	//get state changed
+	if (this->level.getStateChanged()) {
+		this->nextStateId = this->level.getStatusChange().getStateId();
+		std::cout << this->nextStateId << std::endl;
+	}
 }
 
 GameAI::GameAI()
 {
+	this->stateId = -1;
+	this->nextStateId = 0;
 	this->initFont();
 	this->initText();
 	this->initGameScreen();
 	this->initPanel();
+	this->table = QTable(2048, 252);
 	this->level.initLevel();
 	this->nextState = nullptr;
 	this->agent=new AgentRL();
+	
+}
+
+GameAI::~GameAI()
+{
+	delete this->nextState;
+	delete this->agent;
 }
 
 void GameAI::handleInput(sf::RenderWindow& window)

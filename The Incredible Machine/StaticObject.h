@@ -1,7 +1,7 @@
 #pragma once
 #include "stdafx.h"
 
-enum StaticObjectType {PLATFORM,GEAR,FLOOR,WALL};
+enum StaticObjectType {PLATFORM,GEAR,FLOOR,WALL,GOAL};
 
 class StaticObject
 {

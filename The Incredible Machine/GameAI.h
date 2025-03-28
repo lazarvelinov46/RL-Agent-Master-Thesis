@@ -35,6 +35,7 @@ private:
 	void updateState();
 public:
 	GameAI();
+	~GameAI();
 	void handleInput(sf::RenderWindow& window)override;
 	void update(float deltaTime = 0)override;
 	void render(sf::RenderTarget& target)override;

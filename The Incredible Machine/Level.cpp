@@ -34,7 +34,7 @@ void Level::initStaticObjects()
 	this->staticObjects.push_back(new StaticObject(600, 300, 150, 20, sf::Color::Blue, StaticObjectType::PLATFORM));
 
 	this->staticObjects.push_back(new StaticObject(830, 400, 20, 40, sf::Color::Green, StaticObjectType::WALL));
-	this->staticObjects.push_back(new StaticObject(830, 440, 160, 20, sf::Color::Green, StaticObjectType::PLATFORM));
+	this->staticObjects.push_back(new StaticObject(830, 440, 160, 20, sf::Color::Green, StaticObjectType::GOAL));
 	this->staticObjects.push_back(new StaticObject(970, 400, 20, 40, sf::Color::Green, StaticObjectType::WALL));
 }
 
@@ -106,6 +106,8 @@ void Level::startPlatform(const StaticObject* object)
 					platform->move(5.f);
 					this->state.setWheelStarted(i, true);
 					this->stateChanged = true;
+
+					std::cout << "startovana platforma" << std::endl;
 				}
 				if (platform->getObjectType() == StaticObjectType::PLATFORM)i++;
 			}
@@ -198,10 +200,13 @@ void Level::updateBalls(float deltaTime)
 					//top collision
 					newPosition.y = objectBounds.top - ballBounds.height;
 					ball->setVelocity(sf::Vector2f(ball->getVelocity().x, (abs(ball->getVelocity().y*-.5f)<this->velocityMinY)?0.f: ball->getVelocity().y * -.7f));
-					if (object->getObjectType() == StaticObjectType::PLATFORM) {
+
+					if (object->getObjectType() == StaticObjectType::GOAL) {
 						if (!this->state.getTargetHit()) {
 							this->state.setTargetHit(true);
 							this->stateChanged = true;
+
+							std::cout << "cilj" << std::endl;
 						}
 					}
 				}
@@ -211,6 +216,7 @@ void Level::updateBalls(float deltaTime)
 					newPosition.y = objectBottom;
 					ball->setVelocity(sf::Vector2f(ball->getVelocity().x, -ball->getVelocity().y));
 				}
+
 				else if (leftCollision<topCollision && leftCollision<bottomCollision) {
 					//left collision
 					newPosition.x = objectBounds.left - ballBounds.width;
@@ -225,16 +231,19 @@ void Level::updateBalls(float deltaTime)
 					if (!this->state.getGearStarted(gears)) {
 						this->state.setGearStarted(gears, true);
 						this->stateChanged = true;
+
+						std::cout << "zupcanik" << std::endl;
 						this->startPlatform(object);
 					}
 				}
 				if (object->getMoving() && ball->getVelocity().x == 0.f) {
 					ball->setVelocity(sf::Vector2f(object->getSpeed(), 0.f));
 				}
+
 				else {
 					ball->setVelocity(sf::Vector2f(ball->getVelocity().x, ball->getVelocity().y));
 				}
-				
+
 				ball->setPosition(newPosition);
 				break;
 			}
@@ -243,11 +252,11 @@ void Level::updateBalls(float deltaTime)
 			}
 		}
 
-		ball->setVelocity(sf::Vector2f(ball->getVelocity().x, ball->getVelocity().y + this->gravity * deltaTime));
 		if (newPosition.x < 0) {
 			newPosition.x = 0;
 			ball->setVelocity(sf::Vector2f(-0.9f*ball->getVelocity().x, ball->getVelocity().y));
 		}
+
 		else if (newPosition.x + ball->getGlobalBounds().width > this->levelWidth) {
 			newPosition.x = this->levelWidth - ball->getGlobalBounds().width;
 			ball->setVelocity(sf::Vector2f(-0.9f*ball->getVelocity().x, ball->getVelocity().y));
@@ -256,14 +265,19 @@ void Level::updateBalls(float deltaTime)
 			ball->setPosition(newPosition);
 			this->applyDrag(ball);
 		}
-		if (oldVelocity.x == 0.0f && oldVelocity.y == 0.0f && (ball->getVelocity().x != 0 || ball->getVelocity().y != 0)) {
+		if (oldVelocity.x == 0.0f && oldVelocity.y == 0.0f && (abs(ball->getVelocity().x > 1) || abs(ball->getVelocity().y  >1))) {
 			this->state.setBallMoving(i, true);
 			this->stateChanged = true;
+
 		}
-		else if ((oldVelocity.x != 0 || oldVelocity.y != 0) && ball->getVelocity().x == 0.0f && ball->getVelocity().y == 0.0f) {
+		else if ((abs(oldVelocity.x > 1) || abs(oldVelocity.y >1)) && ball->getVelocity().x == 0.0f && ball->getVelocity().y == 0.0f) {
 			this->state.setBallMoving(i, false);
 			this->stateChanged = true;
+
 		}
+
+
+		ball->setVelocity(sf::Vector2f(ball->getVelocity().x, ball->getVelocity().y + this->gravity * deltaTime));
 	}
 }
 

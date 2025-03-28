@@ -14,6 +14,7 @@ QTable::QTable(int numberOfStates, int numberOfActions)
 			this->values[i][j] = 0.0;
 		}
 	}
+	std::cout << this->values[0].size() << std::endl;
 	this->alpha = 0.1;
 	this->gamma = 0.9;
 }
@@ -44,7 +45,7 @@ int QTable::getAction(int stateId, double epsilon)
 {
 	std::srand(std::time(0));
 	if ((rand()/RAND_MAX) < epsilon) {
-		int action = rand() % this->values[stateId].size();
+		int action = rand() % 252;
 		return action;
 	}
 	else {
