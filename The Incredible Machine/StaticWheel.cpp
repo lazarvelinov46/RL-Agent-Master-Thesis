@@ -9,6 +9,11 @@ StaticWheel::StaticWheel(float x, float y, float radius, sf::Color color)
 	this->object.setOrigin(radius, radius);
 }
 
+StaticWheel::StaticWheel(const sf::Sprite& sprite)
+{
+	//TODO: implement
+}
+
 void StaticWheel::render(sf::RenderTarget& target)
 {
 	target.draw(this->object);

@@ -10,11 +10,13 @@ void Menu::initFont()
 
 void Menu::initText()
 {
+	//Title configuration
 	this->title.setFont(font);
 	this->title.setString("Title");
 	this->title.setCharacterSize(48);
 	this->title.setPosition(100, 50);
 
+	//Menu option string
 	std::vector<std::string> menuOptions = {
 		"Play as Human",
 		"Play as AI",
@@ -22,6 +24,7 @@ void Menu::initText()
 		"Quit"
 	};
 
+	//Creates sf::Text element for each menu entry
 	for (size_t i = 0; i < menuOptions.size(); i++) {
 		sf::Text option;
 		option.setFont(this->font);
@@ -30,6 +33,8 @@ void Menu::initText()
 		option.setPosition(100, 150 + i * 50);
 		this->options.push_back(option);
 	}
+
+	this->selectedOption = MenuOption::PLAYER;
 }
 
 Menu::Menu()
@@ -37,6 +42,11 @@ Menu::Menu()
 	this->nextState = nullptr;
 	this->initFont();
 	this->initText();
+}
+
+Menu::~Menu()
+{
+	delete this->nextState;
 }
 
 void Menu::handleInput(sf::RenderWindow& window)
@@ -48,14 +58,17 @@ void Menu::handleInput(sf::RenderWindow& window)
 		}
 		if (ev.type == sf::Event::KeyPressed) {
 			if (ev.key.code == sf::Keyboard::Up) {
+				//Move selection up
 				this->selectedOption = (this->selectedOption > 0) ? 
 					static_cast<MenuOption>(this->selectedOption - 1) :
 					static_cast<MenuOption>(this->options.size() - 1);
 			}
 			else if (ev.key.code == sf::Keyboard::Down) {
+				//Move selection down
 				this->selectedOption = static_cast<MenuOption>((this->selectedOption + 1) % this->options.size());
 			}
 			else if (ev.key.code == sf::Keyboard::Enter) {
+				//Change state or close window based on selected item
 				switch (selectedOption)
 				{
 				case PLAYER:
@@ -65,6 +78,7 @@ void Menu::handleInput(sf::RenderWindow& window)
 					this->nextState = new GameAI();
 					break;
 				case LEVEL:
+					// TODO: Implement level selector
 					break;
 				case QUIT:
 					window.close();
@@ -79,6 +93,7 @@ void Menu::handleInput(sf::RenderWindow& window)
 
 void Menu::update(float deltaTime)
 {
+	//Highlight currently selected option
 	for (size_t i = 0; i < this->options.size(); i++) {
 		this->options[i].setFillColor(i == this->selectedOption ? sf::Color::Blue : sf::Color::White);
 	}
@@ -86,6 +101,7 @@ void Menu::update(float deltaTime)
 
 void Menu::render(sf::RenderTarget& target)
 {
+	//Draw elements
 	target.clear();
 	target.draw(this->title);
 	for (const sf::Text& option : this->options) {

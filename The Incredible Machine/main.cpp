@@ -43,13 +43,26 @@ void levelSelector(sf::RenderWindow& window) {
 		window.display();
 	}
 }
-
+/// <summary>
+/// Main function of the program
+/// Creates game window
+/// Initilazes starting state (menu)
+/// Handles main game loop
+/// </summary>
+/// <returns></returns>
 int main()
 {
 	sf::RenderWindow window(sf::VideoMode(1200, 800), "The Incredible Machine", sf::Style::Close | sf::Style::Titlebar);
 	window.setFramerateLimit(60);
 	State* state = new Menu();
 	sf::Clock clock;
+	/*
+	* Main game loop
+	* Handles user input
+	* Updates physics
+	* Renders graphics
+	* If user changed state, game reansfers to next state
+	*/
 	while (window.isOpen()) {
 		
 		state->handleInput(window);

@@ -318,10 +318,19 @@ void Level::handleClick(sf::Vector2f& mousePosition)
 {
 	if (!this->clickedResource)
 	{
+		/*
+		if there is not clicked resource checking if mouse click happened on some
+		resource element from menu
+		*/
 		for (size_t i = 0;i < this->resources.size();i++) {
 			if (this->resources[i]->sprite->getGlobalBounds().contains(mousePosition) && 
 				mousePosition.x>1000 && 
 				this->resourceNumbers[this->resources[i]->id]>0) {
+				/*
+				* if mouse click position overlaps resource boundaries while
+				* RESOURCE IS IN MENU (hence the mousePosition.x>1000 part)
+				* gets the pointer of the selected resource and updates appropriate variables
+				*/
 				this->selectedResource = this->resources[i]->sprite;
 				this->clickedResource = true;
 				this->selectedResoureceIndex = this->resources[i]->id;
@@ -331,11 +340,18 @@ void Level::handleClick(sf::Vector2f& mousePosition)
 		}
 	}
 	else {
+		/*
+		* If resource is already clicked than its placement needs to be handled
+		*/
 		if (this->selectedResoureceIndex == 0&&!this->activeBeltPlacement) {
 			//placing belt first time
-			
 			for (const StaticWheel* wheel : this->staticWheels) {
 				if (wheel->getGlobalBounds().contains(mousePosition)) {
+					/*
+					if belt placing starts from wheel
+					updating belt start and endPointBelt variables
+					makes belt follow the mouse
+					*/
 					this->activeBeltPlacement = true;
 					this->beltStart = sf::Vector2f(wheel->getGlobalBounds().left, wheel->getGlobalBounds().top);
 					this->endPointsBelt[0].position = this->beltStart;
@@ -347,6 +363,11 @@ void Level::handleClick(sf::Vector2f& mousePosition)
 			}
 			for (const StaticObject* object : this->staticObjects) {
 				if (object->getGlobalBounds().contains(mousePosition)&&object->getObjectType()==StaticObjectType::GEAR) {
+					/*
+					if belt placing starts from gear already placed
+					updating belt start and endPointBelt variables
+					makes belt follow the mouse
+					*/
 					this->activeBeltPlacement = true;
 					this->beltStart = sf::Vector2f(object->getGlobalBounds().left, object->getGlobalBounds().top);
 					this->endPointsBelt[0].position = this->beltStart;
@@ -363,14 +384,24 @@ void Level::handleClick(sf::Vector2f& mousePosition)
 			this->validBeltPlacement = false;
 			for (const StaticWheel* wheel : this->staticWheels) {
 				if (wheel->getGlobalBounds().contains(mousePosition)) {
+					/*
+					checking if belt placement is valid (ends on a wheel)
+					*/
 					this->validBeltPlacement = true;
 					break;
 				}
 			}
 			if (this->validBeltPlacement) {
+				/*
+				if belt placement is valid, belt positions are pushed into list
+				as if it is two lines (simple graphic representation)
+				*/
 				this->belts.push_back({ this->beltStart,mousePosition });
 				this->belts.push_back({ sf::Vector2f(mousePosition.x + this->staticWheels[0]->getGlobalBounds().width,mousePosition.y + this->staticWheels[0]->getGlobalBounds().height),
 					sf::Vector2f(this->beltStart.x + this->staticWheels[0]->getGlobalBounds().width,this->beltStart.y + this->staticWheels[0]->getGlobalBounds().height) });
+				/*
+				Updating variables and UI elements
+				*/
 				this->activeBeltPlacement = false;
 				this->resourceNumbersText[this->selectedResoureceIndex].setString(std::to_string(--this->resourceNumbers[this->selectedResoureceIndex]));
 				this->clickedResource = false;
@@ -382,11 +413,17 @@ void Level::handleClick(sf::Vector2f& mousePosition)
 
 		}
 		else {
+			/*
+			placing gear, aligning it to grid first
+			*/
 			sf::Vector2f alignedPosition = this->alignToGrid(mousePosition);
 
 			this->selectedResource->setPosition(alignedPosition);
 			if (this->checkOverlaping(*this->selectedResource)) {
-
+				/*
+				if it does not overlap anything, gear can be placed
+				updating variables and UI elements
+				*/
 				if (alignedPosition.x < 900 && alignedPosition.y < 700) {
 					this->staticObjects.push_back(new StaticObject(*this->selectedResource, this->selectedResoureceIndex == 1 ? StaticObjectType::GEAR : StaticObjectType::PLATFORM));
 					this->resourceNumbersText[this->selectedResoureceIndex].setString(std::to_string(--this->resourceNumbers[this->selectedResoureceIndex]));
@@ -404,11 +441,17 @@ void Level::handleClick(sf::Vector2f& mousePosition)
 
 void Level::handleRightClick()
 {
+	/*
+	Cancels belt placement
+	*/
 	this->activeBeltPlacement = false;
 }
 
 void Level::update(float deltaTime)
 {
+	/*
+	Updates ball position
+	*/
 	this->updateBalls(deltaTime);
 	if (this->activeBeltPlacement) {
 		for (const StaticWheel* wheel : this->staticWheels) {
@@ -424,6 +467,9 @@ void Level::update(float deltaTime)
 
 void Level::render(sf::RenderTarget& target)
 {
+	/*
+	Renders all game elements
+	*/
 	for (StaticObject* object : this->staticObjects) {
 		object->render(target);
 	}
@@ -457,10 +503,19 @@ void Level::render(sf::RenderTarget& target)
 
 bool Level::tryGearPlacement(sf::Vector2f position)
 {
+	/*
+	Selects gear from resources
+	Aligns it to the grid
+	*/
 	this->selectedResource = this->resources.back()->sprite;
 	sf::Vector2f alignedPosition = this->alignToGrid(position);
 	this->selectedResource->setPosition(alignedPosition);
 	if (this->checkOverlaping(*this->selectedResource)) {
+		/*
+		* If it does not overlap anything it places gear in appropriate place
+		* Adds it to static objects on level map
+		* Lowers the resources
+		*/
 		if (alignedPosition.x < 900 && alignedPosition.y < 700) {
 			this->staticObjects.push_back(new StaticObject(*this->selectedResource, StaticObjectType::GEAR ));
 			this->resourceNumbersText[1].setString(std::to_string(--this->resourceNumbers[1]));
@@ -498,7 +553,11 @@ int Level::getNumberOfBelts()
 
 void Level::placeBelt(sf::Vector2f start, sf::Vector2f end)
 {
-	
+	/*
+	* Adds belt into array (start and end vectors)
+	* Lowers the resources
+	* If gear attached to belt is started, it starts the platform
+	*/
 	this->belts.push_back({start,end });
 	this->belts.push_back({ sf::Vector2f(end.x + this->staticWheels[0]->getGlobalBounds().width,end.y + this->staticWheels[0]->getGlobalBounds().height),
 		sf::Vector2f(start.x + this->staticWheels[0]->getGlobalBounds().width,start.y + this->staticWheels[0]->getGlobalBounds().height) });
