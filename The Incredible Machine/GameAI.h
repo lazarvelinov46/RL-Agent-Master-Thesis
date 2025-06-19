@@ -6,6 +6,14 @@
 #include "AgentRL.h"
 #include "QTable.h"
 
+/**
+* @class GameAI
+* @brief Represents game state controlled by reinforcement learning agent
+* 
+* Simulates same levels as human gameplay
+* Actions selected by AI agent, not by the human
+* Updates simulation state based on AI decision making and feedback from the environment
+*/
 class GameAI : public State
 {
 private:
