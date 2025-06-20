@@ -28,6 +28,6 @@ int ActionRL::getActionIdGear(int gearId, int x, int y)
 
 int ActionRL::getActionIdBelt(int beltId, int startId, int endId)
 {
-    //TO DO
+    //TODO:
     return ActionRL::GRID_WIDTH*ActionRL::GRID_HEIGHT+(endId*5-startId*5+endId-startId);
 }

@@ -31,6 +31,16 @@ bool StateRL::getBallMoving(int ballId) const
     return this->ballsMoving[ballId];
 }
 
+bool StateRL::getBallMoving() const
+{
+    for (int i = 0;i < this->ballsMoving.size();i++) {
+        if (this->ballsMoving[i]) {
+            return true;
+        }
+    }
+    return false;
+}
+
 bool StateRL::getTargetHit() const
 {
     return this->targetHit;
@@ -66,6 +76,11 @@ void StateRL::setGearStarted(int gearId,bool started)
 void StateRL::setBallMoving(int ballId,bool moving)
 {
     this->ballsMoving[ballId] = moving;
+}
+
+void StateRL::setBallMoving(bool moving)
+{
+    this->allBallsMoving = moving;
 }
 
 void StateRL::setTargetHit(bool hit)
