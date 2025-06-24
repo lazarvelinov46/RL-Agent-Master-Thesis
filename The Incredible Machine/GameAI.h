@@ -6,6 +6,13 @@
 #include "AgentRL.h"
 #include "QTable.h"
 
+typedef struct Transition {
+	int stateId;
+	int actionId;
+	double reward;
+	int nextStateId;
+}Transition;
+
 /**
 * @class GameAI
 * @brief Represents game state controlled by reinforcement learning agent
@@ -46,6 +53,9 @@ private:
 	int actionId;
 	//QTable for updating and retreiving QValues
 	QTable table;
+
+	//Vector with all transitions within one episode
+	std::vector<Transition*> episode;
 
 	//Loads font from file
 	void initFont();

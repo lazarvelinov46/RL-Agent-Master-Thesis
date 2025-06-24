@@ -50,6 +50,10 @@ public:
 	/// Initializes components (font and text)
 	/// </summary>
 	Menu();
+	/// <summary>
+	/// Deletes nextState pointer
+	/// </summary>
+	~Menu();
 	//getters
 	/// Returns currently selected menu option
 	const MenuOption getSelectedOption()const { return this->selectedOption; }

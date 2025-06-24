@@ -46,6 +46,7 @@ void GameAI::selectAction()
 	if (this->stateId != this->nextStateId) {
 		this->actionId = this->table.getAction(this->stateId, 0.1);
 		this->stateId = this->nextStateId;
+		this->episode.push_back(new Transition({ this->stateId,this->actionId,0.0,-1 }));
 	}
 }
 
