@@ -125,6 +125,17 @@ void GameAI::update(float deltaTime)
 	}
 	*/
 	this->selectAction();
+	AgentAction actionType=this->actionFunctions.getActionType(this->actionId);
+	if (actionType == AgentAction::PLACE_GEAR) {
+		//gear placement
+		std::pair<int,int> coordinates=this->actionFunctions.getGearCoordinates(this->actionId);
+		if (!level.tryGearPlacement(sf::Vector2f(coordinates.first, coordinates.second))) {
+			//TODO: apply penalty
+		}
+	}
+	else {
+		//belt placement
+	}
 	this->level.update(deltaTime);
 	this->updateState();
 }

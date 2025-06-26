@@ -42,6 +42,10 @@ private:
 	//Pointer to the RL agent performing actions
 	AgentRL* agent;
 
+	//test
+	ActionRL actionFunctions;
+
+
 	//Flag which indicates if simulation is running
 	bool isPlaying = false;
 

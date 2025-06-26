@@ -24,6 +24,7 @@ private:
 	const static int GRID_HEIGHT=13;
 	const static int NO_OF_GEARS = 3;
 	const static int NO_OF_BELTS = 3;
+	const static int NO_OF_WHEELS = 3;
 public:
 	/*
 	bool operator==(const ActionRL& action)const {

@@ -55,6 +55,7 @@ std::pair<BeltActionInfo, BeltActionInfo> ActionRL::getBeltPlacement(int beltAct
     BeltActionInfo end;
     int crossCombinations = ActionRL::NO_OF_BELTS * ActionRL::NO_OF_GEARS;
     int gearCombinations = this->combination(ActionRL::NO_OF_GEARS, 2);
+    int wheelCombinations = this->combination(ActionRL::NO_OF_WHEELS, 2);
     if (beltActionId < crossCombinations) {
         beggining.isElementGear = true;
         beggining.idElement = crossCombinations / ActionRL::NO_OF_GEARS;
@@ -62,12 +63,34 @@ std::pair<BeltActionInfo, BeltActionInfo> ActionRL::getBeltPlacement(int beltAct
         end.idElement = crossCombinations % ActionRL::NO_OF_BELTS;
     }
     else if(beltActionId<gearCombinations+crossCombinations){
-        //TODO
+        //TODO: check this
+        int idBeggining = 1;
+        int startGears = crossCombinations;
+        int gearNumber = beltActionId - crossCombinations;
+        while ((gearNumber - (ActionRL::NO_OF_GEARS - idBeggining)) >= 0) {
+            gearNumber -= (ActionRL::NO_OF_GEARS - idBeggining));
+            idBeggining++;
+        }
+        int idEnd = idBeggining + gearNumber;
         beggining.isElementGear = true;
-        beggining.idElement = (beltActionId);
+        beggining.idElement = idBeggining;
+        end.isElementGear = true;
+        end.idElement = idEnd;
     }
     else {
-        //TODO
+        //TODO: check this
+        int idBeggining = 1;
+        int startWheels = crossCombinations+gearCombinations;
+        int wheelNumber = beltActionId - startWheels;
+        while ((wheelNumber - (ActionRL::NO_OF_WHEELS - idBeggining)) >= 0) {
+            wheelNumber -= (ActionRL::NO_OF_WHEELS - idBeggining));
+            idBeggining++;
+        }
+        int idEnd = idBeggining + wheelNumber;
+        beggining.isElementGear = false;
+        beggining.idElement = idBeggining;
+        end.isElementGear = false;
+        end.idElement = idEnd;
     }
     return std::pair<BeltActionInfo, BeltActionInfo>(beggining,end);
 }
