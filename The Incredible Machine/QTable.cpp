@@ -45,6 +45,7 @@ int QTable::getAction(int stateId, double epsilon)
 {
 	std::srand(std::time(0));
 	if ((rand()/RAND_MAX) < epsilon) {
+		std::cout << "kur" << std::endl;
 		int action = rand() % 252;
 		return action;
 	}

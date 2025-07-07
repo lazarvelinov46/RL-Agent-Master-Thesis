@@ -2,6 +2,8 @@
 #include <ctime>
 #include <iostream>
 #include <time.h>
+#include <stdexcept>
+#include <cmath>
 #include <vector>
 #include <stack>
 #include <unordered_map>

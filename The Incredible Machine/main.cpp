@@ -64,17 +64,21 @@ int main()
 	* If user changed state, game reansfers to next state
 	*/
 	while (window.isOpen()) {
-		
-		state->handleInput(window);
-		float deltaTime = clock.restart().asSeconds();
-		state->update(deltaTime);
-		state->render(window);
-		State* nextState = state->getNextState();
-		if (nextState) {
-			delete state;
-			state = nextState;
+		try {
+
+			state->handleInput(window);
+			float deltaTime = clock.restart().asSeconds();
+			state->update(deltaTime);
+			state->render(window);
+			State* nextState = state->getNextState();
+			if (nextState) {
+				state = nextState;
+			}
+			window.display();
 		}
-		window.display();
+		catch (std::exception e) {
+			std::cout << e.what() << std::endl;
+		}
 	}
 	delete state;
 	return 0;

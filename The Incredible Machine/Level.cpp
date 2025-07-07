@@ -1,10 +1,12 @@
 #include "stdafx.h"
 #include "Level.h"
+#include "QTable.h"
 
 void Level::initState()
 {
 	this->state.setInitialState();
 	this->stateChanged = false;
+	this->reward = 0.0f;
 }
 
 void Level::initFont()
@@ -70,7 +72,6 @@ void Level::initResources()
 		sf::Sprite* gearSprite = new sf::Sprite(this->gearTexture);
 		gearSprite->setScale(0.19531f, 0.19531f);
 		gearSprite->setPosition(1050, 350);
-
 		sf::Text gearText;
 		gearText.setFont(font);
 		gearText.setString("3");
@@ -106,6 +107,7 @@ void Level::startPlatform(const StaticObject* object)
 					platform->move(5.f);
 					this->state.setWheelStarted(i, true);
 					this->stateChanged = true;
+					this->reward = WHEEL_ACTIVATED;
 
 					std::cout << "startovana platforma" << std::endl;
 				}
@@ -127,19 +129,23 @@ bool Level::checkOverlaping(const sf::Sprite& newObject)
 		<< "; W: " << newObject.getGlobalBounds().width
 		<< "; H: " << newObject.getGlobalBounds().height << std::endl;
 	for (size_t i = 0; i < this->staticObjects.size(); i++) {
+		/*
 		std::cout << "STAT X: " << this->staticObjects[i]->getGlobalBounds().left
 			<< "; Y: " << this->staticObjects[i]->getGlobalBounds().top
 			<< "; W: " << this->staticObjects[i]->getGlobalBounds().width
 			<< "; H: " << this->staticObjects[i]->getGlobalBounds().height << std::endl;
+		*/
 		if (newObject.getGlobalBounds().intersects(this->staticObjects[i]->getGlobalBounds())) {
 			return false;
 		}
 	}
 	for (size_t i = 0; i < this->dynamicObjects.size(); i++) {
+		/*
 		std::cout << "DYN X: " << this->dynamicObjects[i]->getGlobalBounds().left
 			<< "; DYN: " << this->dynamicObjects[i]->getGlobalBounds().top
 			<< "; DYN: " << this->dynamicObjects[i]->getGlobalBounds().width
 			<< "; DYN: " << this->dynamicObjects[i]->getGlobalBounds().height << std::endl;
+			*/
 		if (newObject.getGlobalBounds().intersects(this->dynamicObjects[i]->getGlobalBounds())) {
 			return false;
 		}
@@ -172,6 +178,7 @@ const sf::Vector2f& Level::alignToGrid(const sf::Vector2f& pos) const
 void Level::updateBalls(float deltaTime)
 {
 	if (!isPlaying)return;
+	bool ballsMovingPreUpdate = this->state.getBallMoving();
 	for (size_t i = 0; i < this->dynamicObjects.size(); i++) {
 		DynamicObject* ball = this->dynamicObjects[i];
 		sf::Vector2f oldVelocity = ball->getVelocity();
@@ -205,7 +212,7 @@ void Level::updateBalls(float deltaTime)
 						if (!this->state.getTargetHit()) {
 							this->state.setTargetHit(true);
 							this->stateChanged = true;
-
+							this->reward = WON_GAME;
 							std::cout << "cilj" << std::endl;
 						}
 					}
@@ -231,7 +238,7 @@ void Level::updateBalls(float deltaTime)
 					if (!this->state.getGearStarted(gears)) {
 						this->state.setGearStarted(gears, true);
 						this->stateChanged = true;
-
+						this->reward = GEAR_ACTIVATED;
 						std::cout << "zupcanik" << std::endl;
 						this->startPlatform(object);
 					}
@@ -267,17 +274,19 @@ void Level::updateBalls(float deltaTime)
 		}
 		if (oldVelocity.x == 0.0f && oldVelocity.y == 0.0f && (abs(ball->getVelocity().x > 1) || abs(ball->getVelocity().y  >1))) {
 			this->state.setBallMoving(i, true);
-			this->stateChanged = true;
 
 		}
 		else if ((abs(oldVelocity.x > 1) || abs(oldVelocity.y >1)) && ball->getVelocity().x == 0.0f && ball->getVelocity().y == 0.0f) {
 			this->state.setBallMoving(i, false);
-			this->stateChanged = true;
 
 		}
 
 
 		ball->setVelocity(sf::Vector2f(ball->getVelocity().x, ball->getVelocity().y + this->gravity * deltaTime));
+	}
+	if (this->state.getBallMoving() != ballsMovingPreUpdate) {
+		this->stateChanged = true;
+		if (!this->state.getBallMoving())this->reward = LOST_GAME;
 	}
 }
 
@@ -544,6 +553,30 @@ std::vector<StaticObject*> Level::getStaticObjects()
 std::vector<StaticWheel*> Level::getStaticWheels()
 {
 	return this->staticWheels;
+}
+
+sf::Vector2f Level::getGearLocation(int gearId)
+{
+	int g = 0;
+	for (int i = 0; i < this->staticObjects.size(); i++) {
+		if (this->staticObjects[i]->getObjectType() == StaticObjectType::GEAR) {
+			if (g == gearId) {
+				return this->staticObjects[i]->getGlobalBounds().getPosition();
+			}
+			g++;
+		}
+	}
+	return sf::Vector2f(-1.0, -1.0);
+}
+
+sf::Vector2f Level::getWheelLocation(int wheelId)
+{
+	return this->staticWheels[wheelId]->getGlobalBounds().getPosition();
+}
+
+double Level::getReward()
+{
+	return 0.0;
 }
 
 int Level::getNumberOfBelts()

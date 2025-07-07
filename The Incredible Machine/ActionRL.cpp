@@ -34,6 +34,9 @@ int ActionRL::getActionIdBelt(int beltId, int startId, int endId)
 
 AgentAction ActionRL::getActionType(int actionId)
 {
+    if (actionId == -1) {
+        return AgentAction::NO_ACTION;
+    }
     if (actionId < ActionRL::GRID_WIDTH * ActionRL::GRID_HEIGHT) {
         return AgentAction::PLACE_GEAR;
     }
@@ -44,8 +47,8 @@ AgentAction ActionRL::getActionType(int actionId)
 
 std::pair<int, int> ActionRL::getGearCoordinates(int gearActionId)
 {
-    int x = gearActionId / ActionRL::GRID_WIDTH;
-    int y = gearActionId % ActionRL::GRID_HEIGHT;
+    int x = gearActionId % ActionRL::GRID_WIDTH;
+    int y = gearActionId / ActionRL::GRID_HEIGHT;
     return std::pair<int, int>(x, y);
 }
 
@@ -68,7 +71,7 @@ std::pair<BeltActionInfo, BeltActionInfo> ActionRL::getBeltPlacement(int beltAct
         int startGears = crossCombinations;
         int gearNumber = beltActionId - crossCombinations;
         while ((gearNumber - (ActionRL::NO_OF_GEARS - idBeggining)) >= 0) {
-            gearNumber -= (ActionRL::NO_OF_GEARS - idBeggining));
+            gearNumber -= (ActionRL::NO_OF_GEARS - idBeggining);
             idBeggining++;
         }
         int idEnd = idBeggining + gearNumber;
@@ -83,7 +86,7 @@ std::pair<BeltActionInfo, BeltActionInfo> ActionRL::getBeltPlacement(int beltAct
         int startWheels = crossCombinations+gearCombinations;
         int wheelNumber = beltActionId - startWheels;
         while ((wheelNumber - (ActionRL::NO_OF_WHEELS - idBeggining)) >= 0) {
-            wheelNumber -= (ActionRL::NO_OF_WHEELS - idBeggining));
+            wheelNumber -= (ActionRL::NO_OF_WHEELS - idBeggining);
             idBeggining++;
         }
         int idEnd = idBeggining + wheelNumber;

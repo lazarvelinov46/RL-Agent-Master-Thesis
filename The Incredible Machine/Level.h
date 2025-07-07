@@ -79,6 +79,7 @@ private:
 	//AI
 	/* Tracking in which state agent currently is */
 	StateRL state;
+	double reward;
 	/* Variable that is true when there is change in state of agent */
 	bool stateChanged;
 
@@ -131,6 +132,25 @@ public:
 	int getNumberOfGears();
 	std::vector<StaticObject*> getStaticObjects();
 	std::vector<StaticWheel*> getStaticWheels();
+	/// <summary>
+	/// Gets gear location based on gear Id
+	/// gear id - lowest id for earliest placed gear etc
+	/// </summary>
+	/// <param name="gearId">id of gear</param>
+	/// <returns>Location of gear for belt placement</returns>
+	sf::Vector2f getGearLocation(int gearId);
+	/// <summary>
+	/// Gets wheel location based on wheel id
+	/// wheel id - leftmost wheel lowest id etc
+	/// </summary>
+	/// <param name="wheelId">id of wheel</param>
+	/// <returns>Location of static wheel for belt placement</returns>
+	sf::Vector2f getWheelLocation(int wheelId);
+	/// <summary>
+	/// Returns reward after every state change
+	/// </summary>
+	/// <returns>reward value</returns>
+	double getReward();
 
 	int getNumberOfBelts();
 	void placeBelt(sf::Vector2f start, sf::Vector2f end);

@@ -9,7 +9,7 @@ typedef struct BeltActionInfo {
 /// <summary>
 /// Enumerates descrete actions which agent could take
 /// </summary>
-enum AgentAction { PLACE_GEAR, PLACE_BELT, number };
+enum AgentAction { PLACE_GEAR, PLACE_BELT, number, NO_ACTION};
 class ActionRL
 {
 private:
@@ -69,6 +69,5 @@ public:
 	/// <returns>number of possible combinations</returns>
 	long long combination(int n, int r);
 
-	static 
 };
 

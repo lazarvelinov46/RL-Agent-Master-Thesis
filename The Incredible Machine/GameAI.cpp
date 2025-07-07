@@ -44,9 +44,15 @@ void GameAI::selectAction()
 		return;
 	}
 	if (this->stateId != this->nextStateId) {
-		this->actionId = this->table.getAction(this->stateId, 0.1);
+		std::cout << this->stateId << " ee " << this->nextStateId << " oo ";
+		this->actionId = this->table.getAction(this->nextStateId, 0.1);
+
+		std::cout << "ID " << this->actionId << std::endl;
 		this->stateId = this->nextStateId;
 		this->episode.push_back(new Transition({ this->stateId,this->actionId,0.0,-1 }));
+	}
+	else {
+		this->actionId = -1;
 	}
 }
 
@@ -54,14 +60,17 @@ void GameAI::updateState()
 {
 	//get state changed
 	if (this->level.getStateChanged()) {
+		//TODO: add reward getter from level
 		this->nextStateId = this->level.getStatusChange().getStateId();
-		std::cout << this->nextStateId << std::endl;
+		this->table.updateQValue(this->stateId, this->actionId, 1.0, this->nextStateId);
+		std::cout <<"ee"<< this->nextStateId << std::endl;
 	}
 }
 
 GameAI::GameAI()
 {
 	this->stateId = -1;
+	this->actionId = -1;
 	this->nextStateId = 0;
 	this->initFont();
 	this->initText();
@@ -129,12 +138,43 @@ void GameAI::update(float deltaTime)
 	if (actionType == AgentAction::PLACE_GEAR) {
 		//gear placement
 		std::pair<int,int> coordinates=this->actionFunctions.getGearCoordinates(this->actionId);
-		if (!level.tryGearPlacement(sf::Vector2f(coordinates.first, coordinates.second))) {
+		std::cout << coordinates.first << " asdfa " << coordinates.second << std::endl;
+		if (!level.tryGearPlacement(sf::Vector2f(coordinates.first*50, coordinates.second*50))) {
 			//TODO: apply penalty
+			std::cout << "NMZ" << std::endl;
+			this->table.updateQValue(this->stateId, this->actionId, WRONG_GEAR_PLACEMENT, this->stateId);
 		}
 	}
 	else {
 		//belt placement
+		/*
+		TODO: give some restriction to belt placement
+		for example max 200px between start and end
+		*/
+		std::pair<BeltActionInfo,BeltActionInfo> beltActionInfo=this->actionFunctions.getBeltPlacement(actionId);
+		sf::Vector2f start, end;
+		if (beltActionInfo.first.isElementGear) {
+			start = this->level.getGearLocation(beltActionInfo.first.idElement);
+		}
+		else {
+			start = this->level.getWheelLocation(beltActionInfo.first.idElement);
+		}
+		if (beltActionInfo.second.isElementGear) {
+			end = this->level.getGearLocation(beltActionInfo.second.idElement);
+		}
+		else {
+			end = this->level.getWheelLocation(beltActionInfo.second.idElement);
+		}
+		if (sqrt(powf(abs(start.x - end.x), 2) + powf(abs(start.y - end.y), 2)) < 300) {
+			start.x = -1;
+			end.x = -1;
+		}
+		if (start.x == -1 || end.x == -1) {
+			this->table.updateQValue(this->stateId, this->actionId, WRONG_BELT_PLACEMENT, this->stateId);
+		}
+		else {
+			this->level.placeBelt(start, end);
+		}
 	}
 	this->level.update(deltaTime);
 	this->updateState();
