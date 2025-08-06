@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "GameAI.h"
 
+
 void GameAI::initFont()
 {
 	if (!font.loadFromFile("assets/Fonts/ARIAL.TTF")) {
@@ -39,15 +40,12 @@ void GameAI::selectAction()
 {
 	if (this->stateId == -1) {
 		this->isPlaying = true;
-		level.setIsPlaying(this->isPlaying);
-		this->stateId = 1;
+		level->setIsPlaying(this->isPlaying);
+		this->stateId = 0;
 		return;
 	}
 	if (this->stateId != this->nextStateId) {
-		std::cout << this->stateId << " ee " << this->nextStateId << " oo ";
 		this->actionId = this->table.getAction(this->nextStateId, 0.1);
-
-		std::cout << "ID " << this->actionId << std::endl;
 		this->stateId = this->nextStateId;
 		this->episode.push_back(new Transition({ this->stateId,this->actionId,0.0,-1 }));
 	}
@@ -59,25 +57,42 @@ void GameAI::selectAction()
 void GameAI::updateState()
 {
 	//get state changed
-	if (this->level.getStateChanged()) {
+	if (this->level->getStateChanged()) {
 		//TODO: add reward getter from level
-		this->nextStateId = this->level.getStatusChange().getStateId();
+		this->nextStateId = this->level->getStatusChange().getStateId();
 		this->table.updateQValue(this->stateId, this->actionId, 1.0, this->nextStateId);
-		std::cout <<"ee"<< this->nextStateId << std::endl;
+		if (nextStateId == 0) {
+			this->gameOver = true;
+			this->iterations++;
+			this->resetResources();
+			this->stateId = -1;
+			this->actionId = -1;
+			this->nextStateId = 1;
+		}
+		if (this->iterations % 10 == 0) {
+			this->table.printTable(this->iterations);
+		}
 	}
 }
 
+void GameAI::resetResources()
+{
+	delete this->level;
+	this->level = new Level();
+	this->level->initLevel();
+}
 GameAI::GameAI()
 {
 	this->stateId = -1;
 	this->actionId = -1;
-	this->nextStateId = 0;
+	this->nextStateId = 1;
 	this->initFont();
 	this->initText();
 	this->initGameScreen();
 	this->initPanel();
-	this->table = QTable(2048, 252);
-	this->level.initLevel();
+	this->table = QTable(256, 252,"qtable.txt");
+	this->level = new Level();
+	this->level->initLevel();
 	this->nextState = nullptr;
 	this->agent=new AgentRL();
 	
@@ -138,45 +153,49 @@ void GameAI::update(float deltaTime)
 	if (actionType == AgentAction::PLACE_GEAR) {
 		//gear placement
 		std::pair<int,int> coordinates=this->actionFunctions.getGearCoordinates(this->actionId);
-		std::cout << coordinates.first << " asdfa " << coordinates.second << std::endl;
-		if (!level.tryGearPlacement(sf::Vector2f(coordinates.first*50, coordinates.second*50))) {
+		if (!level->tryGearPlacement(sf::Vector2f(coordinates.first*50, coordinates.second*50))) {
 			//TODO: apply penalty
-			std::cout << "NMZ" << std::endl;
 			this->table.updateQValue(this->stateId, this->actionId, WRONG_GEAR_PLACEMENT, this->stateId);
 		}
 	}
-	else {
+	else if(actionType==AgentAction::PLACE_BELT){
 		//belt placement
 		/*
 		TODO: give some restriction to belt placement
 		for example max 200px between start and end
 		*/
-		std::pair<BeltActionInfo,BeltActionInfo> beltActionInfo=this->actionFunctions.getBeltPlacement(actionId);
-		sf::Vector2f start, end;
-		if (beltActionInfo.first.isElementGear) {
-			start = this->level.getGearLocation(beltActionInfo.first.idElement);
+		try {
+			std::pair<BeltActionInfo, BeltActionInfo> beltActionInfo = this->actionFunctions.getBeltPlacement(actionId);
+			sf::Vector2f start, end;
+			if (beltActionInfo.first.isElementGear) {
+				start = this->level->getGearLocation(beltActionInfo.first.idElement);
+			}
+			else {
+				start = this->level->getWheelLocation(beltActionInfo.first.idElement);
+			}
+			if (beltActionInfo.second.isElementGear) {
+				end = this->level->getGearLocation(beltActionInfo.second.idElement);
+			}
+			else {
+				end = this->level->getWheelLocation(beltActionInfo.second.idElement);
+			}
+			if (sqrt(powf(abs(start.x - end.x), 2) + powf(abs(start.y - end.y), 2)) < 300) {
+				start.x = -1;
+				end.x = -1;
+			}
+			if (start.x == -1 || end.x == -1) {
+				this->table.updateQValue(this->stateId, this->actionId, WRONG_BELT_PLACEMENT, this->stateId);
+			}
+			else {
+				this->level->placeBelt(start, end);
+			}
 		}
-		else {
-			start = this->level.getWheelLocation(beltActionInfo.first.idElement);
+		catch (std::exception e) {
+			std::cout << e.what() << std::endl;
 		}
-		if (beltActionInfo.second.isElementGear) {
-			end = this->level.getGearLocation(beltActionInfo.second.idElement);
-		}
-		else {
-			end = this->level.getWheelLocation(beltActionInfo.second.idElement);
-		}
-		if (sqrt(powf(abs(start.x - end.x), 2) + powf(abs(start.y - end.y), 2)) < 300) {
-			start.x = -1;
-			end.x = -1;
-		}
-		if (start.x == -1 || end.x == -1) {
-			this->table.updateQValue(this->stateId, this->actionId, WRONG_BELT_PLACEMENT, this->stateId);
-		}
-		else {
-			this->level.placeBelt(start, end);
-		}
+		
 	}
-	this->level.update(deltaTime);
+	this->level->update(deltaTime);
 	this->updateState();
 }
 
@@ -185,7 +204,7 @@ void GameAI::render(sf::RenderTarget& target)
 	target.clear(sf::Color::White);
 	target.draw(this->panel);
 	target.draw(this->gameScreen);
-	this->level.render(target);
+	this->level->render(target);
 	target.draw(this->playButton);
 	target.draw(this->playButtonText);
 }
