@@ -91,6 +91,10 @@ private:
 	void initDynamicObjects();
 	void initResources();
 
+	void resetStaticObjects();
+	void resetDynamicObjects();
+	void resetResources();
+
 	void startPlatform(const StaticObject* object);
 	bool hasWheel(const StaticObject* object);
 	bool checkOverlaping(const sf::Sprite& newObject);
@@ -107,6 +111,11 @@ public:
 	/// Calls all init functions
 	/// </summary>
 	void initLevel();
+	/// <summary>
+	/// Resets level when game is over (used for AI)
+	/// Reverts everything to starting values
+	/// </summary>
+	void resetLevel();
 	/// <summary>
 	/// Updates position of clicked resource (if there is one)
 	/// </summary>

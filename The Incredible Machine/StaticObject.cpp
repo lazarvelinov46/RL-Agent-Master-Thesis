@@ -36,6 +36,12 @@ void StaticObject::move(float speed)
 	this->speed = speed;
 }
 
+void StaticObject::stop()
+{
+	this->moving = false;
+	this->speed = 0.0f;
+}
+
 sf::FloatRect StaticObject::getGlobalBounds()const
 {
 	return this->object.getGlobalBounds();

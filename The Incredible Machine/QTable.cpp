@@ -7,16 +7,18 @@ QTable::QTable()
 	this->gamma = 0.9;
 }
 
-QTable::QTable(int numberOfStates, int numberOfActions)
+QTable::QTable(int numberOfStates, int numberOfActions,std::string filename)
 {
 	for (int i = 0;i < numberOfStates;i++) {
 		for (int j = 0;j < numberOfActions;j++) {
 			this->values[i][j] = 0.0;
 		}
 	}
-	std::cout << this->values[0].size() << std::endl;
 	this->alpha = 0.1;
 	this->gamma = 0.9;
+	this->numStates = numberOfStates;
+	this->numActions = numberOfActions;
+	this->filename = filename;
 }
 
 double QTable::getQValue(int stateId, int actionId) const
@@ -45,7 +47,6 @@ int QTable::getAction(int stateId, double epsilon)
 {
 	std::srand(std::time(0));
 	if ((rand()/RAND_MAX) < epsilon) {
-		std::cout << "kur" << std::endl;
 		int action = rand() % 252;
 		return action;
 	}
@@ -61,4 +62,20 @@ int QTable::getAction(int stateId, double epsilon)
 		}
 		return actionId;
 	}
+}
+
+void QTable::printTable(int iteration)
+{
+	std::ofstream outFile(this->filename, std::ios::app); // append mode
+	if (!outFile.is_open()) return;
+
+	outFile << "Iteration: " << iteration << "\n";
+	for (int s = 0; s < this->numStates; ++s) {
+		for (int a = 0; a < this->numActions; ++a) {
+			outFile << std::fixed << std::setprecision(2) << this->values[s][a] << " ";
+		}
+		outFile << "\n";
+	}
+	outFile << "-------------------------------\n";
+	outFile.close();
 }

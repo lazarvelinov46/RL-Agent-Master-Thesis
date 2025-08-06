@@ -15,9 +15,12 @@ private:
 	std::unordered_map<int, std::unordered_map<int, double>> values;
 	double alpha;
 	double gamma;
+	int numStates;
+	int numActions;
+	std::string filename;
 public:
 	QTable();
-	QTable(int numberOfStates, int numberOfActions);
+	QTable(int numberOfStates, int numberOfActions, std::string filename);
 	
 
 	double getQValue(int stateId, int actionId)const;
@@ -25,5 +28,7 @@ public:
 	void updateQValue(int stateId, int actionId, double reward, int nextStateId);
 
 	int getAction(int stateId,double epsilon);
+
+	void printTable(int iteration);
 };
 

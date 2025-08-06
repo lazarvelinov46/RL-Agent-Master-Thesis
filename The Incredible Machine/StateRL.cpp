@@ -7,6 +7,8 @@ StateRL::StateRL()
     for (int i = 0;i < 3;i++) {
         this->ballsMoving.push_back(false);
     }
+    //second variant
+    this->allBallsMoving = true;
     for (int i = 0;i < 3;i++) {
         this->gearsStarted.push_back(false);
     }
@@ -50,9 +52,13 @@ int StateRL::getStateId() const
 {
     int id = 0;
     int scnt = 0;
+    /*
+    first variant
     for (int i = 0;i < this->ballsMoving.size();i++) {
         id |= this->ballsMoving[i] ? (1 << scnt++) : 0;
     }
+    */
+    id |= this->allBallsMoving ? (1 << scnt++) : 0;
     for (int i = 0;i < this->gearsStarted.size();i++) {
         id |= this->gearsStarted[i] ? (1 << scnt++) : 0;
     }
@@ -76,6 +82,14 @@ void StateRL::setGearStarted(int gearId,bool started)
 void StateRL::setBallMoving(int ballId,bool moving)
 {
     this->ballsMoving[ballId] = moving;
+    bool anyMoving = false;
+    for (int i = 0; i < this->ballsMoving.size(); i++) {
+        if (this->ballsMoving[i]) {
+            anyMoving = true;
+            break;
+        }
+    }
+    this->allBallsMoving = anyMoving;
 }
 
 void StateRL::setBallMoving(bool moving)
@@ -90,10 +104,13 @@ void StateRL::setTargetHit(bool hit)
 
 void StateRL::setInitialState()
 {
+    /*
     this->ballsMoving.at(0) = true;
     for (int i = 1;i < 4;i++) {
         this->ballsMoving.at(i)=false;
     }
+    */
+    this->allBallsMoving = true;
     for (int i = 0;i < 3;i++) {
         this->gearsStarted.at(i) = false;
     }

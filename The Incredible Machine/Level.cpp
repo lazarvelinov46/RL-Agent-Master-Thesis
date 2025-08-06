@@ -96,6 +96,25 @@ void Level::initResources()
 	}
 }
 
+void Level::resetStaticObjects()
+{
+	while (this->staticObjects.back()->getObjectType() == StaticObjectType::GEAR) {
+		this->staticObjects.pop_back();
+	}
+	for (int i = 0; i < this->staticObjects.size(); i++) {
+		if (this->staticObjects[i]->getObjectType() == StaticObjectType::PLATFORM) {
+			this->staticObjects[i]->stop();
+		}
+	}
+}
+
+void Level::resetDynamicObjects()
+{
+	for (int i = 0; i < this->dynamicObjects.size(); i++) {
+
+	}
+}
+
 void Level::startPlatform(const StaticObject* object)
 {
 	for (const std::vector<sf::Vertex>& belt : this->belts) {
@@ -109,7 +128,6 @@ void Level::startPlatform(const StaticObject* object)
 					this->stateChanged = true;
 					this->reward = WHEEL_ACTIVATED;
 
-					std::cout << "startovana platforma" << std::endl;
 				}
 				if (platform->getObjectType() == StaticObjectType::PLATFORM)i++;
 			}
@@ -124,10 +142,6 @@ bool Level::hasWheel(const StaticObject* object)
 
 bool Level::checkOverlaping(const sf::Sprite& newObject)
 {
-	std::cout << "TO PLACE X: " << newObject.getGlobalBounds().left
-		<< "; Y: " << newObject.getGlobalBounds().top
-		<< "; W: " << newObject.getGlobalBounds().width
-		<< "; H: " << newObject.getGlobalBounds().height << std::endl;
 	for (size_t i = 0; i < this->staticObjects.size(); i++) {
 		/*
 		std::cout << "STAT X: " << this->staticObjects[i]->getGlobalBounds().left
@@ -286,7 +300,9 @@ void Level::updateBalls(float deltaTime)
 	}
 	if (this->state.getBallMoving() != ballsMovingPreUpdate) {
 		this->stateChanged = true;
-		if (!this->state.getBallMoving())this->reward = LOST_GAME;
+		if (!this->state.getBallMoving()) {
+			this->reward = LOST_GAME;
+		}
 	}
 }
 
@@ -311,6 +327,11 @@ void Level::initLevel()
 
 	this->initState();
 
+}
+
+void Level::resetLevel()
+{
+	
 }
 
 void Level::handleInput(sf::RenderWindow& window)
@@ -439,9 +460,6 @@ void Level::handleClick(sf::Vector2f& mousePosition)
 				}
 				this->clickedResource = false;
 				this->selectedResoureceIndex = -1;
-				std::cout << "STAVLJENO " << this->selectedResource->getGlobalBounds().left << this->selectedResource->getGlobalBounds().top
-					<< this->selectedResource->getGlobalBounds().height << this->selectedResource->getGlobalBounds().width << std::endl;
-
 			}
 		}
 		
@@ -530,8 +548,6 @@ bool Level::tryGearPlacement(sf::Vector2f position)
 			this->resourceNumbersText[1].setString(std::to_string(--this->resourceNumbers[1]));
 			this->resources.pop_back();
 		}
-		std::cout << "STAVLJENO " << this->selectedResource->getGlobalBounds().left << this->selectedResource->getGlobalBounds().top
-			<< this->selectedResource->getGlobalBounds().height << this->selectedResource->getGlobalBounds().width << std::endl;
 		return true;
 	}
 	else {
