@@ -22,8 +22,22 @@ void StaticObject::setTexture()
 		break;
 		break;
 	}
-	case StaticObjectType::GOAL:
+	case StaticObjectType::WALL: {
+		sf::Texture& tex = TextureManager::getTexture("assets/Textures/basket.jpg");
+		tex.setRepeated(true);
+		this->object.setTexture(&tex);
+		this->object.setTextureRect(sf::IntRect(0, 0, static_cast<int>(this->object.getGlobalBounds().width),
+			static_cast<int>(this->object.getGlobalBounds().height)));
 		break;
+	}
+	case StaticObjectType::GOAL: {
+		sf::Texture& tex = TextureManager::getTexture("assets/Textures/basket.jpg");
+		tex.setRepeated(true);
+		this->object.setTexture(&tex);
+		this->object.setTextureRect(sf::IntRect(0, 0, static_cast<int>(this->object.getGlobalBounds().width),
+			static_cast<int>(this->object.getGlobalBounds().height)));
+		break;
+	}
 	default:
 		break;
 	}

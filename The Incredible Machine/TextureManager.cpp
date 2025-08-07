@@ -2,7 +2,7 @@
 #include "TextureManager.h"
 
 
-const std::string TextureManager::TEXTURE_FOLDER_PATH= "../../Resources/Textures/";
+const std::string TextureManager::TEXTURE_FOLDER_PATH= "assets/Textures/";
 std::unordered_map<std::string, sf::Texture> TextureManager::textures;
 
 sf::Texture& TextureManager::getTexture(const std::string& filename) 

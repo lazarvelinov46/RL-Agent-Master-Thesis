@@ -39,6 +39,8 @@ private:
 	void initPanel();
 	//Initializes game screen
 	void initGameScreen();
+	//Initializes textures
+	void initTextures();
 public:
 	/// <summary>
 	/// Initializes all elements of the game

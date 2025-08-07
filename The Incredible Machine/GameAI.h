@@ -76,6 +76,8 @@ private:
 	void initPanel();
 	//Initializes game screen
 	void initGameScreen();
+	//Initializes textures
+	void initTextures();
 
 	/// <summary>
 	/// Selects action from QTable according to epsilon-greedy policy
