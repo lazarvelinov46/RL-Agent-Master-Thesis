@@ -77,6 +77,10 @@ public:
 	/// <param name="speed">Rotating speed of an object</param>
 	void move(float speed);
 	/// <summary>
+	/// Stops the moving (rotating) of an object
+	/// </summary>
+	void stop();
+	/// <summary>
 	/// Retrieves global bounds of rectangle around object for collision checks
 	/// </summary>
 	/// <returns>FloatRect object of objects bounds</returns>

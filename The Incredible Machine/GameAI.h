@@ -36,7 +36,7 @@ private:
 	sf::RectangleShape gameScreen;
 
 	//Level object managing game and logic of specific level
-	Level level;
+	Level* level;
 	//Next state object to transition to
 	State* nextState;
 	//Pointer to the RL agent performing actions
@@ -45,9 +45,16 @@ private:
 	//test
 	ActionRL actionFunctions;
 
-
 	//Flag which indicates if simulation is running
 	bool isPlaying = false;
+
+	//Number of iterations since the beggining of game
+	int iterations = 0;
+	//game over indication
+	bool gameOver = false;
+
+	//Resets game resources before new iteration of the game
+	void resetResources();
 
 	//Current stateId used in QLearning
 	int stateId;
