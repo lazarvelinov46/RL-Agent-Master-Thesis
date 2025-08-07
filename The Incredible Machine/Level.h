@@ -78,6 +78,7 @@ private:
 	bool isPlaying = false;
 	
 	//AI
+	bool modeAI = false;
 	/* Tracking in which state agent currently is */
 	StateRL state;
 	double reward;
@@ -107,7 +108,7 @@ private:
 
 	void updateBalls(float deltaTime = 0);
 public:
-	Level();
+	Level(bool mode=false);
 	/// <summary>
 	/// Calls all init functions
 	/// </summary>

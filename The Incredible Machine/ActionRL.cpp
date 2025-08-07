@@ -54,6 +54,7 @@ std::pair<int, int> ActionRL::getGearCoordinates(int gearActionId)
 
 std::pair<BeltActionInfo, BeltActionInfo> ActionRL::getBeltPlacement(int beltActionId)
 {
+    beltActionId -= ActionRL::GRID_WIDTH * ActionRL::GRID_HEIGHT;
     BeltActionInfo beggining;
     BeltActionInfo end;
     int crossCombinations = ActionRL::NO_OF_BELTS * ActionRL::NO_OF_GEARS;
