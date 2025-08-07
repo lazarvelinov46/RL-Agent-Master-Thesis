@@ -1,5 +1,6 @@
 #pragma once
 #include "stdafx.h"
+#include "TextureManager.h"
 
 /**
 * @class DynamicObject
@@ -15,6 +16,11 @@ private:
 	sf::CircleShape shape;
 	//Object velocity vector
 	sf::Vector2f velocity;
+	//Indicate if object is shape or srpite
+	bool isSprite;
+
+	//In game ball size in px
+	static const float IN_GAME_BALL_SIZE;
 public:
 	/// <summary>
 	/// TODO: Constructor using the texture
@@ -22,7 +28,7 @@ public:
 	/// <param name="x">Object position on X axis</param>
 	/// <param name="y">Object position on Y axis</param>
 	/// <param name="texture">Texture for object's sprite</param>
-	DynamicObject(float x, float y, const sf::Texture& texture);
+	DynamicObject(float x, float y, bool goalBall);
 	/// <summary>
 	/// Constructor using circle shape
 	/// </summary>
@@ -49,6 +55,7 @@ public:
 	sf::Vector2f getVelocity()const;
 	sf::Vector2f getPosition()const;
 	sf::CircleShape getShape()const;
+	sf::Sprite getSprite()const;
 
 	void setVelocity(sf::Vector2f velocity);
 	void setPosition(sf::Vector2f position);

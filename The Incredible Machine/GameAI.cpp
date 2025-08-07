@@ -24,16 +24,27 @@ void GameAI::initPanel()
 	this->panel.setPosition(sf::Vector2f(1000, 0));
 	this->panel.setFillColor(sf::Color::White);
 
-	this->playButton.setSize(sf::Vector2f(100, 50));
-	this->playButton.setPosition(sf::Vector2f(1050, 50));
-	this->playButton.setFillColor(sf::Color::Green);
+	this->playButton.setSize(sf::Vector2f(150, 100));
+	this->playButton.setPosition(sf::Vector2f(1025, 50));
+	//this->playButton.setFillColor(sf::Color::Green);
 }
 
 void GameAI::initGameScreen()
 {
 	this->gameScreen.setSize(sf::Vector2f(1000, 800));
 	this->gameScreen.setPosition(sf::Vector2f(0, 0));
-	this->gameScreen.setFillColor(sf::Color(128, 128, 128));
+	//this->gameScreen.setFillColor(sf::Color(128, 128, 128));
+	
+}
+
+void GameAI::initTextures()
+{
+	sf::Texture& textureBackground = TextureManager::getTexture("assets/Textures/backgroundAI_ready.png");
+	this->gameScreen.setTexture(&textureBackground);
+	sf::Texture& texturePanel = TextureManager::getTexture("assets/Textures/panelAI.jpg");
+	this->panel.setTexture(&texturePanel);
+	sf::Texture& texturePlay = TextureManager::getTexture("assets/Textures/play.png");
+	this->playButton.setTexture(&texturePlay);
 }
 
 void GameAI::selectAction()
@@ -87,9 +98,10 @@ GameAI::GameAI()
 	this->actionId = -1;
 	this->nextStateId = 1;
 	this->initFont();
-	this->initText();
+	//this->initText();
 	this->initGameScreen();
 	this->initPanel();
+	this->initTextures();
 	this->table = QTable(256, 252,"qtable.txt");
 	this->level = new Level();
 	this->level->initLevel();

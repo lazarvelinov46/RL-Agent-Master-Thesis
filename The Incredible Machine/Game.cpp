@@ -22,26 +22,35 @@ void Game::initPanel()
 {
 	this->panel.setSize(sf::Vector2f(200, 800));
 	this->panel.setPosition(sf::Vector2f(1000, 0));
-	this->panel.setFillColor(sf::Color::White);
 
-	this->playButton.setSize(sf::Vector2f(100, 50));
-	this->playButton.setPosition(sf::Vector2f(1050, 50));
-	this->playButton.setFillColor(sf::Color::Green);
+	this->playButton.setSize(sf::Vector2f(150, 100));
+	this->playButton.setPosition(sf::Vector2f(1025, 50));
+	//this->playButton.setFillColor(sf::Color::Green);
 }
 
 void Game::initGameScreen()
 {
 	this->gameScreen.setSize(sf::Vector2f(1000, 800));
 	this->gameScreen.setPosition(sf::Vector2f(0, 0));
-	this->gameScreen.setFillColor(sf::Color(128,128,128));
+}
+
+void Game::initTextures()
+{
+	sf::Texture& textureBacktround = TextureManager::getTexture("assets/Textures/background_ready.png");
+	this->gameScreen.setTexture(&textureBacktround);
+	sf::Texture& texturePanel = TextureManager::getTexture("assets/Textures/panel.jpg");
+	this->panel.setTexture(&texturePanel);
+	sf::Texture& texturePlay = TextureManager::getTexture("assets/Textures/play.png");
+	this->playButton.setTexture(&texturePlay);
 }
 
 Game::Game()
 {
 	this->initFont();
-	this->initText();
+	//this->initText();
 	this->initGameScreen();
 	this->initPanel();
+	this->initTextures();
 	this->level.initLevel();
 	this->nextState = nullptr;
 }

@@ -29,30 +29,35 @@ void Level::initTextures()
 
 void Level::initStaticObjects()
 {
-	this->staticObjects.push_back(new StaticObject(0, 760, 1200, 50,StaticObjectType::FLOOR));
+	this->staticObjects.push_back(new StaticObject(0, 760, 1000, 50,StaticObjectType::FLOOR));
 
 	this->staticObjects.push_back(new StaticObject(100, 600, 150, 20, StaticObjectType::PLATFORM));
 	this->staticObjects.push_back(new StaticObject(300, 500, 150, 20, StaticObjectType::PLATFORM));
 	this->staticObjects.push_back(new StaticObject(600, 300, 150, 20, StaticObjectType::PLATFORM));
 
-	this->staticObjects.push_back(new StaticObject(830, 400, 20, 40, sf::Color::Green, StaticObjectType::WALL));
-	this->staticObjects.push_back(new StaticObject(830, 440, 160, 20, sf::Color::Green, StaticObjectType::GOAL));
-	this->staticObjects.push_back(new StaticObject(970, 400, 20, 40, sf::Color::Green, StaticObjectType::WALL));
+	this->staticObjects.push_back(new StaticObject(830, 400, 20, 40, StaticObjectType::WALL));
+	this->staticObjects.push_back(new StaticObject(830, 440, 160, 20, StaticObjectType::GOAL));
+	this->staticObjects.push_back(new StaticObject(970, 400, 20, 40, StaticObjectType::WALL));
 }
 
 void Level::initStaticWheels()
 {
+	/*
 	this->staticWheels.push_back(new StaticWheel(200, 610.f, 10.f));
 	this->staticWheels.push_back(new StaticWheel(400, 510.f, 10.f));
 	this->staticWheels.push_back(new StaticWheel(700, 310.f, 10.f));
+	*/
+	this->staticWheels.push_back(new StaticWheel(200, 610.f));
+	this->staticWheels.push_back(new StaticWheel(400, 510.f));
+	this->staticWheels.push_back(new StaticWheel(700, 310.f));
 }
 
 void Level::initDynamicObjects()
 {
-	this->dynamicObjects.push_back(new DynamicObject(25, 500, 25, sf::Color::Cyan));
-	this->dynamicObjects.push_back(new DynamicObject(100, 550, 25, sf::Color::Cyan));
-	this->dynamicObjects.push_back(new DynamicObject(300, 450, 25, sf::Color::Cyan));
-	this->dynamicObjects.push_back(new DynamicObject(600, 250, 25, sf::Color::Magenta));
+	this->dynamicObjects.push_back(new DynamicObject(25, 500, false));
+	this->dynamicObjects.push_back(new DynamicObject(100, 550, false));
+	this->dynamicObjects.push_back(new DynamicObject(300, 450, false));
+	this->dynamicObjects.push_back(new DynamicObject(600, 250, true));
 }
 
 void Level::initResources()
@@ -197,7 +202,7 @@ void Level::updateBalls(float deltaTime)
 		DynamicObject* ball = this->dynamicObjects[i];
 		sf::Vector2f oldVelocity = ball->getVelocity();
 		sf::Vector2f newPosition = ball->getPosition()+ oldVelocity;
-		sf::FloatRect ballBounds = ball->getShape().getGlobalBounds();
+		sf::FloatRect ballBounds = ball->getGlobalBounds();
 		float ballBottom = ballBounds.top + ballBounds.height;
 		float ballRight = ballBounds.left + ballBounds.width;
 
@@ -383,7 +388,8 @@ void Level::handleClick(sf::Vector2f& mousePosition)
 					makes belt follow the mouse
 					*/
 					this->activeBeltPlacement = true;
-					this->beltStart = sf::Vector2f(wheel->getGlobalBounds().left, wheel->getGlobalBounds().top);
+					this->startBeltGear = false;
+					this->beltStart = sf::Vector2f(wheel->getGlobalBounds().left+wheel->getGlobalBounds().width/2, wheel->getGlobalBounds().top+2);
 					this->endPointsBelt[0].position = this->beltStart;
 					this->endPointsBelt[1].position = mousePosition;
 					this->endPointsBelt[0].color = sf::Color::Yellow;
@@ -399,7 +405,9 @@ void Level::handleClick(sf::Vector2f& mousePosition)
 					makes belt follow the mouse
 					*/
 					this->activeBeltPlacement = true;
-					this->beltStart = sf::Vector2f(object->getGlobalBounds().left, object->getGlobalBounds().top);
+					this->startBeltGear = true;
+					this->beltStart = sf::Vector2f(object->getGlobalBounds().left+ object->getGlobalBounds().width/8,
+						object->getGlobalBounds().top+object->getGlobalBounds().height/4);
 					this->endPointsBelt[0].position = this->beltStart;
 					this->endPointsBelt[1].position = mousePosition;
 					this->endPointsBelt[0].color = sf::Color::Yellow;
@@ -412,12 +420,15 @@ void Level::handleClick(sf::Vector2f& mousePosition)
 		else if (this->selectedResoureceIndex == 0 && this->activeBeltPlacement) {
 			//placing belt second time
 			this->validBeltPlacement = false;
-			for (const StaticWheel* wheel : this->staticWheels) {
+			this->startBeltGear = false;
+			StaticWheel* wheelToPlace = nullptr;
+			for (StaticWheel* wheel : this->staticWheels) {
 				if (wheel->getGlobalBounds().contains(mousePosition)) {
 					/*
 					checking if belt placement is valid (ends on a wheel)
 					*/
 					this->validBeltPlacement = true;
+					wheelToPlace = wheel;
 					break;
 				}
 			}
@@ -426,9 +437,28 @@ void Level::handleClick(sf::Vector2f& mousePosition)
 				if belt placement is valid, belt positions are pushed into list
 				as if it is two lines (simple graphic representation)
 				*/
-				this->belts.push_back({ this->beltStart,mousePosition });
-				this->belts.push_back({ sf::Vector2f(mousePosition.x + this->staticWheels[0]->getGlobalBounds().width,mousePosition.y + this->staticWheels[0]->getGlobalBounds().height),
-					sf::Vector2f(this->beltStart.x + this->staticWheels[0]->getGlobalBounds().width,this->beltStart.y + this->staticWheels[0]->getGlobalBounds().height) });
+				this->belts.push_back({ this->beltStart,
+					sf::Vector2f(
+						wheelToPlace->getGlobalBounds().left+2,
+						wheelToPlace->getGlobalBounds().top+wheelToPlace->getGlobalBounds().height/2)});
+				if (this->startBeltGear) {
+					this->belts.push_back({ 
+						sf::Vector2f(
+							wheelToPlace->getGlobalBounds().left + wheelToPlace->getGlobalBounds().width,
+							wheelToPlace->getGlobalBounds().top + wheelToPlace->getGlobalBounds().height/2),
+						sf::Vector2f(
+							this->beltStart.x + this->staticWheels[0]->getGlobalBounds().width,
+							this->beltStart.y + this->staticWheels[0]->getGlobalBounds().height) });
+				}
+				else {
+					this->belts.push_back({
+						sf::Vector2f(
+							wheelToPlace->getGlobalBounds().left + wheelToPlace->getGlobalBounds().width,
+							wheelToPlace->getGlobalBounds().top + wheelToPlace->getGlobalBounds().height / 2),
+						sf::Vector2f(
+							this->beltStart.x + this->staticWheels[0]->getGlobalBounds().width/2,
+							this->beltStart.y + this->staticWheels[0]->getGlobalBounds().height/2) });
+				}
 				/*
 				Updating variables and UI elements
 				*/

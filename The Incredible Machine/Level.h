@@ -62,6 +62,7 @@ private:
 	/* Flag if resource is clicked */
 	bool clickedResource = false;
 	bool activeBeltPlacement = false;
+	bool startBeltGear;
 	/* Flag if belt placement is currently valid */
 	bool validBeltPlacement = false;
 	/* Index of selected resource */

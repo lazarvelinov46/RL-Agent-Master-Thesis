@@ -12,6 +12,8 @@
 class StaticWheel
 {
 private:
+	//Sprite which will represent the wheel
+	sf::Sprite sprite;
 	/// <summary>
 	/// Circle shape which is used to render the "wheel"
 	/// TODO: Implement it with some sprite and texture
@@ -19,6 +21,9 @@ private:
 	sf::CircleShape object;
 	//sets texture of an object depending on object type
 	void setTexture();
+
+	//wheel size in game
+	static const float IN_GAME_WHEEL_SIZE;
 
 public:
 	/// <summary>
@@ -38,7 +43,7 @@ public:
 	/// Constructor that creates wheel with sprite
 	/// </summary>
 	/// <param name="sprite">Sprite that defines the wheel</param>
-	StaticWheel(const sf::Sprite& sprite);
+	StaticWheel(float x, float y);
 	/// <summary>
 	/// Draws the wheel on specific render target
 	/// </summary>
