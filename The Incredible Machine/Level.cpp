@@ -311,10 +311,11 @@ void Level::updateBalls(float deltaTime)
 	}
 }
 
-Level::Level()
+Level::Level(bool mode)
 {
-	//this->initLevel();
+	this->modeAI = true;
 }
+
 
 void Level::initLevel()
 {
