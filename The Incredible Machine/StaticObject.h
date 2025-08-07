@@ -1,5 +1,6 @@
 #pragma once
 #include "stdafx.h"
+#include "TextureManager.h"
 
 /// <summary>
 /// Types of static objects that could appear on level
@@ -29,6 +30,8 @@ private:
 	bool moving = false;
 	//Speed of moving (rotating)
 	float speed = 0.f;
+	//sets texture of an object depending on object type
+	void setTexture();
 
 
 public:
@@ -42,6 +45,15 @@ public:
 	/// <param name="color">Color of an object</param>
 	/// <param name="t">Object type</param>
 	StaticObject(float x, float y, float width, float height,sf::Color color,StaticObjectType t);
+	/// <summary>
+	/// Creates static object with given position, size, and type
+	/// </summary>
+	/// <param name="x">Position on X axis</param>
+	/// <param name="y">Position on Y axis</param>
+	/// <param name="width">Width of an object</param>
+	/// <param name="height">Height of an object</param>
+	/// <param name="t">Object type</param>
+	StaticObject(float x, float y, float width, float height, StaticObjectType t);
 	/// <summary>
 	/// Copy constructor
 	/// </summary>

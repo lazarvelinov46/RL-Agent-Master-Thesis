@@ -6,6 +6,7 @@
 #include <cmath>
 #include <vector>
 #include <stack>
+#include <string>
 #include <unordered_map>
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>

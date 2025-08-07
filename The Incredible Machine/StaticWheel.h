@@ -1,6 +1,7 @@
 #pragma once
 
 #include "stdafx.h"
+#include "TextureManager.h"
 
 /**
 * @class StaticWheel
@@ -16,6 +17,8 @@ private:
 	/// TODO: Implement it with some sprite and texture
 	/// </summary>
 	sf::CircleShape object;
+	//sets texture of an object depending on object type
+	void setTexture();
 
 public:
 	/// <summary>
@@ -25,7 +28,7 @@ public:
 	/// <param name="y">Position on Y axis</param>
 	/// <param name="radius">Radius of the wheel</param>
 	/// <param name="color">Fill color of the wheel</param>
-	StaticWheel(float x, float y, float radius, sf::Color color);
+	StaticWheel(float x, float y, float radius);
 	/// <summary>
 	/// Copy constructor
 	/// </summary>

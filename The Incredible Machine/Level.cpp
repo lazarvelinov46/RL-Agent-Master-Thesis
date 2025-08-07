@@ -29,11 +29,11 @@ void Level::initTextures()
 
 void Level::initStaticObjects()
 {
-	this->staticObjects.push_back(new StaticObject(0, 760, 1200, 50, sf::Color::Red,StaticObjectType::FLOOR));
+	this->staticObjects.push_back(new StaticObject(0, 760, 1200, 50,StaticObjectType::FLOOR));
 
-	this->staticObjects.push_back(new StaticObject(100, 600, 150, 20, sf::Color::Blue, StaticObjectType::PLATFORM));
-	this->staticObjects.push_back(new StaticObject(300, 500, 150, 20, sf::Color::Blue, StaticObjectType::PLATFORM));
-	this->staticObjects.push_back(new StaticObject(600, 300, 150, 20, sf::Color::Blue, StaticObjectType::PLATFORM));
+	this->staticObjects.push_back(new StaticObject(100, 600, 150, 20, StaticObjectType::PLATFORM));
+	this->staticObjects.push_back(new StaticObject(300, 500, 150, 20, StaticObjectType::PLATFORM));
+	this->staticObjects.push_back(new StaticObject(600, 300, 150, 20, StaticObjectType::PLATFORM));
 
 	this->staticObjects.push_back(new StaticObject(830, 400, 20, 40, sf::Color::Green, StaticObjectType::WALL));
 	this->staticObjects.push_back(new StaticObject(830, 440, 160, 20, sf::Color::Green, StaticObjectType::GOAL));
@@ -42,9 +42,9 @@ void Level::initStaticObjects()
 
 void Level::initStaticWheels()
 {
-	this->staticWheels.push_back(new StaticWheel(200, 610.f, 10.f, sf::Color::Yellow));
-	this->staticWheels.push_back(new StaticWheel(400, 510.f, 10.f, sf::Color::Yellow));
-	this->staticWheels.push_back(new StaticWheel(700, 310.f, 10.f, sf::Color::Yellow));
+	this->staticWheels.push_back(new StaticWheel(200, 610.f, 10.f));
+	this->staticWheels.push_back(new StaticWheel(400, 510.f, 10.f));
+	this->staticWheels.push_back(new StaticWheel(700, 310.f, 10.f));
 }
 
 void Level::initDynamicObjects()
