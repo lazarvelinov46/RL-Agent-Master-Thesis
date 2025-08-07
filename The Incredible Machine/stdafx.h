@@ -3,6 +3,8 @@
 #include <iostream>
 #include <time.h>
 #include <stdexcept>
+#include <iomanip>
+#include <fstream>
 #include <cmath>
 #include <vector>
 #include <stack>

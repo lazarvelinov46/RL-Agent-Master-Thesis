@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Game.h"
 
+
 void Game::initFont()
 {
 	if (!font.loadFromFile("assets/Fonts/ARIAL.TTF")) {
