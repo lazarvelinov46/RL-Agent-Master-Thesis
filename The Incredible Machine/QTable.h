@@ -29,6 +29,8 @@ public:
 
 	int getAction(int stateId,double epsilon);
 
-	void printTable(int iteration);
+	void printTable(const std::string& filename,int iteration);
+
+	void saveQTableCSV(const std::string& filename);
 };
 

@@ -52,13 +52,15 @@ void GameAI::updateActionState()
 	if (this->stateId == -1) {
 		this->isPlaying = true;
 		level->setIsPlaying(this->isPlaying);
-		this->stateId = 0;
+		this->stateId = 1;
 		this->actionId = this->table.getAction(this->stateId, 0.1);
+		this->lastExecutedAction = this->actionId;
 		return;
 	}
 	if (this->selectAction) {
 		this->actionId = this->table.getAction(this->nextStateId, 0.1);
 		this->stateId = this->nextStateId;
+		this->lastExecutedAction = this->actionId;
 	}
 	else {
 		this->actionId = -1;
@@ -72,10 +74,10 @@ bool GameAI::updateState()
 	if (this->level->getStateChanged()) {
 		//TODO: add reward getter from level
 		this->nextStateId = this->level->getStatusChange().getStateId();
-		std::cout << this->stateId << " " << this->nextStateId << std::endl;
+		std::cout << this->stateId << " s " << this->nextStateId << " r " << this->level->getReward() << std::endl;
 		if (this->nextStateId != this->stateId) {
-			this->table.updateQValue(this->stateId, this->actionId, 1.0, this->nextStateId);
-			this->episode.push_back(new Transition({ this->stateId,this->actionId,0.0,-1 }));
+			this->table.updateQValue(this->stateId, this->lastExecutedAction, this->level->getReward(), this->nextStateId);
+			this->episode.push_back(new Transition({ this->stateId,this->lastExecutedAction,0.0,-1 }));
 		}
 		if (nextStateId%2 == 0) {
 			this->gameOver = true;
@@ -85,7 +87,10 @@ bool GameAI::updateState()
 			this->actionId = -1;
 			this->nextStateId = 1;
 			if (this->iterations % 10 == 0) {
-				this->table.printTable(this->iterations);
+				this->table.printTable("qtable.txt",this->iterations);
+				std::string csvFilename = "qtable" + std::to_string(this->iterations) + ".csv";
+				std::cout << csvFilename << std::endl;
+				this->table.saveQTableCSV(csvFilename);
 			}
 		}
 		return true;
@@ -172,15 +177,17 @@ void GameAI::update(float deltaTime)
 	if (actionType == AgentAction::PLACE_GEAR) {
 		//gear placement
 		std::pair<int,int> coordinates=this->actionFunctions.getGearCoordinates(this->actionId);
-		//if (this->stateId==1&&!level->tryGearPlacement(sf::Vector2f(coordinates.first*50, coordinates.second*50))) {
-		if (this->stateId==0&&!level->tryGearPlacement(sf::Vector2f(0*50, 13*50))) {
+		if (!level->tryGearPlacement(sf::Vector2f(coordinates.first*50, coordinates.second*50))) {
+		//if (this->stateId==0&&!level->tryGearPlacement(sf::Vector2f(0*50, 13*50))) {
 			//TODO: apply penalty
 			this->table.updateQValue(this->stateId, this->actionId, WRONG_GEAR_PLACEMENT, this->stateId);
 		}
+		/*
 		if (this->stateId != 0 && !level->tryGearPlacement(sf::Vector2f(coordinates.first * 50, coordinates.second * 50))) {
 
 			this->table.updateQValue(this->stateId, this->actionId, WRONG_GEAR_PLACEMENT, this->stateId);
 		}
+		*/
 	}
 	else if(actionType==AgentAction::PLACE_BELT){
 		//belt placement

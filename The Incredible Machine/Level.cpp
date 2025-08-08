@@ -633,7 +633,7 @@ sf::Vector2f Level::getWheelLocation(int wheelId)
 
 double Level::getReward()
 {
-	return 0.0;
+	return this->reward;
 }
 
 int Level::getNumberOfBelts()
