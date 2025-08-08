@@ -47,43 +47,50 @@ void GameAI::initTextures()
 	this->playButton.setTexture(&texturePlay);
 }
 
-void GameAI::selectAction()
+void GameAI::updateActionState()
 {
 	if (this->stateId == -1) {
 		this->isPlaying = true;
 		level->setIsPlaying(this->isPlaying);
 		this->stateId = 0;
+		this->actionId = this->table.getAction(this->stateId, 0.1);
 		return;
 	}
-	if (this->stateId != this->nextStateId) {
+	if (this->selectAction) {
 		this->actionId = this->table.getAction(this->nextStateId, 0.1);
 		this->stateId = this->nextStateId;
-		this->episode.push_back(new Transition({ this->stateId,this->actionId,0.0,-1 }));
 	}
 	else {
 		this->actionId = -1;
 	}
 }
 
-void GameAI::updateState()
+bool GameAI::updateState()
 {
+	//std::cout << this->stateId << " " << this->nextStateId << std::endl;
 	//get state changed
 	if (this->level->getStateChanged()) {
 		//TODO: add reward getter from level
 		this->nextStateId = this->level->getStatusChange().getStateId();
-		this->table.updateQValue(this->stateId, this->actionId, 1.0, this->nextStateId);
-		if (nextStateId == 0) {
+		std::cout << this->stateId << " " << this->nextStateId << std::endl;
+		if (this->nextStateId != this->stateId) {
+			this->table.updateQValue(this->stateId, this->actionId, 1.0, this->nextStateId);
+			this->episode.push_back(new Transition({ this->stateId,this->actionId,0.0,-1 }));
+		}
+		if (nextStateId%2 == 0) {
 			this->gameOver = true;
 			this->iterations++;
 			this->resetResources();
 			this->stateId = -1;
 			this->actionId = -1;
 			this->nextStateId = 1;
+			if (this->iterations % 10 == 0) {
+				this->table.printTable(this->iterations);
+			}
 		}
-		if (this->iterations % 10 == 0) {
-			this->table.printTable(this->iterations);
-		}
+		return true;
 	}
+	return false;
 }
 
 void GameAI::resetResources()
@@ -160,13 +167,18 @@ void GameAI::update(float deltaTime)
 		}
 	}
 	*/
-	this->selectAction();
+	this->updateActionState();
 	AgentAction actionType=this->actionFunctions.getActionType(this->actionId);
 	if (actionType == AgentAction::PLACE_GEAR) {
 		//gear placement
 		std::pair<int,int> coordinates=this->actionFunctions.getGearCoordinates(this->actionId);
-		if (!level->tryGearPlacement(sf::Vector2f(coordinates.first*50, coordinates.second*50))) {
+		//if (this->stateId==1&&!level->tryGearPlacement(sf::Vector2f(coordinates.first*50, coordinates.second*50))) {
+		if (this->stateId==0&&!level->tryGearPlacement(sf::Vector2f(0*50, 13*50))) {
 			//TODO: apply penalty
+			this->table.updateQValue(this->stateId, this->actionId, WRONG_GEAR_PLACEMENT, this->stateId);
+		}
+		if (this->stateId != 0 && !level->tryGearPlacement(sf::Vector2f(coordinates.first * 50, coordinates.second * 50))) {
+
 			this->table.updateQValue(this->stateId, this->actionId, WRONG_GEAR_PLACEMENT, this->stateId);
 		}
 	}
@@ -178,6 +190,7 @@ void GameAI::update(float deltaTime)
 		*/
 		try {
 			std::pair<BeltActionInfo, BeltActionInfo> beltActionInfo = this->actionFunctions.getBeltPlacement(actionId);
+			std::cout << "Belt"<<std::endl;
 			sf::Vector2f start, end;
 			if (beltActionInfo.first.isElementGear) {
 				start = this->level->getGearLocation(beltActionInfo.first.idElement);
@@ -208,7 +221,7 @@ void GameAI::update(float deltaTime)
 		
 	}
 	this->level->update(deltaTime);
-	this->updateState();
+	this->selectAction=this->updateState();
 }
 
 void GameAI::render(sf::RenderTarget& target)

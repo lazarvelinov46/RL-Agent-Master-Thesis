@@ -43,6 +43,11 @@ bool StateRL::getBallMoving() const
     return false;
 }
 
+bool StateRL::getAllBallsMoving() const
+{
+    return this->allBallsMoving;
+}
+
 bool StateRL::getTargetHit() const
 {
     return this->targetHit;
@@ -58,14 +63,18 @@ int StateRL::getStateId() const
         id |= this->ballsMoving[i] ? (1 << scnt++) : 0;
     }
     */
-    id |= this->allBallsMoving ? (1 << scnt++) : 0;
+    id |= this->allBallsMoving ? (1 << scnt) : 0;
+    scnt++;
     for (int i = 0;i < this->gearsStarted.size();i++) {
-        id |= this->gearsStarted[i] ? (1 << scnt++) : 0;
+        id |= this->gearsStarted[i] ? (1 << scnt) : 0;
+        scnt++;
     }
     for (int i = 0;i < this->wheelsStarted.size();i++) {
-        id |= this->wheelsStarted[i] ? (1<<scnt++) : 0;
+        id |= this->wheelsStarted[i] ? (1<<scnt) : 0;
+        scnt++;
     }
-    id |= this->targetHit ? (1 << scnt++) : 0;
+    id |= this->targetHit ? (1 << scnt) : 0;
+    scnt++;
     return id;
 }
 

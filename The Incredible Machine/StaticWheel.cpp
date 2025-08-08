@@ -38,3 +38,12 @@ sf::FloatRect StaticWheel::getGlobalBounds() const
 {
 	return this->sprite.getTexture()?this->sprite.getGlobalBounds() : this->object.getGlobalBounds();
 }
+void StaticWheel::setAttached(bool attached)
+{
+	this->attached = attached;
+}
+
+bool StaticWheel::getAttached()const
+{
+	return this->attached;
+}

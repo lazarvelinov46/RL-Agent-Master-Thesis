@@ -100,3 +100,13 @@ sf::FloatRect StaticObject::getGlobalBounds()const
 {
 	return this->object.getGlobalBounds();
 }
+
+void StaticObject::setAttached(bool attached)
+{
+	if (this->type==StaticObjectType::GEAR) this->attached = attached;
+}
+
+bool StaticObject::getAttached()
+{
+	return this->attached;
+}
