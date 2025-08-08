@@ -64,9 +64,9 @@ int QTable::getAction(int stateId, double epsilon)
 	}
 }
 
-void QTable::printTable(int iteration)
+void QTable::printTable(const std::string& filename,int iteration)
 {
-	std::ofstream outFile(this->filename, std::ios::app); // append mode
+	std::ofstream outFile(filename, std::ios::app);
 	if (!outFile.is_open()) return;
 
 	outFile << "Iteration: " << iteration << "\n";
@@ -77,5 +77,21 @@ void QTable::printTable(int iteration)
 		outFile << "\n";
 	}
 	outFile << "-------------------------------\n";
+	outFile.close();
+}
+
+void QTable::saveQTableCSV(const std::string& filename) {
+	std::ofstream outFile(filename);
+	if (!outFile.is_open()) return;
+
+	for (int s = 0; s < this->numStates; ++s) {
+		for (int a = 0; a < this->numActions; ++a) {
+			outFile << this->values[s][a];
+			if (a != this->numActions - 1)
+				outFile << ",";
+		}
+		outFile << "\n";
+	}
+
 	outFile.close();
 }
