@@ -54,7 +54,7 @@ void Level::initStaticWheels()
 
 void Level::initDynamicObjects()
 {
-	this->dynamicObjects.push_back(new DynamicObject(25, 500, false));
+	this->dynamicObjects.push_back(new DynamicObject(25, 470, false));
 	this->dynamicObjects.push_back(new DynamicObject(100, 550, false));
 	this->dynamicObjects.push_back(new DynamicObject(300, 450, false));
 	this->dynamicObjects.push_back(new DynamicObject(600, 250, true));
@@ -257,6 +257,7 @@ void Level::updateBalls(float deltaTime)
 					if (!this->state.getGearStarted(gears)) {
 						this->state.setGearStarted(gears, true);
 						this->stateChanged = true;
+						std::cout << this->state.getStateId() << std::endl;
 						this->reward = GEAR_ACTIVATED;
 						std::cout << "zupcanik" << std::endl;
 						this->startPlatform(object);
@@ -306,6 +307,7 @@ void Level::updateBalls(float deltaTime)
 	if (this->state.getBallMoving() != ballsMovingPreUpdate) {
 		this->stateChanged = true;
 		if (!this->state.getBallMoving()) {
+			
 			this->reward = LOST_GAME;
 		}
 	}
@@ -388,6 +390,10 @@ void Level::handleClick(sf::Vector2f& mousePosition)
 					updating belt start and endPointBelt variables
 					makes belt follow the mouse
 					*/
+					if (wheel->getAttached()) {
+						//impossible action, select new
+						this->stateChanged = true;
+					}
 					this->activeBeltPlacement = true;
 					this->startBeltGear = false;
 					this->beltStart = sf::Vector2f(wheel->getGlobalBounds().left+wheel->getGlobalBounds().width/2, wheel->getGlobalBounds().top+2);
@@ -579,6 +585,10 @@ bool Level::tryGearPlacement(sf::Vector2f position)
 			this->resourceNumbersText[1].setString(std::to_string(--this->resourceNumbers[1]));
 			this->resources.pop_back();
 		}
+		/*
+		std::cout << "STAVLJENO " << this->selectedResource->getGlobalBounds().left << this->selectedResource->getGlobalBounds().top
+			<< this->selectedResource->getGlobalBounds().height << this->selectedResource->getGlobalBounds().width << std::endl;
+			*/
 		return true;
 	}
 	else {

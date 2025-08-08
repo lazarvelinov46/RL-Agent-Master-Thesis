@@ -32,6 +32,8 @@ private:
 	float speed = 0.f;
 	//sets texture of an object depending on object type
 	void setTexture();
+	//indicator if belt is attached to the gear (only for gear)
+	bool attached = false;
 
 
 public:
@@ -100,5 +102,15 @@ public:
 	/// </summary>
 	/// <returns>StaticObjectType enum value</returns>
 	StaticObjectType getObjectType()const { return this->type; }
+	/// <summary>
+	/// For gear objects only, sets if belt is attached or not
+	/// </summary>
+	/// <param name="attached">true if belt attached, otherwise false</param>
+	void setAttached(bool attached);
+	/// <summary>
+	/// For gear objects retreives info if belt is attached to them
+	/// </summary>
+	/// <returns>true if attached false otherwise</returns>
+	bool getAttached();
 };
 

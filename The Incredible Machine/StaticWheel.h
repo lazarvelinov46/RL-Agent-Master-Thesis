@@ -19,6 +19,10 @@ private:
 	/// TODO: Implement it with some sprite and texture
 	/// </summary>
 	sf::CircleShape object;
+	/// <summary>
+	/// Indicator if the belt is attached to wheel
+	/// </summary>
+	bool attached;
 	//sets texture of an object depending on object type
 	void setTexture();
 
@@ -55,5 +59,15 @@ public:
 	/// </summary>
 	/// <returns>Float rectangle around wheel</returns>
 	sf::FloatRect getGlobalBounds()const;
+	/// <summary>
+	/// For gear objects only, sets if belt is attached or not
+	/// </summary>
+	/// <param name="attached">true if belt attached, otherwise false</param>
+	void setAttached(bool attached);
+	/// <summary>
+	/// For gear objects retreives info if belt is attached to them
+	/// </summary>
+	/// <returns>true if attached false otherwise</returns>
+	bool getAttached()const;
 };
 

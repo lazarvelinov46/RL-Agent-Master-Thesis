@@ -75,6 +75,12 @@ public:
 	/// <returns>True if any ball is moving false otherwise</returns>
 	bool getBallMoving()const;
 	/// <summary>
+	/// VARIANT 2
+	/// Info if any ball is moving
+	/// </summary>
+	/// <returns>True if any ball is moving false otherwise</returns>
+	bool getAllBallsMoving()const;
+	/// <summary>
 	/// Returns info if the target has been hit
 	/// </summary>
 	/// <returns>True if hit, false otherwise</returns>

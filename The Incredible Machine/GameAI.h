@@ -47,7 +47,8 @@ private:
 
 	//Flag which indicates if simulation is running
 	bool isPlaying = false;
-
+	//Indicates if new action is to be selected
+	bool selectAction = false;
 	//Number of iterations since the beggining of game
 	int iterations = 0;
 	//game over indication
@@ -83,11 +84,11 @@ private:
 	/// Selects action from QTable according to epsilon-greedy policy
 	/// Updates simulation based on selected action
 	/// </summary>
-	void selectAction();
+	void updateActionState();
 	/// <summary>
 	/// Updates nextStateId if environment state changes
 	/// </summary>
-	void updateState();
+	bool updateState();
 public:
 	/// <summary>
 	/// Initializes everything needed: GameAI state, QTable, level and RLAgent
