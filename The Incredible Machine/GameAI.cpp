@@ -47,6 +47,15 @@ void GameAI::initTextures()
 	this->playButton.setTexture(&texturePlay);
 }
 
+void GameAI::initQTable()
+{
+	int statesNum = std::pow(2,Level::getNumberOfGearsStatic() + Level::getNumberOfWheels() + 1 + 1);
+	int actionsNum = ActionRL::getGridWidth() * ActionRL::getGridHeight();//gear placements
+	actionsNum += Level::getNumberOfGearsStatic() * Level::getNumberOfWheels();//belt placements between gear and wheel
+	actionsNum += ActionRL::combination(Level::getNumberOfWheels(), 2);//belt placements between two wheels
+	this->table = QTable(statesNum, actionsNum, "qtable.txt");
+}
+
 void GameAI::updateActionState()
 {
 	if (this->stateId == -1) {
@@ -74,7 +83,7 @@ bool GameAI::updateState()
 	if (this->level->getStateChanged()) {
 		//TODO: add reward getter from level
 		this->nextStateId = this->level->getStatusChange().getStateId();
-		std::cout << this->stateId << " s " << this->nextStateId << " r " << this->level->getReward() << std::endl;
+		std::cout << this->stateId << " s " << this->nextStateId << " r " << this->level->getReward() << 1/3<< std::endl;
 		if (this->nextStateId != this->stateId) {
 			this->table.updateQValue(this->stateId, this->lastExecutedAction, this->level->getReward(), this->nextStateId);
 			this->episode.push_back(new Transition({ this->stateId,this->lastExecutedAction,0.0,-1 }));
@@ -114,7 +123,7 @@ GameAI::GameAI()
 	this->initGameScreen();
 	this->initPanel();
 	this->initTextures();
-	this->table = QTable(256, 252,"qtable.txt");
+	this->initQTable();
 	this->level = new Level();
 	this->level->initLevel();
 	this->nextState = nullptr;
@@ -196,8 +205,10 @@ void GameAI::update(float deltaTime)
 		for example max 200px between start and end
 		*/
 		try {
+			std::cout << "Belt " <<actionId<< std::endl;
 			std::pair<BeltActionInfo, BeltActionInfo> beltActionInfo = this->actionFunctions.getBeltPlacement(actionId);
-			std::cout << "Belt"<<std::endl;
+			std::cout << "Is start gear " << beltActionInfo.first.isElementGear << " id " << beltActionInfo.first.idElement << std::endl;
+			std::cout << "Is end gear " << beltActionInfo.second.isElementGear << " id " << beltActionInfo.second.idElement << std::endl;
 			sf::Vector2f start, end;
 			if (beltActionInfo.first.isElementGear) {
 				start = this->level->getGearLocation(beltActionInfo.first.idElement);

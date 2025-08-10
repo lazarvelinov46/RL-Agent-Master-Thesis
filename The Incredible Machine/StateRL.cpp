@@ -1,18 +1,19 @@
 #include "stdafx.h"
 #include "StateRL.h"
+#include "Level.h"
 
 StateRL::StateRL()
 {
     this->ballsMoving.push_back(true);
-    for (int i = 0;i < 3;i++) {
+    for (int i = 0;i < Level::getNumberOfBalls()-1;i++) {
         this->ballsMoving.push_back(false);
     }
     //second variant
     this->allBallsMoving = true;
-    for (int i = 0;i < 3;i++) {
+    for (int i = 0;i < Level::getNumberOfGearsStatic();i++) {
         this->gearsStarted.push_back(false);
     }
-    for (int i = 0;i < 3;i++) {
+    for (int i = 0;i < Level::getNumberOfWheels();i++) {
         this->wheelsStarted.push_back(false);
     }
     this->targetHit = false;

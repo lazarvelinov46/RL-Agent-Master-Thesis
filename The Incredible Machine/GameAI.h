@@ -86,7 +86,8 @@ private:
 	void initGameScreen();
 	//Initializes textures
 	void initTextures();
-
+	//Initializes QTable
+	void initQTable();
 	/// <summary>
 	/// Selects action from QTable according to epsilon-greedy policy
 	/// Updates simulation based on selected action

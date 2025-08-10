@@ -1,4 +1,5 @@
 #pragma once
+#include "Level.h"
 
 typedef struct BeltActionInfo {
 	bool isElementGear;
@@ -20,11 +21,8 @@ private:
 	*/
 	std::vector<std::pair<int, int>> gearPlaced;
 	std::vector<std::pair<int, int>> beltPlaced;
-	const static int GRID_WIDTH=18;
-	const static int GRID_HEIGHT=13;
-	const static int NO_OF_GEARS = 3;
-	const static int NO_OF_BELTS = 3;
-	const static int NO_OF_WHEELS = 3;
+	const static int GRID_WIDTH = 18;
+	const static int GRID_HEIGHT = 13;
 public:
 	/*
 	bool operator==(const ActionRL& action)const {
@@ -67,7 +65,8 @@ public:
 	/// <param name="n">Total elements in set</param>
 	/// <param name="r">Number of elements to choose from (2 in this case)</param>
 	/// <returns>number of possible combinations</returns>
-	long long combination(int n, int r);
-
+	static long long combination(int n, int r);
+	static int getGridWidth() { return ActionRL::GRID_WIDTH; }
+	static int getGridHeight() { return ActionRL::GRID_HEIGHT; }
 };
 
