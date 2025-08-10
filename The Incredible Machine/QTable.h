@@ -12,12 +12,14 @@
 class QTable
 {
 private:
-	std::unordered_map<int, std::unordered_map<int, double>> values;
+	std::vector<std::vector<double>> values;
 	double alpha;
 	double gamma;
 	int numStates;
 	int numActions;
 	std::string filename;
+
+	std::mt19937 rng;
 public:
 	QTable();
 	QTable(int numberOfStates, int numberOfActions, std::string filename);
@@ -25,12 +27,16 @@ public:
 
 	double getQValue(int stateId, int actionId)const;
 
-	void updateQValue(int stateId, int actionId, double reward, int nextStateId);
+	void updateQValue(int stateId, int actionId, double reward, int nextStateId, bool nextIsTerminal=false);
 
 	int getAction(int stateId,double epsilon);
 
 	void printTable(const std::string& filename,int iteration);
 
 	void saveQTableCSV(const std::string& filename);
+
+	void setAlpha(double alpha) { this->alpha = alpha; }
+	void setGamma(double gamma) { this->gamma = gamma; }
+	void seedRng(unsigned int seed) { this->rng.seed(seed); }
 };
 
