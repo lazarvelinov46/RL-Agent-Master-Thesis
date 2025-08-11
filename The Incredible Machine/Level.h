@@ -167,5 +167,7 @@ public:
 	void placeBelt(sf::Vector2f start, sf::Vector2f end);
 	StateRL getStatusChange();
 	bool getStateChanged();
+	//calculates distance between two points
+	static float distance(const sf::Vector2f& a, const sf::Vector2f& b);
 };
 
