@@ -32,7 +32,7 @@ void Level::initStaticObjects()
 	this->staticObjects.push_back(new StaticObject(0, 760, 1000, 50,StaticObjectType::FLOOR));
 
 	this->staticObjects.push_back(new StaticObject(100, 600, 150, 20, StaticObjectType::PLATFORM));
-	this->staticObjects.push_back(new StaticObject(300, 500, 150, 20, StaticObjectType::PLATFORM));
+	this->staticObjects.push_back(new StaticObject(350, 500, 150, 20, StaticObjectType::PLATFORM));
 	this->staticObjects.push_back(new StaticObject(600, 300, 150, 20, StaticObjectType::PLATFORM));
 
 	this->staticObjects.push_back(new StaticObject(830, 400, 20, 40, StaticObjectType::WALL));
@@ -48,7 +48,7 @@ void Level::initStaticWheels()
 	this->staticWheels.push_back(new StaticWheel(700, 310.f, 10.f));
 	*/
 	this->staticWheels.push_back(new StaticWheel(200, 610.f));
-	this->staticWheels.push_back(new StaticWheel(400, 510.f));
+	this->staticWheels.push_back(new StaticWheel(450, 510.f));
 	this->staticWheels.push_back(new StaticWheel(700, 310.f));
 }
 
@@ -56,7 +56,7 @@ void Level::initDynamicObjects()
 {
 	this->dynamicObjects.push_back(new DynamicObject(25, 470, false));
 	this->dynamicObjects.push_back(new DynamicObject(100, 550, false));
-	this->dynamicObjects.push_back(new DynamicObject(300, 450, false));
+	this->dynamicObjects.push_back(new DynamicObject(350, 450, false));
 	this->dynamicObjects.push_back(new DynamicObject(600, 250, true));
 }
 
@@ -424,7 +424,9 @@ void Level::handleClick(sf::Vector2f& mousePosition)
 			}
 
 		}
-		else if (this->selectedResoureceIndex == 0 && this->activeBeltPlacement) {
+		else if (this->selectedResoureceIndex == 0 &&
+			this->activeBeltPlacement && 
+			Level::distance(this->endPointsBelt[0].position,this->endPointsBelt[1].position)<=400.0) {
 			//placing belt second time
 			this->validBeltPlacement = false;
 			this->startBeltGear = false;
@@ -517,12 +519,33 @@ void Level::update(float deltaTime)
 	Updates ball position
 	*/
 	this->updateBalls(deltaTime);
+	float beltLength = Level::distance(this->endPointsBelt[0].position, this->endPointsBelt[1].position);
 	if (this->activeBeltPlacement) {
+		bool overWheel = false;
 		for (const StaticWheel* wheel : this->staticWheels) {
 			if (wheel->getGlobalBounds().contains(this->endPointsBelt[1].position)) {
-				this->endPointsBelt[0].color = sf::Color::Green;
-				this->endPointsBelt[1].color = sf::Color::Green;
-				break;
+				if (beltLength <= 400.f) {
+					this->endPointsBelt[0].color = sf::Color::Green;
+					this->endPointsBelt[1].color = sf::Color::Green;
+					overWheel = true;
+					break;
+				}
+				else {
+					this->endPointsBelt[0].color = sf::Color::Red;
+					this->endPointsBelt[1].color = sf::Color::Red;
+					overWheel = true;
+					break;
+				}
+			}
+		}
+		if (!overWheel) {
+			if (beltLength <= 400.f) {
+				this->endPointsBelt[0].color = sf::Color::Yellow;
+				this->endPointsBelt[1].color = sf::Color::Yellow;
+			}
+			else {
+				this->endPointsBelt[0].color = sf::Color::Red;
+				this->endPointsBelt[1].color = sf::Color::Red;
 			}
 		}
 	}
@@ -682,6 +705,12 @@ bool Level::getStateChanged()
 	return retVal;
 }
 
+float Level::distance(const sf::Vector2f& a, const sf::Vector2f& b)
+{
+	return std::sqrt((b.x - a.x) * (b.x - a.x) +
+		(b.y - a.y) * (b.y - a.y));
+}
+
 const sf::FloatRect& Level::getBouds() const
 {
 	return sf::FloatRect(0,0,1000,800);
@@ -691,6 +720,7 @@ void Level::setIsPlaying(bool playing)
 {
 	this->isPlaying = playing;
 }
+
 
 Level::~Level()
 {
