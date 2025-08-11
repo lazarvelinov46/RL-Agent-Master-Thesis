@@ -148,12 +148,12 @@ bool Level::hasWheel(const StaticObject* object)
 bool Level::checkOverlaping(const sf::Sprite& newObject)
 {
 	for (size_t i = 0; i < this->staticObjects.size(); i++) {
-		
+		/*
 		std::cout << "STAT X: " << newObject.getGlobalBounds().left
 			<< "; Y: " << newObject.getGlobalBounds().top
 			<< "; W: " << newObject.getGlobalBounds().width
 			<< "; H: " << newObject.getGlobalBounds().height << std::endl;
-		
+		*/
 		if (newObject.getGlobalBounds().intersects(this->staticObjects[i]->getGlobalBounds())) {
 			return false;
 		}
@@ -198,8 +198,10 @@ void Level::updateBalls(float deltaTime)
 {
 	if (!isPlaying)return;
 	bool ballsMovingPreUpdate = this->state.getBallMoving();
+	bool bMPU[4];
 	for (size_t i = 0; i < this->dynamicObjects.size(); i++) {
 		DynamicObject* ball = this->dynamicObjects[i];
+		bMPU[i] = this->state.getBallMoving(i);
 		sf::Vector2f oldVelocity = ball->getVelocity();
 		sf::Vector2f newPosition = ball->getPosition()+ oldVelocity;
 		sf::FloatRect ballBounds = ball->getGlobalBounds();
@@ -207,10 +209,18 @@ void Level::updateBalls(float deltaTime)
 		float ballRight = ballBounds.left + ballBounds.width;
 
 		bool collision = false;
+		bool noGravity = false;
+		bool onMovingPlatform = false;
 		int gears = 0;
 		for (const StaticObject* object : this->staticObjects) {
 			sf::FloatRect objectBounds = object->getGlobalBounds();
-			
+			if (objectBounds.top == ballBottom&&objectBounds.left<=(ballBounds.left+ballBounds.width)&&
+				objectBounds.left+objectBounds.width>=ballBounds.left+ballBounds.width) {
+				noGravity = true;
+				if (object->getObjectType() == StaticObjectType::PLATFORM&&object->getMoving()) {
+					onMovingPlatform = true;
+				}
+			}
 			if (ballBounds.intersects(objectBounds)) {
 				
 				collision = true;
@@ -225,7 +235,9 @@ void Level::updateBalls(float deltaTime)
 				if (topCollision <leftCollision && topCollision<rightCollision) {
 					//top collision
 					newPosition.y = objectBounds.top - ballBounds.height;
-					ball->setVelocity(sf::Vector2f(ball->getVelocity().x, (abs(ball->getVelocity().y*-.5f)<this->velocityMinY)?0.f: ball->getVelocity().y * -.7f));
+					ball->setVelocity(sf::Vector2f(ball->getVelocity().x, (abs(ball->getVelocity().y * -.5f) < this->velocityMinY) ? 0.f : ball->getVelocity().y * -.7f));
+					
+					
 
 					if (object->getObjectType() == StaticObjectType::GOAL) {
 						if (!this->state.getTargetHit()) {
@@ -250,6 +262,7 @@ void Level::updateBalls(float deltaTime)
 				}
 				else if (rightCollision<topCollision&& rightCollision<bottomCollision) {
 					//left collision
+					std::cout << "aaa" << std::endl;
 					newPosition.x = objectRight;
 					ball->setVelocity(sf::Vector2f(ball->getVelocity().x * -0.9f, ball->getVelocity().y));
 				}
@@ -274,6 +287,15 @@ void Level::updateBalls(float deltaTime)
 				ball->setPosition(newPosition);
 				break;
 			}
+			else if (noGravity == true) {
+				if (object->getMoving() && ball->getVelocity().x == 0.f&&onMovingPlatform) {
+					ball->setVelocity(sf::Vector2f(object->getSpeed(), 0.f));
+				}
+
+				else {
+					ball->setVelocity(sf::Vector2f(ball->getVelocity().x, ball->getVelocity().y));
+				}
+			}
 			if (object->getObjectType() == StaticObjectType::GEAR) {
 				gears++;
 			}
@@ -290,24 +312,31 @@ void Level::updateBalls(float deltaTime)
 		}
 		if (!collision) {
 			ball->setPosition(newPosition);
-			this->applyDrag(ball);
+			if(!onMovingPlatform)this->applyDrag(ball);
 		}
-		if (oldVelocity.x == 0.0f && oldVelocity.y == 0.0f && (abs(ball->getVelocity().x > 1) || abs(ball->getVelocity().y  >1))) {
+		if (oldVelocity.x == 0.0f && oldVelocity.y == 0.0f && ((abs(ball->getVelocity().x) > 1) || abs(ball->getVelocity().y)  >1)) {
 			this->state.setBallMoving(i, true);
 
 		}
-		else if ((abs(oldVelocity.x > 1) || abs(oldVelocity.y >1)) && ball->getVelocity().x == 0.0f && ball->getVelocity().y == 0.0f) {
+		else if ((abs(oldVelocity.x > 1) || abs(oldVelocity.y > 1)) && ball->getVelocity().x == 0.0f && ball->getVelocity().y == 0.0f) {
 			this->state.setBallMoving(i, false);
 
 		}
+		
 
-
-		ball->setVelocity(sf::Vector2f(ball->getVelocity().x, ball->getVelocity().y + this->gravity * deltaTime));
+		if (!(ball->getVelocity().y == 0 && noGravity)) {
+			ball->setVelocity(sf::Vector2f(ball->getVelocity().x, ball->getVelocity().y + this->gravity * deltaTime));
+		}
+		/*
+		if (i == 1) {
+			std::cout << "aa	" << ball->getVelocity().x << "	bb	" << ball->getVelocity().y <<
+				"	cc	" << oldVelocity.x << "	dd	" << oldVelocity.y << std::endl;
+		}
+		*/
 	}
 	if (this->state.getBallMoving() != ballsMovingPreUpdate) {
 		this->stateChanged = true;
 		if (!this->state.getBallMoving()) {
-			
 			this->reward = LOST_GAME;
 		}
 	}
@@ -597,7 +626,7 @@ bool Level::tryGearPlacement(sf::Vector2f position)
 	this->selectedResource = this->resources.back()->sprite;
 	sf::Vector2f alignedPosition = this->alignToGrid(position);
 	this->selectedResource->setPosition(alignedPosition);
-	std::cout << "x " << this->selectedResource->getPosition().x << " y " << this->selectedResource->getPosition().y << std::endl;
+	//std::cout << "x " << this->selectedResource->getPosition().x << " y " << this->selectedResource->getPosition().y << std::endl;
 	if (this->checkOverlaping(*this->selectedResource)) {
 		/*
 		* If it does not overlap anything it places gear in appropriate place
