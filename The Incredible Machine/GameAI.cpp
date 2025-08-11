@@ -69,8 +69,11 @@ void GameAI::updateActionState()
 	}
 	if (this->selectAction) {
 		/*
-		if (this->stateId = 1) {
+		if (this->nextStateId ==3) {
 			this->actionId = 266;
+		}
+		else{
+			this->actionId = 1;
 		}
 		*/
 		this->actionId = this->table.getAction(this->nextStateId, 0.1);
@@ -89,7 +92,7 @@ bool GameAI::updateState()
 	if (this->level->getStateChanged()) {
 		//TODO: add reward getter from level
 		this->nextStateId = this->level->getStatusChange().getStateId();
-		std::cout << this->stateId << " s " << this->nextStateId << " r " << this->level->getReward() << 1/3<< std::endl;
+		std::cout << this->stateId << " s " << this->nextStateId << " r " << this->level->getReward() << std::endl;
 		if (this->nextStateId != this->stateId) {
 			this->table.updateQValue(this->stateId, this->lastExecutedAction, this->level->getReward(), this->nextStateId);
 			this->episode.push_back(new Transition({ this->stateId,this->lastExecutedAction,0.0,-1 }));
