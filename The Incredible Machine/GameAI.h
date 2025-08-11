@@ -61,8 +61,15 @@ private:
 	int stateId;
 	//Next state ID after action execution
 	int nextStateId;
-	//ID of executed action
+	//ID of currently executed action
 	int actionId;
+	/// <summary>
+	/// Id of last executed action
+	/// waits until state is changed to update qtable
+	/// because noaction is -1 (almost every iteration between regular action and state changed)
+	/// we need to store last regular action in order to correctly update qtable
+	/// </summary>
+	int lastExecutedAction;
 	//QTable for updating and retreiving QValues
 	QTable table;
 
@@ -79,7 +86,8 @@ private:
 	void initGameScreen();
 	//Initializes textures
 	void initTextures();
-
+	//Initializes QTable
+	void initQTable();
 	/// <summary>
 	/// Selects action from QTable according to epsilon-greedy policy
 	/// Updates simulation based on selected action

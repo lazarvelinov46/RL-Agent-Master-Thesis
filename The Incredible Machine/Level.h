@@ -29,6 +29,11 @@ typedef struct Resource {
 class Level
 {
 private:
+	static const int NUMBER_OF_GEARS = 3;
+	static const int NUMBER_OF_BELTS = 3;
+	static const int NUMBER_OF_WHEELS = 3;
+	static const int NUMBER_OF_BALLS = 4;
+
 	/* Non moving parts of level, already placed when level opens unlike resources */
 	std::vector<StaticObject*> staticObjects;
 	/* Movable objects (balls) */
@@ -167,7 +172,10 @@ public:
 	void placeBelt(sf::Vector2f start, sf::Vector2f end);
 	StateRL getStatusChange();
 	bool getStateChanged();
-	//calculates distance between two points
-	static float distance(const sf::Vector2f& a, const sf::Vector2f& b);
+
+	static int getNumberOfGearsStatic();
+	static int getNumberOfBeltsStatic();
+	static int getNumberOfWheels();
+	static int getNumberOfBalls();
 };
 
