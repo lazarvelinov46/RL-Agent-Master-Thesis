@@ -62,18 +62,18 @@ void Level::initDynamicObjects()
 
 void Level::initResources()
 {
-	int beltNum = 3;
-	int gearNum = 3;
-	int resNum = 0;
-	for (size_t i = 0;i < beltNum;i++) {
+	this->currentNumberOfBelts = Level::NUMBER_OF_BELTS;
+	this->currentNumberOfGears = Level::NUMBER_OF_GEARS;
+	this->currentNumberOfResources = 0;
+	for (size_t i = 0;i < this->currentNumberOfBelts;i++) {
 		sf::Sprite* beltSprite = new sf::Sprite(this->beltTexture);
 		beltSprite->setScale(0.5f, 0.5f);
 		beltSprite->setPosition(1050, 150);
 
-		this->resources.push_back(new Resource(beltSprite, resNum,beltNum));
+		this->resources.push_back(new Resource(beltSprite, this->currentNumberOfResources,this->currentNumberOfBelts));
 	}
-	resNum++;
-	for (size_t i = 0;i < gearNum;i++) {
+	this->currentNumberOfResources++;
+	for (size_t i = 0;i < this->currentNumberOfGears;i++) {
 		sf::Sprite* gearSprite = new sf::Sprite(this->gearTexture);
 		gearSprite->setScale(0.19531f, 0.19531f);
 		gearSprite->setPosition(1050, 350);
@@ -84,10 +84,10 @@ void Level::initResources()
 		gearText.setPosition(gearSprite->getPosition().x + gearSprite->getGlobalBounds().width / 2 - 18, gearSprite->getPosition().y + gearSprite->getGlobalBounds().height);
 		gearText.setFillColor(sf::Color::Black);
 
-		this->resources.push_back(new Resource(gearSprite, resNum,gearNum));
+		this->resources.push_back(new Resource(gearSprite, this->currentNumberOfResources,this->currentNumberOfGears));
 	}
-	resNum++;
-	for (size_t i = 0;i < resNum;i++) {
+	this->currentNumberOfResources++;
+	for (size_t i = 0;i < this->currentNumberOfResources;i++) {
 		const Resource* res = this->getResourceById(i);
 		sf::Text text;
 		text.setFont(font);
@@ -623,7 +623,11 @@ bool Level::tryGearPlacement(sf::Vector2f position)
 	Selects gear from resources
 	Aligns it to the grid
 	*/
+	if (this->currentNumberOfGears == 0) {
+		return false;
+	}
 	this->selectedResource = this->resources.back()->sprite;
+
 	sf::Vector2f alignedPosition = this->alignToGrid(position);
 	this->selectedResource->setPosition(alignedPosition);
 	//std::cout << "x " << this->selectedResource->getPosition().x << " y " << this->selectedResource->getPosition().y << std::endl;
@@ -637,6 +641,7 @@ bool Level::tryGearPlacement(sf::Vector2f position)
 			this->staticObjects.push_back(new StaticObject(*this->selectedResource, StaticObjectType::GEAR ));
 			this->resourceNumbersText[1].setString(std::to_string(--this->resourceNumbers[1]));
 			this->resources.pop_back();
+			this->currentNumberOfGears--;
 		}
 		/*
 		std::cout << "STAVLJENO " << this->selectedResource->getGlobalBounds().left << this->selectedResource->getGlobalBounds().top
@@ -704,7 +709,7 @@ int Level::getNumberOfBalls()
 	return Level::NUMBER_OF_BALLS;
 }
 
-void Level::placeBelt(sf::Vector2f start, sf::Vector2f end, bool startBeltGear)
+bool Level::placeBelt(sf::Vector2f start, sf::Vector2f end, bool startBeltGear)
 {
 	/*
 	* Adds belt into array (start and end vectors)
@@ -737,6 +742,9 @@ void Level::placeBelt(sf::Vector2f start, sf::Vector2f end, bool startBeltGear)
 							this->beltStart.y + this->staticWheels[0]->getGlobalBounds().height/2) });
 				}
 	*/
+	if (this->currentNumberOfBelts == 0) {
+		return false;
+	}
 	this->belts.push_back({sf::Vector2f(start.x + 100 / 8,start.y + 100 / 4),
 		sf::Vector2f(end.x + 2,end.y + this->staticWheels[0]->getGlobalBounds().height / 2)});
 	if (startBeltGear) {
@@ -762,7 +770,7 @@ void Level::placeBelt(sf::Vector2f start, sf::Vector2f end, bool startBeltGear)
 	this->activeBeltPlacement = false;
 	this->resourceNumbersText[0].setString(std::to_string(--this->resourceNumbers[0]));
 	this->resources.erase(this->resources.begin());
-	
+	this->currentNumberOfBelts--;
 	int gears = 0;
 	for (const StaticObject* object : this->staticObjects) {
 		if (object->getObjectType() == StaticObjectType::GEAR) {
@@ -776,6 +784,7 @@ void Level::placeBelt(sf::Vector2f start, sf::Vector2f end, bool startBeltGear)
 			gears++;
 		}
 	}
+	return true;
 }
 
 StateRL Level::getStatusChange()
