@@ -62,11 +62,17 @@ void GameAI::updateActionState()
 		this->isPlaying = true;
 		level->setIsPlaying(this->isPlaying);
 		this->stateId = 1;
+		//this->actionId = 247;
 		this->actionId = this->table.getAction(this->stateId, 0.1);
 		this->lastExecutedAction = this->actionId;
 		return;
 	}
 	if (this->selectAction) {
+		/*
+		if (this->stateId = 1) {
+			this->actionId = 266;
+		}
+		*/
 		this->actionId = this->table.getAction(this->nextStateId, 0.1);
 		this->stateId = this->nextStateId;
 		this->lastExecutedAction = this->actionId;
@@ -222,7 +228,8 @@ void GameAI::update(float deltaTime)
 			else {
 				end = this->level->getWheelLocation(beltActionInfo.second.idElement);
 			}
-			if (sqrt(powf(abs(start.x - end.x), 2) + powf(abs(start.y - end.y), 2)) < 300) {
+			std::cout << sqrt(powf(abs(start.x - end.x), 2) + powf(abs(start.y - end.y), 2)) << std::endl;
+			if (sqrt(powf(abs(start.x - end.x), 2) + powf(abs(start.y - end.y), 2)) > 400.0) {
 				start.x = -1;
 				end.x = -1;
 			}
@@ -230,7 +237,7 @@ void GameAI::update(float deltaTime)
 				this->table.updateQValue(this->stateId, this->actionId, WRONG_BELT_PLACEMENT, this->stateId);
 			}
 			else {
-				this->level->placeBelt(start, end);
+				this->level->placeBelt(start, end,beltActionInfo.first.isElementGear);
 			}
 		}
 		catch (std::exception e) {
