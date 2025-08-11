@@ -48,9 +48,9 @@ AgentAction ActionRL::getActionType(int actionId)
 
 std::pair<int, int> ActionRL::getGearCoordinates(int gearActionId)
 {
-    int x = gearActionId % ActionRL::GRID_WIDTH;
-    int y = gearActionId / ActionRL::GRID_HEIGHT;
-    return std::pair<int, int>(x, y);
+    int x = gearActionId / ActionRL::GRID_WIDTH;
+    int y = gearActionId % ActionRL::GRID_WIDTH;
+    return std::pair<int, int>(y, x);
 }
 
 std::pair<BeltActionInfo, BeltActionInfo> ActionRL::getBeltPlacement(int beltActionId)

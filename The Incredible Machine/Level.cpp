@@ -148,12 +148,12 @@ bool Level::hasWheel(const StaticObject* object)
 bool Level::checkOverlaping(const sf::Sprite& newObject)
 {
 	for (size_t i = 0; i < this->staticObjects.size(); i++) {
-		/*
-		std::cout << "STAT X: " << this->staticObjects[i]->getGlobalBounds().left
-			<< "; Y: " << this->staticObjects[i]->getGlobalBounds().top
-			<< "; W: " << this->staticObjects[i]->getGlobalBounds().width
-			<< "; H: " << this->staticObjects[i]->getGlobalBounds().height << std::endl;
-		*/
+		
+		std::cout << "STAT X: " << newObject.getGlobalBounds().left
+			<< "; Y: " << newObject.getGlobalBounds().top
+			<< "; W: " << newObject.getGlobalBounds().width
+			<< "; H: " << newObject.getGlobalBounds().height << std::endl;
+		
 		if (newObject.getGlobalBounds().intersects(this->staticObjects[i]->getGlobalBounds())) {
 			return false;
 		}
@@ -597,6 +597,7 @@ bool Level::tryGearPlacement(sf::Vector2f position)
 	this->selectedResource = this->resources.back()->sprite;
 	sf::Vector2f alignedPosition = this->alignToGrid(position);
 	this->selectedResource->setPosition(alignedPosition);
+	std::cout << "x " << this->selectedResource->getPosition().x << " y " << this->selectedResource->getPosition().y << std::endl;
 	if (this->checkOverlaping(*this->selectedResource)) {
 		/*
 		* If it does not overlap anything it places gear in appropriate place
@@ -674,17 +675,62 @@ int Level::getNumberOfBalls()
 	return Level::NUMBER_OF_BALLS;
 }
 
-void Level::placeBelt(sf::Vector2f start, sf::Vector2f end)
+void Level::placeBelt(sf::Vector2f start, sf::Vector2f end, bool startBeltGear)
 {
 	/*
 	* Adds belt into array (start and end vectors)
 	* Lowers the resources
 	* If gear attached to belt is started, it starts the platform
+	* */
+	/*
+	* sf::Vector2f(object->getGlobalBounds().left+ object->getGlobalBounds().width/8,
+						object->getGlobalBounds().top+object->getGlobalBounds().height/4);
+	* this->belts.push_back({ this->beltStart,
+					sf::Vector2f(
+						wheelToPlace->getGlobalBounds().left+2,
+						wheelToPlace->getGlobalBounds().top+wheelToPlace->getGlobalBounds().height/2)});
+				if (this->startBeltGear) {
+					this->belts.push_back({ 
+						sf::Vector2f(
+							wheelToPlace->getGlobalBounds().left + wheelToPlace->getGlobalBounds().width,
+							wheelToPlace->getGlobalBounds().top + wheelToPlace->getGlobalBounds().height/2),
+						sf::Vector2f(
+							this->beltStart.x + this->staticWheels[0]->getGlobalBounds().width,
+							this->beltStart.y + this->staticWheels[0]->getGlobalBounds().height) });
+				}
+				else {
+					this->belts.push_back({
+						sf::Vector2f(
+							wheelToPlace->getGlobalBounds().left + wheelToPlace->getGlobalBounds().width,
+							wheelToPlace->getGlobalBounds().top + wheelToPlace->getGlobalBounds().height / 2),
+						sf::Vector2f(
+							this->beltStart.x + this->staticWheels[0]->getGlobalBounds().width/2,
+							this->beltStart.y + this->staticWheels[0]->getGlobalBounds().height/2) });
+				}
 	*/
-	this->belts.push_back({start,end });
-	this->belts.push_back({ sf::Vector2f(end.x + this->staticWheels[0]->getGlobalBounds().width,end.y + this->staticWheels[0]->getGlobalBounds().height),
-		sf::Vector2f(start.x + this->staticWheels[0]->getGlobalBounds().width,start.y + this->staticWheels[0]->getGlobalBounds().height) });
-	//this->activeBeltPlacement = false;
+	this->belts.push_back({sf::Vector2f(start.x + 100 / 8,start.y + 100 / 4),
+		sf::Vector2f(end.x + 2,end.y + this->staticWheels[0]->getGlobalBounds().height / 2)});
+	if (startBeltGear) {
+		this->belts.push_back({
+						sf::Vector2f(
+							end.x + this->staticWheels[0]->getGlobalBounds().width,
+							end.y + this->staticWheels[0]->getGlobalBounds().height / 2),
+						sf::Vector2f(
+							start.x + this->staticWheels[0]->getGlobalBounds().width,
+							start.y + this->staticWheels[0]->getGlobalBounds().height) });
+	}
+	else {
+		this->belts.push_back({
+						sf::Vector2f(
+							end.x + this->staticWheels[0]->getGlobalBounds().width,
+							end.y + this->staticWheels[0]->getGlobalBounds().height / 2),
+						sf::Vector2f(
+							start.x + this->staticWheels[0]->getGlobalBounds().width/2,
+							start.y + this->staticWheels[0]->getGlobalBounds().height/2) });
+	}
+	//this->belts.push_back({ sf::Vector2f(end.x + this->staticWheels[0]->getGlobalBounds().width,end.y + this->staticWheels[0]->getGlobalBounds().height),
+		//sf::Vector2f(start.x + this->staticWheels[0]->getGlobalBounds().width,start.y + this->staticWheels[0]->getGlobalBounds().height) });
+	this->activeBeltPlacement = false;
 	this->resourceNumbersText[0].setString(std::to_string(--this->resourceNumbers[0]));
 	this->resources.erase(this->resources.begin());
 	
@@ -713,6 +759,12 @@ bool Level::getStateChanged()
 	bool retVal = this->stateChanged;
 	this->stateChanged = false;
 	return retVal;
+}
+
+float Level::distance(const sf::Vector2f& a, const sf::Vector2f& b)
+{
+	return std::sqrt((b.x - a.x) * (b.x - a.x) +
+		(b.y - a.y) * (b.y - a.y));
 }
 
 int Level::getNumberOfGearsStatic()

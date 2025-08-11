@@ -21,8 +21,8 @@ private:
 	*/
 	std::vector<std::pair<int, int>> gearPlaced;
 	std::vector<std::pair<int, int>> beltPlaced;
-	const static int GRID_WIDTH = 18;
-	const static int GRID_HEIGHT = 13;
+	const static int GRID_WIDTH = 19;
+	const static int GRID_HEIGHT = 14;
 public:
 	/*
 	bool operator==(const ActionRL& action)const {

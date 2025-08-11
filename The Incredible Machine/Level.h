@@ -169,10 +169,11 @@ public:
 	double getReward();
 
 	int getNumberOfBelts();
-	void placeBelt(sf::Vector2f start, sf::Vector2f end);
+	void placeBelt(sf::Vector2f start, sf::Vector2f end, bool startBeltGear);
 	StateRL getStatusChange();
 	bool getStateChanged();
-
+	//calculates distance between two points
+	static float distance(const sf::Vector2f& a, const sf::Vector2f& b);
 	static int getNumberOfGearsStatic();
 	static int getNumberOfBeltsStatic();
 	static int getNumberOfWheels();
