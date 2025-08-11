@@ -34,6 +34,9 @@ private:
 	static const int NUMBER_OF_WHEELS = 3;
 	static const int NUMBER_OF_BALLS = 4;
 
+	int currentNumberOfGears;
+	int currentNumberOfBelts;
+	int currentNumberOfResources;
 	/* Non moving parts of level, already placed when level opens unlike resources */
 	std::vector<StaticObject*> staticObjects;
 	/* Movable objects (balls) */
@@ -169,7 +172,7 @@ public:
 	double getReward();
 
 	int getNumberOfBelts();
-	void placeBelt(sf::Vector2f start, sf::Vector2f end, bool startBeltGear);
+	bool placeBelt(sf::Vector2f start, sf::Vector2f end, bool startBeltGear);
 	StateRL getStatusChange();
 	bool getStateChanged();
 	//calculates distance between two points

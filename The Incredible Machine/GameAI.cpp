@@ -240,7 +240,9 @@ void GameAI::update(float deltaTime)
 				this->table.updateQValue(this->stateId, this->actionId, WRONG_BELT_PLACEMENT, this->stateId);
 			}
 			else {
-				this->level->placeBelt(start, end,beltActionInfo.first.isElementGear);
+				if (!this->level->placeBelt(start, end, beltActionInfo.first.isElementGear)) {
+					this->table.updateQValue(this->stateId, this->actionId, WRONG_BELT_PLACEMENT, this->stateId);
+				}
 			}
 		}
 		catch (std::exception e) {
