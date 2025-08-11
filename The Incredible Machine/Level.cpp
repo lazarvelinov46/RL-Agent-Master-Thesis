@@ -62,7 +62,7 @@ void Level::initDynamicObjects()
 
 void Level::initResources()
 {
-	int beltNum = 4;
+	int beltNum = 3;
 	int gearNum = 3;
 	int resNum = 0;
 	for (size_t i = 0;i < beltNum;i++) {
@@ -656,12 +656,22 @@ sf::Vector2f Level::getWheelLocation(int wheelId)
 
 double Level::getReward()
 {
-	return 0.0;
+	return this->reward;
 }
 
 int Level::getNumberOfBelts()
 {
 	return this->resourceNumbers[0];
+}
+
+int Level::getNumberOfWheels()
+{
+	return Level::NUMBER_OF_WHEELS;
+}
+
+int Level::getNumberOfBalls()
+{
+	return Level::NUMBER_OF_BALLS;
 }
 
 void Level::placeBelt(sf::Vector2f start, sf::Vector2f end)
@@ -705,10 +715,14 @@ bool Level::getStateChanged()
 	return retVal;
 }
 
-float Level::distance(const sf::Vector2f& a, const sf::Vector2f& b)
+int Level::getNumberOfGearsStatic()
 {
-	return std::sqrt((b.x - a.x) * (b.x - a.x) +
-		(b.y - a.y) * (b.y - a.y));
+	return Level::NUMBER_OF_GEARS;
+}
+
+int Level::getNumberOfBeltsStatic()
+{
+	return Level::NUMBER_OF_BELTS;
 }
 
 const sf::FloatRect& Level::getBouds() const

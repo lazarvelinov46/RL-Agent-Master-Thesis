@@ -10,6 +10,9 @@
 #include <stack>
 #include <string>
 #include <unordered_map>
+#include <math.h>
+#include <random>
+#include <chrono>
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
 #include <SFML/Audio.hpp>

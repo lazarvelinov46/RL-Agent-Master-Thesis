@@ -7,13 +7,10 @@ QTable::QTable()
 	this->gamma = 0.9;
 }
 
-QTable::QTable(int numberOfStates, int numberOfActions,std::string filename)
+QTable::QTable(int numberOfStates, int numberOfActions,std::string filename):
+	rng(static_cast<unsigned>(std::chrono::high_resolution_clock::now().time_since_epoch().count()))
 {
-	for (int i = 0;i < numberOfStates;i++) {
-		for (int j = 0;j < numberOfActions;j++) {
-			this->values[i][j] = 0.0;
-		}
-	}
+	this->values.assign(numberOfStates, std::vector<double>(numberOfActions, 0.0));
 	this->alpha = 0.1;
 	this->gamma = 0.9;
 	this->numStates = numberOfStates;
@@ -23,20 +20,19 @@ QTable::QTable(int numberOfStates, int numberOfActions,std::string filename)
 
 double QTable::getQValue(int stateId, int actionId) const
 {
-	if (this->values.count(stateId) && this->values.at(stateId).count(actionId)) {
-		return this->values.at(stateId).at(actionId);
-	}
-	return 0.0;
+	if (stateId < 0 || stateId >= numStates)return 0.0;
+	if (actionId < 0 || actionId >= numActions)return 0.0;
+	return this->values[stateId][actionId];
 }
 
-void QTable::updateQValue(int stateId, int actionId, double reward, int nextStateId)
+void QTable::updateQValue(int stateId, int actionId, double reward, int nextStateId, bool nextIsTerminal)
 {
+	if (stateId < 0 || stateId >= numStates)return;
+	if (actionId < 0 || actionId >= numActions)return;
 	double qValue = this->getQValue(stateId, actionId);
-	double maxNextQ = -DBL_MAX;
-	if (this->values.count(nextStateId)) {
-		for (const std::pair<int, double>& action : this->values.at(nextStateId)) {
-			maxNextQ = std::max(maxNextQ,action.second);
-		}
+	double maxNextQ = 0.0;
+	if (!nextIsTerminal&&nextStateId>=0&&nextStateId<this->numStates) {
+		maxNextQ = *std::max_element(this->values[nextStateId].begin(), this->values[nextStateId].end());
 	}
 	double newValue = qValue + this->alpha*(reward + gamma * maxNextQ - qValue);
 	this->values[stateId][actionId] = newValue;
@@ -45,12 +41,30 @@ void QTable::updateQValue(int stateId, int actionId, double reward, int nextStat
 //maybe not all actions but best possible
 int QTable::getAction(int stateId, double epsilon)
 {
-	std::srand(std::time(0));
-	if ((rand()/RAND_MAX) < epsilon) {
-		int action = rand() % 252;
-		return action;
+	if (stateId < 0 || stateId >= numStates)return 0;
+	std::uniform_real_distribution<double> uniformDist(0.0, 1.0);
+	double sample = uniformDist(rng);
+	if (sample < epsilon) {
+		std::uniform_int_distribution<int> actionDist(0, numActions - 1);
+		return actionDist(rng);
 	}
 	else {
+		std::vector<double> row = this->values[stateId];
+		double maxVal = *std::max_element(this->values[stateId].begin(), this->values[stateId].end());
+
+		std::vector<int> bestActions;
+		bestActions.reserve(numActions);
+
+		for (int i = 0; i < numActions; i++) {
+			if (this->values[stateId][i] == maxVal)bestActions.push_back(i);
+		}
+		if (bestActions.empty()) {
+			std::uniform_int_distribution<int> actionDist(0, numActions - 1);
+			return actionDist(rng);
+		}
+		std::uniform_int_distribution<int> bestActionsDist(0, bestActions.size() - 1);
+		return bestActions[bestActionsDist(rng)];
+		/*
 		int actionId = 0;
 		double maxValue = this->values[stateId][actionId];
 		for (int i = 1;i < this->values[stateId].size();i++) {
@@ -61,12 +75,13 @@ int QTable::getAction(int stateId, double epsilon)
 			}
 		}
 		return actionId;
+		*/
 	}
 }
 
-void QTable::printTable(int iteration)
+void QTable::printTable(const std::string& filename,int iteration)
 {
-	std::ofstream outFile(this->filename, std::ios::app); // append mode
+	std::ofstream outFile(filename, std::ios::app);
 	if (!outFile.is_open()) return;
 
 	outFile << "Iteration: " << iteration << "\n";
@@ -77,5 +92,21 @@ void QTable::printTable(int iteration)
 		outFile << "\n";
 	}
 	outFile << "-------------------------------\n";
+	outFile.close();
+}
+
+void QTable::saveQTableCSV(const std::string& filename) {
+	std::ofstream outFile(filename);
+	if (!outFile.is_open()) return;
+
+	for (int s = 0; s < this->numStates; ++s) {
+		for (int a = 0; a < this->numActions; ++a) {
+			outFile << this->values[s][a];
+			if (a != this->numActions - 1)
+				outFile << ",";
+		}
+		outFile << "\n";
+	}
+
 	outFile.close();
 }

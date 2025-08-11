@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "ActionRL.h"
 
+
 std::pair<int, int> ActionRL::getGearPlaced(int gearId) const
 {
     return this->gearPlaced[gearId];
@@ -57,15 +58,15 @@ std::pair<BeltActionInfo, BeltActionInfo> ActionRL::getBeltPlacement(int beltAct
     beltActionId -= ActionRL::GRID_WIDTH * ActionRL::GRID_HEIGHT;
     BeltActionInfo beggining;
     BeltActionInfo end;
-    int crossCombinations = ActionRL::NO_OF_BELTS * ActionRL::NO_OF_GEARS;
-    int gearCombinations = this->combination(ActionRL::NO_OF_GEARS, 2);
-    int wheelCombinations = this->combination(ActionRL::NO_OF_WHEELS, 2);
+    int crossCombinations = Level::getNumberOfGearsStatic() * Level::getNumberOfBeltsStatic();
+    int wheelCombinations = ActionRL::combination(Level::getNumberOfWheels(), 2);
     if (beltActionId < crossCombinations) {
         beggining.isElementGear = true;
-        beggining.idElement = crossCombinations / ActionRL::NO_OF_GEARS;
+        beggining.idElement = beltActionId / Level::getNumberOfGearsStatic();
         end.isElementGear = false;
-        end.idElement = crossCombinations % ActionRL::NO_OF_BELTS;
+        end.idElement = beltActionId % Level::getNumberOfBeltsStatic();
     }
+    /*
     else if(beltActionId<gearCombinations+crossCombinations){
         //TODO: check this
         int idBeggining = 1;
@@ -81,16 +82,26 @@ std::pair<BeltActionInfo, BeltActionInfo> ActionRL::getBeltPlacement(int beltAct
         end.isElementGear = true;
         end.idElement = idEnd;
     }
+    */
     else {
         //TODO: check this
-        int idBeggining = 1;
-        int startWheels = crossCombinations+gearCombinations;
+        int idBeggining = -1;
+        int idEnd = -1;
+        //int startWheels = crossCombinations+gearCombinations;
+        int startWheels = crossCombinations;
         int wheelNumber = beltActionId - startWheels;
-        while ((wheelNumber - (ActionRL::NO_OF_WHEELS - idBeggining)) >= 0) {
-            wheelNumber -= (ActionRL::NO_OF_WHEELS - idBeggining);
-            idBeggining++;
+        int count = 0;
+        for (int i = 0; i < Level::getNumberOfWheels(); i++) {
+            for (int j = i + 1; j < Level::getNumberOfWheels(); j++) {
+                if (count == wheelNumber) {
+                    idBeggining = i;
+                    idEnd = j;
+                    count++;
+                    break;
+                }
+                count++;
+            }
         }
-        int idEnd = idBeggining + wheelNumber;
         beggining.isElementGear = false;
         beggining.idElement = idBeggining;
         end.isElementGear = false;
