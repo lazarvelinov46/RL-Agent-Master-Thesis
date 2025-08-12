@@ -115,6 +115,7 @@
     <Text Include="..\..\..\..\Desktop\teksture\License free ground.txt">
       <Filter>Resource Files\Txt documents</Filter>
     </Text>
+    <Text Include="TODO.txt" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\..\..\Desktop\teksture\ground.jpg">

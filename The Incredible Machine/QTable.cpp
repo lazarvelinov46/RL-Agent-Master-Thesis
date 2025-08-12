@@ -56,7 +56,7 @@ int QTable::getAction(int stateId, double epsilon)
 		bestActions.reserve(numActions);
 
 		for (int i = 0; i < numActions; i++) {
-			if (this->values[stateId][i] == maxVal)bestActions.push_back(i);
+			if (std::abs(this->values[stateId][i] - maxVal)<1e-9)bestActions.push_back(i);
 		}
 		if (bestActions.empty()) {
 			std::uniform_int_distribution<int> actionDist(0, numActions - 1);

@@ -94,7 +94,8 @@ bool GameAI::updateState()
 		this->nextStateId = this->level->getStatusChange().getStateId();
 		std::cout << this->stateId << " s " << this->nextStateId << " r " << this->level->getReward() << std::endl;
 		if (this->nextStateId != this->stateId) {
-			this->table.updateQValue(this->stateId, this->lastExecutedAction, this->level->getReward(), this->nextStateId);
+			bool terminalState = this->nextStateId % 2 == 0 || this->nextStateId > 127;
+			this->table.updateQValue(this->stateId, this->lastExecutedAction, this->level->getReward(), this->nextStateId,terminalState);
 			this->episode.push_back(new Transition({ this->stateId,this->lastExecutedAction,0.0,-1 }));
 		}
 		if (nextStateId%2 == 0) {
@@ -191,6 +192,10 @@ void GameAI::update(float deltaTime)
 	}
 	*/
 	this->updateActionState();
+	if ((level->getNumberOfBelts() + level->getNumberOfGears())==0) {
+		std::cout << "Nema vise " << std::endl;
+		this->actionId = -1;
+	}
 	AgentAction actionType=this->actionFunctions.getActionType(this->actionId);
 	if (actionType == AgentAction::PLACE_GEAR) {
 		//gear placement
@@ -232,7 +237,7 @@ void GameAI::update(float deltaTime)
 				end = this->level->getWheelLocation(beltActionInfo.second.idElement);
 			}
 			std::cout << sqrt(powf(abs(start.x - end.x), 2) + powf(abs(start.y - end.y), 2)) << std::endl;
-			if (sqrt(powf(abs(start.x - end.x), 2) + powf(abs(start.y - end.y), 2)) > 400.0) {
+			if (sqrt(powf(abs(start.x - end.x), 2) + powf(abs(start.y - end.y), 2)) > 350.0) {
 				start.x = -1;
 				end.x = -1;
 			}
