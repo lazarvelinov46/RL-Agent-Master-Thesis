@@ -24,6 +24,13 @@ typedef struct Transition {
 class GameAI : public State
 {
 private:
+	const double E_START = 0.6;
+	const double E_END = 0.05;
+	const int E_DECAY = 2000;
+	const double ALPHA_START = 0.2;
+	const double ALPHA_END = 0.05;
+	const int ALPHA_DECAY = 5000;
+	const double GAMMA = 0.95;
 	//UI panel on right side on the screen (consists of user action and resource elements
 	sf::RectangleShape panel;
 	//Play button that starts the simulation
@@ -127,5 +134,9 @@ public:
 	/// </summary>
 	/// <returns>Pointer to the next state or nullptr</returns>
 	State* getNextState()override;
+	/// <summary>
+	/// decays value lineary
+	/// </summary>
+	static double linearDecay(double start, double end, int episode, int decayEpisodes);
 };
 

@@ -10,8 +10,10 @@ QTable::QTable()
 QTable::QTable(int numberOfStates, int numberOfActions,std::string filename):
 	rng(static_cast<unsigned>(std::chrono::high_resolution_clock::now().time_since_epoch().count()))
 {
-	this->values.assign(numberOfStates, std::vector<double>(numberOfActions, 0.0));
-	this->alpha = 0.1;
+	double initVal = 0.5;
+	this->values.assign(numberOfStates, std::vector<double>(numberOfActions, 0.5));
+	this->visits.assign(numberOfStates, std::vector<int>(numberOfActions, 0));
+	this->alpha = 0.2;
 	this->gamma = 0.9;
 	this->numStates = numberOfStates;
 	this->numActions = numberOfActions;
@@ -29,12 +31,15 @@ void QTable::updateQValue(int stateId, int actionId, double reward, int nextStat
 {
 	if (stateId < 0 || stateId >= numStates)return;
 	if (actionId < 0 || actionId >= numActions)return;
+	int n = this->visits[stateId][actionId]++;
+	double localAlphaFromVisits = 1.0 / (1.0 + (double)n);
+	double localAlpha = std::min(this->alpha, localAlphaFromVisits);
 	double qValue = this->getQValue(stateId, actionId);
 	double maxNextQ = 0.0;
 	if (!nextIsTerminal&&nextStateId>=0&&nextStateId<this->numStates) {
 		maxNextQ = *std::max_element(this->values[nextStateId].begin(), this->values[nextStateId].end());
 	}
-	double newValue = qValue + this->alpha*(reward + gamma * maxNextQ - qValue);
+	double newValue = qValue + localAlpha*(reward + gamma * maxNextQ - qValue);
 	this->values[stateId][actionId] = newValue;
 }
 

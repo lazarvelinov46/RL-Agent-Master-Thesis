@@ -63,7 +63,8 @@ void GameAI::updateActionState()
 		level->setIsPlaying(this->isPlaying);
 		this->stateId = 1;
 		//this->actionId = 247;
-		this->actionId = this->table.getAction(this->stateId, 0.1);
+		double eps = GameAI::linearDecay(this->E_START, this->E_END, this->iterations, this->E_DECAY);
+		this->actionId = this->table.getAction(this->stateId, eps);
 		this->lastExecutedAction = this->actionId;
 		return;
 	}
@@ -272,4 +273,11 @@ void GameAI::render(sf::RenderTarget& target)
 State* GameAI::getNextState()
 {
 	return this->nextState;
+}
+
+double GameAI::linearDecay(double start, double end, int episode, int decayEpisodes)
+{
+	if (episode >= decayEpisodes)return end;
+	double t = (double)episode / (double)decayEpisodes;
+	return start + (end - start) * t;
 }

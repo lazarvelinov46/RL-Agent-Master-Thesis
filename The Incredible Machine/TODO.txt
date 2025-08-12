@@ -1,5 +1,0 @@
-- forbid placing gear where ball were
-- change QTable logic so it can revert back when it goes on wrong path
-- change maximum belt length - DONE
-- when all resources are used - no penalty (only if game lost fr) - TEST
-- maybe update physics
