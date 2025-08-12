@@ -185,6 +185,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\..\..\Desktop\teksture\License free ground.txt" />
+    <Text Include="TODO.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\Desktop\Vecteezy-License-Information.pdf" />
