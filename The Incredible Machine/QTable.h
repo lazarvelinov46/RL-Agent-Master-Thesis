@@ -2,17 +2,18 @@
 
 #include "stdafx.h"
 
-#define WRONG_GEAR_PLACEMENT -5.0
+#define WRONG_GEAR_PLACEMENT -3.0
 #define WRONG_BELT_PLACEMENT -1.0
 #define LOST_GAME -5.0
 #define GEAR_ACTIVATED 1.0
-#define WHEEL_ACTIVATED 1.0
+#define WHEEL_ACTIVATED 2.0
 #define WON_GAME 10.0
 
 class QTable
 {
 private:
 	std::vector<std::vector<double>> values;
+	std::vector<std::vector<int>> visits;
 	double alpha;
 	double gamma;
 	int numStates;
