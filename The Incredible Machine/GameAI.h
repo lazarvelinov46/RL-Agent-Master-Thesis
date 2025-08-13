@@ -60,6 +60,8 @@ private:
 	int iterations = 0;
 	//game over indication
 	bool gameOver = false;
+	//sets of actions which are forbidden
+	std::unordered_set<int> forbiddenActions;
 
 	//Resets game resources before new iteration of the game
 	void resetResources();
@@ -138,5 +140,11 @@ public:
 	/// decays value lineary
 	/// </summary>
 	static double linearDecay(double start, double end, int episode, int decayEpisodes);
+	/// <summary>
+	/// Updates forbidden actions based on gears and belts placed
+	/// </summary>
+	/// <param name="gearsPlaced">number of gears placed</param>
+	/// <param name="beltsPlaced">number of belts placed</param>
+	void updateForbiddenActions(int gearsPlaced, int beltsPlaced);
 };
 

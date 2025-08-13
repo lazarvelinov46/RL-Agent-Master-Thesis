@@ -18,6 +18,9 @@ QTable::QTable(int numberOfStates, int numberOfActions,std::string filename):
 	this->numStates = numberOfStates;
 	this->numActions = numberOfActions;
 	this->filename = filename;
+	for (int i = 0;i < this->numActions;i++) {
+		this->validActions.push_back(i);
+	}
 }
 
 double QTable::getQValue(int stateId, int actionId) const
@@ -44,28 +47,44 @@ void QTable::updateQValue(int stateId, int actionId, double reward, int nextStat
 }
 
 //maybe not all actions but best possible
-int QTable::getAction(int stateId, double epsilon)
+int QTable::getAction(int stateId, double epsilon,std::unordered_set<int> forbiddenActions)
 {
 	if (stateId < 0 || stateId >= numStates)return 0;
+	std::vector<int> allowedActions;
+	allowedActions.reserve(this->numActions);
+	for (int i = 0;i < this->numActions;i++) {
+		if (forbiddenActions.find(i) == forbiddenActions.end()) {
+			allowedActions.push_back(i);
+		}
+	}
+	if (allowedActions.empty())return -1;
 	std::uniform_real_distribution<double> uniformDist(0.0, 1.0);
 	double sample = uniformDist(rng);
 	if (sample < epsilon) {
-		std::uniform_int_distribution<int> actionDist(0, numActions - 1);
-		return actionDist(rng);
+		std::uniform_int_distribution<int> actionDist(0, allowedActions.size() - 1);
+		return allowedActions[actionDist(rng)];
 	}
 	else {
-		std::vector<double> row = this->values[stateId];
-		double maxVal = *std::max_element(this->values[stateId].begin(), this->values[stateId].end());
+		//std::vector<double> row = this->values[stateId];
+		double maxVal = -std::numeric_limits<double>::infinity();
 
+		for (int a : allowedActions) {
+			double val = this->values[stateId][a];
+			if (val > maxVal)maxVal = val;
+		}
 		std::vector<int> bestActions;
-		bestActions.reserve(numActions);
-
-		for (int i = 0; i < numActions; i++) {
-			if (std::abs(this->values[stateId][i] - maxVal)<1e-9)bestActions.push_back(i);
+		bestActions.reserve(allowedActions.size());
+		/*
+		if (allowedActions.size() < this->numActions) {
+			std::cout << "DES" << std::endl;
+		}
+		*/
+		for (int a:allowedActions) {
+			if (std::abs(this->values[stateId][a] - maxVal)<1e-9)bestActions.push_back(a);
 		}
 		if (bestActions.empty()) {
-			std::uniform_int_distribution<int> actionDist(0, numActions - 1);
-			return actionDist(rng);
+			std::uniform_int_distribution<int> actionDist(0, allowedActions.size() - 1);
+			return allowedActions[actionDist(rng)];
 		}
 		std::uniform_int_distribution<int> bestActionsDist(0, bestActions.size() - 1);
 		return bestActions[bestActionsDist(rng)];
@@ -114,4 +133,32 @@ void QTable::saveQTableCSV(const std::string& filename) {
 	}
 
 	outFile.close();
+}
+
+void QTable::updateValidActions(int gearsPlaced, int beltsPlaced)
+{
+	this->validActions.clear();
+	//3 is max number of gears
+	if (gearsPlaced <3) {
+		//3 is max num of belts
+		if (beltsPlaced < 3) {
+			for (int i = 0;i < this->numActions;i++) {
+				this->validActions.push_back(i);
+			}
+		}
+		else {
+			//12 is number of belt actions
+			for (int i = 0;i < this->numActions-12;i++) {
+				this->validActions.push_back(i);
+			}
+		}
+	}
+	else {
+		//3 is max num of belts
+		if (beltsPlaced < 3) {
+			for (int i = 19*14;i < this->numActions;i++) {
+				this->validActions.push_back(i);
+			}
+		}
+	}
 }

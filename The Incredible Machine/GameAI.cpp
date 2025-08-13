@@ -62,9 +62,11 @@ void GameAI::updateActionState()
 		this->isPlaying = true;
 		level->setIsPlaying(this->isPlaying);
 		this->stateId = 1;
-		//this->actionId = 247;
+		//this->actionId = 248;
 		double eps = GameAI::linearDecay(this->E_START, this->E_END, this->iterations, this->E_DECAY);
-		this->actionId = this->table.getAction(this->stateId, eps);
+		//FORBIDDEN ACTION
+		this->forbiddenActions = this->level->getBallZonesPassed();
+		this->actionId = this->table.getAction(this->stateId, eps,this->forbiddenActions);
 		this->lastExecutedAction = this->actionId;
 		return;
 	}
@@ -77,7 +79,9 @@ void GameAI::updateActionState()
 			this->actionId = 1;
 		}
 		*/
-		this->actionId = this->table.getAction(this->nextStateId, 0.1);
+		//FORBIDDEN ACTION
+		this->forbiddenActions = this->level->getBallZonesPassed();
+		this->actionId = this->table.getAction(this->nextStateId, 0.1,this->forbiddenActions);
 		this->stateId = this->nextStateId;
 		this->lastExecutedAction = this->actionId;
 	}
@@ -95,6 +99,9 @@ bool GameAI::updateState()
 		this->nextStateId = this->level->getStatusChange().getStateId();
 		std::cout << this->stateId << " s " << this->nextStateId << " r " << this->level->getReward() << std::endl;
 		if (this->nextStateId != this->stateId) {
+			this->table.updateValidActions(
+				Level::getNumberOfGearsStatic()-this->level->getNumberOfGears(),
+				Level::getNumberOfBeltsStatic()-this->level->getNumberOfBelts());
 			bool terminalState = this->nextStateId % 2 == 0 || this->nextStateId > 127;
 			this->table.updateQValue(this->stateId, this->lastExecutedAction, this->level->getReward(), this->nextStateId,terminalState);
 			this->episode.push_back(new Transition({ this->stateId,this->lastExecutedAction,0.0,-1 }));
@@ -106,6 +113,8 @@ bool GameAI::updateState()
 			this->stateId = -1;
 			this->actionId = -1;
 			this->nextStateId = 1;
+			this->table.updateValidActions(0,0);
+			this->forbiddenActions.clear();
 			if (this->iterations % 10 == 0) {
 				this->table.printTable("qtable.txt",this->iterations);
 				std::string csvFilename = "qtable" + std::to_string(this->iterations) + ".csv";
@@ -281,3 +290,35 @@ double GameAI::linearDecay(double start, double end, int episode, int decayEpiso
 	double t = (double)episode / (double)decayEpisodes;
 	return start + (end - start) * t;
 }
+/*
+void GameAI::updateForbiddenActions(int gearsPlaced, int beltsPlaced)
+{
+	if (gearsPlaced == 3) {
+		for (int i = 0;i < ActionRL::getGridHeight() * ActionRL::getGridWidth();i++) {
+
+		}
+	}
+	if (gearsPlaced < 3) {
+		//3 is max num of belts
+		if (beltsPlaced < 3) {
+			for (int i = 0;i < this->numActions;i++) {
+				this->validActions.push_back(i);
+			}
+		}
+		else {
+			//12 is number of belt actions
+			for (int i = 0;i < this->numActions - 12;i++) {
+				this->validActions.push_back(i);
+			}
+		}
+	}
+	else {
+		//3 is max num of belts
+		if (beltsPlaced < 3) {
+			for (int i = 19 * 14;i < this->numActions;i++) {
+				this->validActions.push_back(i);
+			}
+		}
+	}
+}
+*/

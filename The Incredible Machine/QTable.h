@@ -9,11 +9,13 @@
 #define WHEEL_ACTIVATED 2.0
 #define WON_GAME 10.0
 
+
 class QTable
 {
 private:
 	std::vector<std::vector<double>> values;
 	std::vector<std::vector<int>> visits;
+	std::vector<int> validActions;
 	double alpha;
 	double gamma;
 	int numStates;
@@ -30,7 +32,7 @@ public:
 
 	void updateQValue(int stateId, int actionId, double reward, int nextStateId, bool nextIsTerminal=false);
 
-	int getAction(int stateId,double epsilon);
+	int getAction(int stateId,double epsilon,std::unordered_set<int> forbiddenActions);
 
 	void printTable(const std::string& filename,int iteration);
 
@@ -39,5 +41,6 @@ public:
 	void setAlpha(double alpha) { this->alpha = alpha; }
 	void setGamma(double gamma) { this->gamma = gamma; }
 	void seedRng(unsigned int seed) { this->rng.seed(seed); }
+	void updateValidActions(int gearsPlaced, int beltsPlaced);
 };
 
