@@ -3,6 +3,7 @@
 #include "DynamicObject.h"
 #include "StaticWheel.h"
 #include "StateRL.h"
+#include "ActionRL.h"
 
 
 /// <summary>
@@ -66,6 +67,9 @@ private:
 	std::vector<int> resourceNumbers;
 	/* Text on screen which represents resources left */
 	std::vector<sf::Text> resourceNumbersText;
+
+	//where balls were there can't be gear in AI mode
+	std::unordered_set<int> forbiddenActions;
 
 	/* Flag if resource is clicked */
 	bool clickedResource = false;
@@ -181,5 +185,10 @@ public:
 	static int getNumberOfBeltsStatic();
 	static int getNumberOfWheels();
 	static int getNumberOfBalls();
+	/// <summary>
+	/// Set which contains ids of forbidden actions
+	/// </summary>
+	/// <returns>unordered sets of forbidden actions</returns>
+	std::unordered_set<int> getBallZonesPassed();
 };
 

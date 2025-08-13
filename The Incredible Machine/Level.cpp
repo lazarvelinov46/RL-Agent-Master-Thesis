@@ -333,6 +333,27 @@ void Level::updateBalls(float deltaTime)
 				"	cc	" << oldVelocity.x << "	dd	" << oldVelocity.y << std::endl;
 		}
 		*/
+		//FORBIDDEN ACTIONS
+		float value;
+		value = ball->getGlobalBounds().top;
+		int verticalCheck = static_cast<int>(value) / 10 * 10;
+		value = ball->getGlobalBounds().left + ball->getGlobalBounds().width;
+		int horizontalCheck = static_cast<int>(value) / 10 * 10;
+		if (verticalCheck % 50 ==0 ||horizontalCheck % 50 ==0) {
+			int id = (verticalCheck / 50) * 19 +
+				horizontalCheck / 50;
+			if (id < ActionRL::getGridWidth() * ActionRL::getGridHeight()) {
+				auto result = this->forbiddenActions.insert(id);
+				if (result.second) {
+					std::cout << " id " << id << " x " << horizontalCheck
+						<< " y " << verticalCheck << std::endl;
+					for (int i : this->forbiddenActions) {
+						std::cout << i << "		";
+					}
+					std::cout << std::endl;
+				}
+			}
+		}
 	}
 	if (this->state.getBallMoving() != ballsMovingPreUpdate) {
 		this->stateChanged = true;
@@ -502,6 +523,13 @@ void Level::handleClick(sf::Vector2f& mousePosition)
 				*/
 				this->activeBeltPlacement = false;
 				this->resourceNumbersText[this->selectedResoureceIndex].setString(std::to_string(--this->resourceNumbers[this->selectedResoureceIndex]));
+				//FORBIDDEN ACTIONS
+				if (this->resourceNumbers[this->selectedResoureceIndex] == 0) {
+					int numActions = Level::getNumberOfGearsStatic() * Level::getNumberOfWheels() + ActionRL::combination(Level::getNumberOfWheels(), 2);
+					for (int i = ActionRL::getGridHeight() * ActionRL::getGridWidth();i < numActions;i++) {
+						this->forbiddenActions.insert(i);
+					}
+				}
 				this->clickedResource = false;
 				this->selectedResoureceIndex = -1;
 				this->resources.erase(this->resources.begin()+this->selectedResourceListPosition);
@@ -525,6 +553,12 @@ void Level::handleClick(sf::Vector2f& mousePosition)
 				if (alignedPosition.x < 900 && alignedPosition.y < 700) {
 					this->staticObjects.push_back(new StaticObject(*this->selectedResource, this->selectedResoureceIndex == 1 ? StaticObjectType::GEAR : StaticObjectType::PLATFORM));
 					this->resourceNumbersText[this->selectedResoureceIndex].setString(std::to_string(--this->resourceNumbers[this->selectedResoureceIndex]));
+				}
+				//FORBIDDEN ACTIONS
+				if (this->resourceNumbers[this->selectedResoureceIndex] == 0) {
+					for (int i = 0;i < ActionRL::getGridHeight() * ActionRL::getGridWidth();i++) {
+						this->forbiddenActions.insert(i);
+					}
 				}
 				this->clickedResource = false;
 				this->selectedResoureceIndex = -1;
@@ -707,6 +741,11 @@ int Level::getNumberOfWheels()
 int Level::getNumberOfBalls()
 {
 	return Level::NUMBER_OF_BALLS;
+}
+
+std::unordered_set<int> Level::getBallZonesPassed()
+{
+	return this->forbiddenActions;
 }
 
 bool Level::placeBelt(sf::Vector2f start, sf::Vector2f end, bool startBeltGear)

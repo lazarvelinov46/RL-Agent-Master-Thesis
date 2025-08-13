@@ -13,6 +13,7 @@
 #include <math.h>
 #include <random>
 #include <chrono>
+#include <unordered_set>
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
 #include <SFML/Audio.hpp>
