@@ -140,6 +140,35 @@ void Level::startPlatform(const StaticObject* object)
 	}
 }
 
+void Level::initForbiddenActions()
+{
+	for (size_t i = 0; i < this->dynamicObjects.size(); i++) {
+		DynamicObject* ball = this->dynamicObjects[i];
+		int boundsTop = static_cast<int>(ball->getGlobalBounds().top);
+		int boundsBottom = static_cast<int>(ball->getGlobalBounds().top+ball->getGlobalBounds().height);
+		int boundsLeft = static_cast<int>(ball->getGlobalBounds().left);
+		int boundsRight = static_cast<int>(ball->getGlobalBounds().left+ball->getGlobalBounds().width);
+		float value;
+		int ids[4];
+		ids[0] = boundsTop / 50 * 19 + boundsLeft / 50;
+		ids[1] = boundsTop / 50 * 19 + boundsRight / 50;
+		ids[2] = boundsBottom / 50 * 19 + boundsLeft / 50;
+		ids[3] = boundsBottom / 50 * 19 + boundsRight / 50;
+		for (int j = 0; j < 4; j++) {
+			if (ids[j] < ActionRL::getGridWidth() * ActionRL::getGridHeight()) {
+				auto result = this->forbiddenActions.insert(ids[j]);
+				if (result.second) {
+					std::cout << " id " << ids[j];
+
+					std::cout << std::endl;
+				}
+			}
+		}
+		
+	}
+	
+}
+
 bool Level::hasWheel(const StaticObject* object)
 {
 	return false;
@@ -262,7 +291,6 @@ void Level::updateBalls(float deltaTime)
 				}
 				else if (rightCollision<topCollision&& rightCollision<bottomCollision) {
 					//left collision
-					std::cout << "aaa" << std::endl;
 					newPosition.x = objectRight;
 					ball->setVelocity(sf::Vector2f(ball->getVelocity().x * -0.9f, ball->getVelocity().y));
 				}
@@ -380,6 +408,7 @@ void Level::initLevel()
 	this->initStaticWheels();
 
 	this->initDynamicObjects();
+	this->initForbiddenActions();
 
 	this->initResources();
 

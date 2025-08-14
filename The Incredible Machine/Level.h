@@ -103,6 +103,7 @@ private:
 	void initStaticObjects();
 	void initStaticWheels();
 	void initDynamicObjects();
+	void initForbiddenActions();
 	void initResources();
 
 	void resetStaticObjects();
