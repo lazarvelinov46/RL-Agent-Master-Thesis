@@ -157,11 +157,12 @@ void Level::initForbiddenActions()
 		for (int j = 0; j < 4; j++) {
 			if (ids[j] < ActionRL::getGridWidth() * ActionRL::getGridHeight()) {
 				auto result = this->forbiddenActions.insert(ids[j]);
+				/*
 				if (result.second) {
 					std::cout << " id " << ids[j];
 
 					std::cout << std::endl;
-				}
+				}*/
 			}
 		}
 		
@@ -364,14 +365,107 @@ void Level::updateBalls(float deltaTime)
 		//FORBIDDEN ACTIONS
 		float value;
 		value = ball->getGlobalBounds().top;
-		int verticalCheck = static_cast<int>(value) / 10 * 10;
+		int verticalCheckUp = static_cast<int>(value) / 10 * 10;
+		value = ball->getGlobalBounds().top+ball->getGlobalBounds().height;
+		int verticalCheckDown = static_cast<int>(value) / 10 * 10;
 		value = ball->getGlobalBounds().left + ball->getGlobalBounds().width;
-		int horizontalCheck = static_cast<int>(value) / 10 * 10;
-		if (verticalCheck % 50 ==0 ||horizontalCheck % 50 ==0) {
+		int horizontalCheckRight = static_cast<int>(value) / 10 * 10;
+		value = ball->getGlobalBounds().left ;
+		int horizontalCheckLeft = static_cast<int>(value) / 10 * 10;
+		if (verticalCheckUp % 50 == 0) {
+			int id = (verticalCheckUp / 50) * 19 + horizontalCheckRight / 50;
+			auto result = this->forbiddenActions.insert(id);
+			/*
+			if (result.second) {
+				std::cout << " id " << id << " x " << horizontalCheckRight
+					<< " y " << verticalCheckUp << std::endl;
+
+				std::cout << std::endl;
+			}
+			*/
+			id = (verticalCheckUp / 50) * 19 + horizontalCheckLeft / 50;
+			result = this->forbiddenActions.insert(id);
+			/*
+			if (result.second) {
+				std::cout << " id " << id << " x " << horizontalCheckLeft
+					<< " y " << verticalCheckUp << std::endl;
+
+				std::cout << std::endl;
+			}
+			*/
+		}
+		if (verticalCheckDown % 50 == 0) {
+			int id = (verticalCheckDown / 50) * 19 + horizontalCheckRight / 50;
+			auto result = this->forbiddenActions.insert(id);
+			/*
+			if (result.second) {
+				std::cout << " id " << id << " x " << horizontalCheckRight
+					<< " y " << verticalCheckDown << std::endl;
+
+				std::cout << std::endl;
+			}
+			*/
+			id = (verticalCheckDown / 50) * 19 + horizontalCheckLeft / 50;
+			result = this->forbiddenActions.insert(id);
+			/*
+			if (result.second) {
+				std::cout << " id " << id << " x " << horizontalCheckLeft
+					<< " y " << verticalCheckDown << std::endl;
+
+				std::cout << std::endl;
+			}
+			*/
+		}
+		if (horizontalCheckLeft % 50 == 0) {
+			int id = (verticalCheckUp / 50) * 19 + horizontalCheckLeft / 50;
+			auto result = this->forbiddenActions.insert(id);
+			/*
+			if (result.second) {
+				std::cout << " id " << id << " x " << horizontalCheckLeft
+					<< " y " << verticalCheckUp << std::endl;
+
+				std::cout << std::endl;
+			}
+			*/
+			id = (verticalCheckDown / 50) * 19 + horizontalCheckLeft / 50;
+			result = this->forbiddenActions.insert(id);
+			/*
+			if (result.second) {
+				std::cout << " id " << id << " x " << horizontalCheckLeft
+					<< " y " << verticalCheckDown << std::endl;
+
+				std::cout << std::endl;
+			}
+			*/
+		}
+		if (horizontalCheckRight % 50 == 0) {
+			int id = (verticalCheckUp / 50) * 19 + horizontalCheckRight / 50;
+			auto result = this->forbiddenActions.insert(id);
+			/*
+			if (result.second) {
+				std::cout << " id " << id << " x " << horizontalCheckRight
+					<< " y " << verticalCheckUp << std::endl;
+
+				std::cout << std::endl;
+			}
+			*/
+			id = (verticalCheckDown / 50) * 19 + horizontalCheckRight / 50;
+			result = this->forbiddenActions.insert(id);
+			/*
+			if (result.second) {
+				std::cout << " id " << id << " x " << horizontalCheckRight
+					<< " y " << verticalCheckDown << std::endl;
+
+				std::cout << std::endl;
+			}
+			*/
+		}
+		/*
 			int id = (verticalCheck / 50) * 19 +
 				horizontalCheck / 50;
 			if (id < ActionRL::getGridWidth() * ActionRL::getGridHeight()) {
 				auto result = this->forbiddenActions.insert(id);
+				/*
 				if (result.second) {
 					std::cout << " id " << id << " x " << horizontalCheck
 						<< " y " << verticalCheck << std::endl;
@@ -381,7 +475,8 @@ void Level::updateBalls(float deltaTime)
 					std::cout << std::endl;
 				}
 			}
-		}
+			*/
+		
 	}
 	if (this->state.getBallMoving() != ballsMovingPreUpdate) {
 		this->stateChanged = true;
@@ -739,6 +834,10 @@ sf::Vector2f Level::getGearLocation(int gearId)
 	for (int i = 0; i < this->staticObjects.size(); i++) {
 		if (this->staticObjects[i]->getObjectType() == StaticObjectType::GEAR) {
 			if (g == gearId) {
+				if (this->staticObjects[i]->getAttached()) {
+					//already placed
+					return sf::Vector2f(-1.0, -1.0);
+				}
 				return this->staticObjects[i]->getGlobalBounds().getPosition();
 			}
 			g++;
@@ -749,6 +848,9 @@ sf::Vector2f Level::getGearLocation(int gearId)
 
 sf::Vector2f Level::getWheelLocation(int wheelId)
 {
+	if (this->staticWheels[wheelId]->getAttached()) {
+		return sf::Vector2f(-1.0, -1.0);
+	}
 	return this->staticWheels[wheelId]->getGlobalBounds().getPosition();
 }
 
@@ -825,6 +927,11 @@ bool Level::placeBelt(sf::Vector2f start, sf::Vector2f end, bool startBeltGear)
 							start.y + this->staticWheels[0]->getGlobalBounds().height) });
 	}
 	else {
+		for (StaticWheel* object : this->staticWheels) {
+			if (object->getGlobalBounds().contains(start)||object->getGlobalBounds().contains(end)) {
+				object->setAttached(true);
+			}
+		}
 		this->belts.push_back({
 						sf::Vector2f(
 							end.x + this->staticWheels[0]->getGlobalBounds().width,
@@ -840,12 +947,12 @@ bool Level::placeBelt(sf::Vector2f start, sf::Vector2f end, bool startBeltGear)
 	this->resources.erase(this->resources.begin());
 	this->currentNumberOfBelts--;
 	int gears = 0;
-	for (const StaticObject* object : this->staticObjects) {
+	for (StaticObject* object : this->staticObjects) {
 		if (object->getObjectType() == StaticObjectType::GEAR) {
 			//maybe start and end
 			if (object->getGlobalBounds().contains(start)) {
 				if (this->state.getGearStarted(gears)) {
-					
+					object->setAttached(true);
 					this->startPlatform(object);
 				}
 			}

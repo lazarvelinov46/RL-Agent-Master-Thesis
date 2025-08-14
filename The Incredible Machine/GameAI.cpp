@@ -82,6 +82,7 @@ void GameAI::updateActionState()
 		//FORBIDDEN ACTION
 		this->forbiddenActions = this->level->getBallZonesPassed();
 		this->actionId = this->table.getAction(this->nextStateId, 0.1,this->forbiddenActions);
+		std::cout << "ACTION " << this->actionId << std::endl;
 		this->stateId = this->nextStateId;
 		this->lastExecutedAction = this->actionId;
 	}
