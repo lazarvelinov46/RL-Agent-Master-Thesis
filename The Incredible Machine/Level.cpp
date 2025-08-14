@@ -291,7 +291,6 @@ void Level::updateBalls(float deltaTime)
 				}
 				else if (rightCollision<topCollision&& rightCollision<bottomCollision) {
 					//left collision
-					std::cout << "aaa" << std::endl;
 					newPosition.x = objectRight;
 					ball->setVelocity(sf::Vector2f(ball->getVelocity().x * -0.9f, ball->getVelocity().y));
 				}
