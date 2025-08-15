@@ -22,7 +22,7 @@ private:
 	/// <summary>
 	/// Indicator if the belt is attached to wheel
 	/// </summary>
-	bool attached;
+	bool attached=false;
 	//sets texture of an object depending on object type
 	void setTexture();
 

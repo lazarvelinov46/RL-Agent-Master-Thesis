@@ -836,7 +836,8 @@ sf::Vector2f Level::getGearLocation(int gearId)
 			if (g == gearId) {
 				if (this->staticObjects[i]->getAttached()) {
 					//already placed
-					return sf::Vector2f(-1.0, -1.0);
+					std::cout << "ATTACHED" << std::endl;
+					return sf::Vector2f(-2.0, -2.0);
 				}
 				return this->staticObjects[i]->getGlobalBounds().getPosition();
 			}
@@ -849,7 +850,8 @@ sf::Vector2f Level::getGearLocation(int gearId)
 sf::Vector2f Level::getWheelLocation(int wheelId)
 {
 	if (this->staticWheels[wheelId]->getAttached()) {
-		return sf::Vector2f(-1.0, -1.0);
+		std::cout << "ATTACHED WHEEL" << std::endl;
+		return sf::Vector2f(-2.0, -2.0);
 	}
 	return this->staticWheels[wheelId]->getGlobalBounds().getPosition();
 }

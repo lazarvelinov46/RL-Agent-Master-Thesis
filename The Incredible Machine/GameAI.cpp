@@ -81,6 +81,10 @@ void GameAI::updateActionState()
 		*/
 		//FORBIDDEN ACTION
 		this->forbiddenActions = this->level->getBallZonesPassed();
+		for (int a : this->forbiddenActions) {
+			std::cout << a << " ";
+		}
+		std::cout<<std::endl;
 		this->actionId = this->table.getAction(this->nextStateId, 0.1,this->forbiddenActions);
 		std::cout << "ACTION " << this->actionId << std::endl;
 		this->stateId = this->nextStateId;
@@ -246,6 +250,10 @@ void GameAI::update(float deltaTime)
 			}
 			else {
 				end = this->level->getWheelLocation(beltActionInfo.second.idElement);
+			}
+			if (start.x == -2 || end.x == -2) {
+				this->table.updateQValue(this->stateId, this->actionId, WRONG_BELT_PLACEMENT, this->stateId);
+				std::cout << "NMZ" << std::endl;
 			}
 			std::cout << sqrt(powf(abs(start.x - end.x), 2) + powf(abs(start.y - end.y), 2)) << std::endl;
 			if (sqrt(powf(abs(start.x - end.x), 2) + powf(abs(start.y - end.y), 2)) > 350.0) {
