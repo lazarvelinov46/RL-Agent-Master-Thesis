@@ -241,14 +241,18 @@ void Level::updateBalls(float deltaTime)
 		bool collision = false;
 		bool noGravity = false;
 		bool onMovingPlatform = false;
+		bool stop = false;
 		int gears = 0;
 		for (const StaticObject* object : this->staticObjects) {
 			sf::FloatRect objectBounds = object->getGlobalBounds();
 			if (objectBounds.top == ballBottom&&objectBounds.left<=(ballBounds.left+ballBounds.width)&&
 				objectBounds.left+objectBounds.width>=ballBounds.left+ballBounds.width) {
 				noGravity = true;
-				if (object->getObjectType() == StaticObjectType::PLATFORM&&object->getMoving()) {
-					onMovingPlatform = true;
+
+				for (const StaticObject* platformObject : this->staticObjects) {
+					if (object->getObjectType() == StaticObjectType::PLATFORM && object->getMoving()) {
+						onMovingPlatform = true;
+					}
 				}
 			}
 			if (ballBounds.intersects(objectBounds)) {
@@ -287,8 +291,24 @@ void Level::updateBalls(float deltaTime)
 
 				else if (leftCollision<topCollision && leftCollision<bottomCollision) {
 					//left collision
-					newPosition.x = objectBounds.left - ballBounds.width;
-					ball->setVelocity(sf::Vector2f(ball->getVelocity().x*-0.9f, ball->getVelocity().y));
+					for (const StaticObject* platformObject : this->staticObjects) {
+						if (platformObject->getObjectType() == StaticObjectType::PLATFORM && platformObject->getMoving()&&
+							ballBounds.top+ballBounds.height==platformObject->getGlobalBounds().top&&
+							ballBounds.left+ballBounds.width/2>=platformObject->getGlobalBounds().left&&
+							ballBounds.left+ballBounds.width/2<=platformObject->getGlobalBounds().left+platformObject->getGlobalBounds().width) {
+							onMovingPlatform = true;
+						}
+					}
+					if (!onMovingPlatform) {
+						newPosition.x = objectBounds.left - ballBounds.width;
+						ball->setVelocity(sf::Vector2f(ball->getVelocity().x * -0.9f, ball->getVelocity().y));
+					}
+					else {
+						newPosition.x = objectBounds.left - ballBounds.width-1.0f;
+						ball->setStoppedOnPlatform(true);
+						ball->setVelocity(sf::Vector2f(0.f,0.f));
+					}
+					
 				}
 				else if (rightCollision<topCollision&& rightCollision<bottomCollision) {
 					//left collision
@@ -305,7 +325,7 @@ void Level::updateBalls(float deltaTime)
 						this->startPlatform(object);
 					}
 				}
-				if (object->getMoving() && ball->getVelocity().x == 0.f) {
+				if (object->getMoving() && ball->getVelocity().x == 0.f&&!ball->getStoppedOnPlatform()) {
 					ball->setVelocity(sf::Vector2f(object->getSpeed(), 0.f));
 				}
 
@@ -317,7 +337,7 @@ void Level::updateBalls(float deltaTime)
 				break;
 			}
 			else if (noGravity == true) {
-				if (object->getMoving() && ball->getVelocity().x == 0.f&&onMovingPlatform) {
+				if (object->getMoving() && ball->getVelocity().x == 0.f&&onMovingPlatform&&!ball->getStoppedOnPlatform()) {
 					ball->setVelocity(sf::Vector2f(object->getSpeed(), 0.f));
 				}
 
@@ -365,101 +385,53 @@ void Level::updateBalls(float deltaTime)
 		//FORBIDDEN ACTIONS
 		float value;
 		value = ball->getGlobalBounds().top;
-		int verticalCheckUp = static_cast<int>(value) / 10 * 10;
+		int verticalCheckUp = static_cast<int>(value) ;
 		value = ball->getGlobalBounds().top+ball->getGlobalBounds().height;
-		int verticalCheckDown = static_cast<int>(value) / 10 * 10;
+		int verticalCheckDown = static_cast<int>(value) ;
 		value = ball->getGlobalBounds().left + ball->getGlobalBounds().width;
-		int horizontalCheckRight = static_cast<int>(value) / 10 * 10;
+		int horizontalCheckRight = static_cast<int>(value);
 		value = ball->getGlobalBounds().left ;
-		int horizontalCheckLeft = static_cast<int>(value) / 10 * 10;
-		if (verticalCheckUp % 50 == 0) {
+		int horizontalCheckLeft = static_cast<int>(value);
+		int id = verticalCheckUp / 50 * 19 + horizontalCheckLeft / 50;
+		auto result = this->forbiddenActions.insert(id);
+		id = verticalCheckUp / 50 * 19 + horizontalCheckRight / 50;
+		result = this->forbiddenActions.insert(id);
+		id = verticalCheckDown / 50 * 19 + horizontalCheckLeft / 50;
+		result = this->forbiddenActions.insert(id);
+		id = verticalCheckDown / 50 * 19 + horizontalCheckRight / 50;
+		/*
+		if (verticalCheckUp % 10 == 0) {
 			int id = (verticalCheckUp / 50) * 19 + horizontalCheckRight / 50;
 			auto result = this->forbiddenActions.insert(id);
-			/*
-			if (result.second) {
-				std::cout << " id " << id << " x " << horizontalCheckRight
-					<< " y " << verticalCheckUp << std::endl;
-
-				std::cout << std::endl;
-			}
-			*/
 			id = (verticalCheckUp / 50) * 19 + horizontalCheckLeft / 50;
 			result = this->forbiddenActions.insert(id);
-			/*
-			if (result.second) {
-				std::cout << " id " << id << " x " << horizontalCheckLeft
-					<< " y " << verticalCheckUp << std::endl;
-
-				std::cout << std::endl;
-			}
-			*/
 		}
-		if (verticalCheckDown % 50 == 0) {
+		if (verticalCheckDown % 10 == 0) {
 			int id = (verticalCheckDown / 50) * 19 + horizontalCheckRight / 50;
 			auto result = this->forbiddenActions.insert(id);
-			/*
-			if (result.second) {
-				std::cout << " id " << id << " x " << horizontalCheckRight
-					<< " y " << verticalCheckDown << std::endl;
-
-				std::cout << std::endl;
-			}
-			*/
 			id = (verticalCheckDown / 50) * 19 + horizontalCheckLeft / 50;
 			result = this->forbiddenActions.insert(id);
-			/*
-			if (result.second) {
-				std::cout << " id " << id << " x " << horizontalCheckLeft
-					<< " y " << verticalCheckDown << std::endl;
-
-				std::cout << std::endl;
-			}
-			*/
 		}
-		if (horizontalCheckLeft % 50 == 0) {
+		if (horizontalCheckLeft % 10 == 0) {
 			int id = (verticalCheckUp / 50) * 19 + horizontalCheckLeft / 50;
 			auto result = this->forbiddenActions.insert(id);
-			/*
-			if (result.second) {
-				std::cout << " id " << id << " x " << horizontalCheckLeft
-					<< " y " << verticalCheckUp << std::endl;
-
-				std::cout << std::endl;
-			}
-			*/
 			id = (verticalCheckDown / 50) * 19 + horizontalCheckLeft / 50;
 			result = this->forbiddenActions.insert(id);
-			/*
-			if (result.second) {
-				std::cout << " id " << id << " x " << horizontalCheckLeft
-					<< " y " << verticalCheckDown << std::endl;
-
-				std::cout << std::endl;
-			}
-			*/
 		}
-		if (horizontalCheckRight % 50 == 0) {
+		if (horizontalCheckRight % 10 == 0) {
 			int id = (verticalCheckUp / 50) * 19 + horizontalCheckRight / 50;
 			auto result = this->forbiddenActions.insert(id);
-			/*
-			if (result.second) {
-				std::cout << " id " << id << " x " << horizontalCheckRight
-					<< " y " << verticalCheckUp << std::endl;
-
-				std::cout << std::endl;
-			}
-			*/
 			id = (verticalCheckDown / 50) * 19 + horizontalCheckRight / 50;
 			result = this->forbiddenActions.insert(id);
-			/*
 			if (result.second) {
 				std::cout << " id " << id << " x " << horizontalCheckRight
 					<< " y " << verticalCheckDown << std::endl;
 
 				std::cout << std::endl;
 			}
-			*/
+			
 		}
+		*/
 		/*
 			int id = (verticalCheck / 50) * 19 +
 				horizontalCheck / 50;
@@ -650,7 +622,7 @@ void Level::handleClick(sf::Vector2f& mousePosition)
 				//FORBIDDEN ACTIONS
 				if (this->resourceNumbers[this->selectedResoureceIndex] == 0) {
 					int numActions = Level::getNumberOfGearsStatic() * Level::getNumberOfWheels() + ActionRL::combination(Level::getNumberOfWheels(), 2);
-					for (int i = ActionRL::getGridHeight() * ActionRL::getGridWidth();i < numActions;i++) {
+					for (int i = ActionRL::getGridHeight() * ActionRL::getGridWidth(); i < numActions; i++) {
 						this->forbiddenActions.insert(i);
 					}
 				}
@@ -799,7 +771,12 @@ bool Level::tryGearPlacement(sf::Vector2f position)
 			this->staticObjects.push_back(new StaticObject(*this->selectedResource, StaticObjectType::GEAR ));
 			this->resourceNumbersText[1].setString(std::to_string(--this->resourceNumbers[1]));
 			this->resources.pop_back();
-			this->currentNumberOfGears--;
+			if (--this->currentNumberOfGears == 0) {
+				int numActions = Level::getNumberOfGearsStatic() * Level::getNumberOfWheels() + ActionRL::combination(Level::getNumberOfWheels(), 2);
+				for (int i = 0; i < ActionRL::getGridWidth()*ActionRL::getGridHeight(); i++) {
+					this->forbiddenActions.insert(i);
+				}
+			}
 		}
 		/*
 		std::cout << "STAVLJENO " << this->selectedResource->getGlobalBounds().left << this->selectedResource->getGlobalBounds().top
@@ -914,51 +891,53 @@ bool Level::placeBelt(sf::Vector2f start, sf::Vector2f end, bool startBeltGear)
 							this->beltStart.y + this->staticWheels[0]->getGlobalBounds().height/2) });
 				}
 	*/
+
 	if (this->currentNumberOfBelts == 0) {
 		return false;
 	}
-	this->belts.push_back({sf::Vector2f(start.x + 100 / 8,start.y + 100 / 4),
-		sf::Vector2f(end.x + 2,end.y + this->staticWheels[0]->getGlobalBounds().height / 2)});
 	if (startBeltGear) {
-		this->belts.push_back({
-						sf::Vector2f(
-							end.x + this->staticWheels[0]->getGlobalBounds().width,
-							end.y + this->staticWheels[0]->getGlobalBounds().height / 2),
-						sf::Vector2f(
-							start.x + this->staticWheels[0]->getGlobalBounds().width,
-							start.y + this->staticWheels[0]->getGlobalBounds().height) });
-	}
-	else {
-		for (StaticWheel* object : this->staticWheels) {
-			if (object->getGlobalBounds().contains(start)||object->getGlobalBounds().contains(end)) {
-				object->setAttached(true);
+		/*
+		this->belts.push_back({ sf::Vector2f(start.x + 100 / 8,start.y + 100 / 4),
+			sf::Vector2f(end.x + 2,end.y + this->staticWheels[0]->getGlobalBounds().height / 2) });
+			this->beltStart = sf::Vector2f(object->getGlobalBounds().left+ object->getGlobalBounds().width/8,
+						object->getGlobalBounds().top+object->getGlobalBounds().height/4);
+		*/
+		sf::Vector2f beltStart1 = sf::Vector2f(start.x + 100 / 8, start.y + 100 / 4);
+		sf::Vector2f beltEnd1 = sf::Vector2f(end.x + 2, end.y + this->staticWheels[0]->getGlobalBounds().height / 2);
+		sf::Vector2f beltStart2 = sf::Vector2f(end.x + this->staticWheels[0]->getGlobalBounds().width, end.y + this->staticWheels[0]->getGlobalBounds().height / 2);
+		sf::Vector2f beltEnd2 = sf::Vector2f(beltStart1.x + this->staticWheels[0]->getGlobalBounds().width, beltStart1.y + this->staticWheels[0]->getGlobalBounds().height / 2);
+		this->belts.push_back({ beltStart1, beltEnd1 });
+		this->belts.push_back({ beltStart2,beltEnd2 });
+		int gears = 0;
+		for (StaticObject* object : this->staticObjects) {
+			if (object->getObjectType() == StaticObjectType::GEAR) {
+				//maybe start and end
+				if (object->getGlobalBounds().contains(start)) {
+					if (this->state.getGearStarted(gears)) {
+						object->setAttached(true);
+						this->startPlatform(object);
+					}
+				}
+				gears++;
 			}
 		}
-		this->belts.push_back({
-						sf::Vector2f(
-							end.x + this->staticWheels[0]->getGlobalBounds().width,
-							end.y + this->staticWheels[0]->getGlobalBounds().height / 2),
-						sf::Vector2f(
-							start.x + this->staticWheels[0]->getGlobalBounds().width/2,
-							start.y + this->staticWheels[0]->getGlobalBounds().height/2) });
 	}
-	//this->belts.push_back({ sf::Vector2f(end.x + this->staticWheels[0]->getGlobalBounds().width,end.y + this->staticWheels[0]->getGlobalBounds().height),
-		//sf::Vector2f(start.x + this->staticWheels[0]->getGlobalBounds().width,start.y + this->staticWheels[0]->getGlobalBounds().height) });
+	else {
+		//this->beltStart = sf::Vector2f(wheel->getGlobalBounds().left+wheel->getGlobalBounds().width/2, wheel->getGlobalBounds().top+2);
+		sf::Vector2f beltStart1 = sf::Vector2f(start.x + this->staticWheels[0]->getGlobalBounds().width / 2, start.y + 2);
+		sf::Vector2f beltEnd1 = sf::Vector2f(end.x + 2, end.y + this->staticWheels[0]->getGlobalBounds().height / 2);
+		sf::Vector2f beltStart2 = sf::Vector2f(end.x + this->staticWheels[0]->getGlobalBounds().width, end.y + this->staticWheels[0]->getGlobalBounds().height / 2);
+		sf::Vector2f beltEnd2 = sf::Vector2f(beltStart1.x + this->staticWheels[0]->getGlobalBounds().width / 2, beltStart1.y + this->staticWheels[0]->getGlobalBounds().height / 2);
+		this->belts.push_back({ beltStart1,beltEnd1 });
+		this->belts.push_back({ beltStart2,beltEnd2 });
+	}
 	this->activeBeltPlacement = false;
 	this->resourceNumbersText[0].setString(std::to_string(--this->resourceNumbers[0]));
 	this->resources.erase(this->resources.begin());
 	this->currentNumberOfBelts--;
-	int gears = 0;
-	for (StaticObject* object : this->staticObjects) {
-		if (object->getObjectType() == StaticObjectType::GEAR) {
-			//maybe start and end
-			if (object->getGlobalBounds().contains(start)) {
-				if (this->state.getGearStarted(gears)) {
-					object->setAttached(true);
-					this->startPlatform(object);
-				}
-			}
-			gears++;
+	for (StaticWheel* object : this->staticWheels) {
+		if (object->getGlobalBounds().contains(start) || object->getGlobalBounds().contains(end)) {
+			object->setAttached(true);
 		}
 	}
 	return true;

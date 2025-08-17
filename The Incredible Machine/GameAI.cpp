@@ -62,30 +62,43 @@ void GameAI::updateActionState()
 		this->isPlaying = true;
 		level->setIsPlaying(this->isPlaying);
 		this->stateId = 1;
-		//this->actionId = 248;
+		this->actionId = 248;
 		double eps = GameAI::linearDecay(this->E_START, this->E_END, this->iterations, this->E_DECAY);
 		//FORBIDDEN ACTION
 		this->forbiddenActions = this->level->getBallZonesPassed();
-		this->actionId = this->table.getAction(this->stateId, eps,this->forbiddenActions);
+		//this->actionId = this->table.getAction(this->stateId, eps,this->forbiddenActions);
 		this->lastExecutedAction = this->actionId;
 		return;
 	}
 	if (this->selectAction) {
-		/*
-		if (this->nextStateId ==3) {
-			this->actionId = 266;
-		}
-		else{
-			this->actionId = 1;
-		}
-		*/
+		
 		//FORBIDDEN ACTION
+		
 		this->forbiddenActions = this->level->getBallZonesPassed();
+		
 		for (int a : this->forbiddenActions) {
 			std::cout << a << " ";
 		}
+		
 		std::cout<<std::endl;
-		this->actionId = this->table.getAction(this->nextStateId, 0.1,this->forbiddenActions);
+		switch (this->nextStateId) {
+		case 3:
+			this->actionId = 266;
+			break;
+		case 19:
+			this->actionId = 255;
+			break;
+		case 23:
+			//this->actionId = 270;
+			this->actionId = 252;
+			break;
+		case 55:
+			this->actionId = 265;
+			break;
+		default:
+			this->actionId = this->table.getAction(this->nextStateId, 0.1, this->forbiddenActions);
+		}
+		//this->actionId = this->table.getAction(this->nextStateId, 0.1,this->forbiddenActions);
 		std::cout << "ACTION " << this->actionId << std::endl;
 		this->stateId = this->nextStateId;
 		this->lastExecutedAction = this->actionId;
@@ -208,7 +221,6 @@ void GameAI::update(float deltaTime)
 	*/
 	this->updateActionState();
 	if ((level->getNumberOfBelts() + level->getNumberOfGears())==0) {
-		std::cout << "Nema vise " << std::endl;
 		this->actionId = -1;
 	}
 	AgentAction actionType=this->actionFunctions.getActionType(this->actionId);
@@ -239,6 +251,9 @@ void GameAI::update(float deltaTime)
 			std::cout << "Is start gear " << beltActionInfo.first.isElementGear << " id " << beltActionInfo.first.idElement << std::endl;
 			std::cout << "Is end gear " << beltActionInfo.second.isElementGear << " id " << beltActionInfo.second.idElement << std::endl;
 			sf::Vector2f start, end;
+			if (this->stateId == 23) {
+				std::cout << "prob" << std::endl;
+			}
 			if (beltActionInfo.first.isElementGear) {
 				start = this->level->getGearLocation(beltActionInfo.first.idElement);
 			}

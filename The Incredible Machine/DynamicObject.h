@@ -18,6 +18,8 @@ private:
 	sf::Vector2f velocity;
 	//Indicate if object is shape or srpite
 	bool isSprite;
+	//indicates if it is stoped due to collision while on platform
+	bool stoppedOnPlatform = false;
 
 	//In game ball size in px
 	static const float IN_GAME_BALL_SIZE;
@@ -65,5 +67,8 @@ public:
 	/// </summary>
 	/// <returns>FloacRect of object's boundaries</returns>
 	sf::FloatRect getGlobalBounds()const;
+
+	void setStoppedOnPlatform(bool stopped);
+	bool getStoppedOnPlatform()const;
 };
 

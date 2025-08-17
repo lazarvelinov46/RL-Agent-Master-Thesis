@@ -64,3 +64,13 @@ sf::FloatRect DynamicObject::getGlobalBounds()const
 {
     return this->isSprite?this->sprite.getGlobalBounds():this->shape.getGlobalBounds();
 }
+
+void DynamicObject::setStoppedOnPlatform(bool stopped)
+{
+    this->stoppedOnPlatform = stopped;
+}
+
+bool DynamicObject::getStoppedOnPlatform() const
+{
+    return this->stoppedOnPlatform;
+}
