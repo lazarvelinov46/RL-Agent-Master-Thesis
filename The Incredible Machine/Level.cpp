@@ -2,6 +2,8 @@
 #include "Level.h"
 #include "QTable.h"
 
+const float Level::GEAR_WIDTH = 100.0;
+
 void Level::initState()
 {
 	this->state.setInitialState();
@@ -142,6 +144,7 @@ void Level::startPlatform(const StaticObject* object)
 
 void Level::initForbiddenActions()
 {
+	/*
 	for (size_t i = 0; i < this->dynamicObjects.size(); i++) {
 		DynamicObject* ball = this->dynamicObjects[i];
 		int boundsTop = static_cast<int>(ball->getGlobalBounds().top);
@@ -157,16 +160,12 @@ void Level::initForbiddenActions()
 		for (int j = 0; j < 4; j++) {
 			if (ids[j] < ActionRL::getGridWidth() * ActionRL::getGridHeight()) {
 				auto result = this->forbiddenActions.insert(ids[j]);
-				/*
-				if (result.second) {
-					std::cout << " id " << ids[j];
-
-					std::cout << std::endl;
-				}*/
+				
 			}
 		}
 		
 	}
+	*/
 	
 }
 
@@ -382,7 +381,12 @@ void Level::updateBalls(float deltaTime)
 				"	cc	" << oldVelocity.x << "	dd	" << oldVelocity.y << std::endl;
 		}
 		*/
+
 		//FORBIDDEN ACTIONS
+		
+		this->markForbiddenFromBall(ball);
+
+		/*
 		float value;
 		value = ball->getGlobalBounds().top;
 		int verticalCheckUp = static_cast<int>(value) ;
@@ -399,6 +403,7 @@ void Level::updateBalls(float deltaTime)
 		id = verticalCheckDown / 50 * 19 + horizontalCheckLeft / 50;
 		result = this->forbiddenActions.insert(id);
 		id = verticalCheckDown / 50 * 19 + horizontalCheckRight / 50;
+		*/
 		/*
 		if (verticalCheckUp % 10 == 0) {
 			int id = (verticalCheckUp / 50) * 19 + horizontalCheckRight / 50;
@@ -454,6 +459,38 @@ void Level::updateBalls(float deltaTime)
 		this->stateChanged = true;
 		if (!this->state.getBallMoving()) {
 			this->reward = LOST_GAME;
+		}
+	}
+}
+
+void Level::markForbiddenFromBall(DynamicObject* ball)
+{
+	const sf::FloatRect ballBounds = ball->getGlobalBounds();
+	const float ballLeft = ballBounds.left;
+	const float ballTop = ballBounds.top;
+	const float ballRight = ballBounds.left + ballBounds.width;
+	const float ballBottom = ballBounds.top + ballBounds.height;
+
+	int colMin = static_cast<int>(std::floor((ballLeft - (Level::GEAR_WIDTH - ballBounds.width)) / 50));
+	int rowMin=static_cast<int>(std::floor((ballTop - (Level::GEAR_WIDTH - ballBounds.height)) / 50));
+
+	int colMax=static_cast<int>(std::floor((ballRight - 1.0f) / 50));
+	int rowMax= static_cast<int>(std::floor((ballBottom - 1.0f) / 50));
+
+	colMin = std::max(0, colMin);
+	rowMin = std::max(0, rowMin);
+	colMax = std::min(ActionRL::getGridWidth() - 1, colMax);
+	rowMax = std::min(ActionRL::getGridHeight() - 1, rowMax);
+
+	for (int i = rowMin;i <= rowMax;i++) {
+		for (int j = colMin;j <= colMax;j++) {
+			int id = i * ActionRL::getGridWidth() + j;
+			auto result = this->forbiddenActions.insert(id);
+			/*
+			if (result.second) {
+				std::cout << "New forbidden " << id << std::endl;
+			}
+			*/
 		}
 	}
 }

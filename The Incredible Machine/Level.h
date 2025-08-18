@@ -34,6 +34,7 @@ private:
 	static const int NUMBER_OF_BELTS = 3;
 	static const int NUMBER_OF_WHEELS = 3;
 	static const int NUMBER_OF_BALLS = 4;
+	static const float GEAR_WIDTH;
 
 	int currentNumberOfGears;
 	int currentNumberOfBelts;
@@ -120,6 +121,11 @@ private:
 	const sf::Vector2f& alignToGrid(const sf::Vector2f& pos)const;
 
 	void updateBalls(float deltaTime = 0);
+	/// <summary>
+	/// Adds element to forbidden action set based on ball location
+	/// </summary>
+	/// <param name="ball">Object which location is taken into consideration</param>
+	void markForbiddenFromBall(DynamicObject* ball);
 public:
 	Level(bool mode=false);
 	/// <summary>
