@@ -1,6 +1,6 @@
-- forbid placing gear where ball were
-- change QTable logic so it can revert back when it goes on wrong path - TEST
+- forbid placing gear where ball were - DONE in some extent
+- change QTable logic so it can revert back when it goes on wrong path - TEST - added alpha udpate per visit, changed epsilon and alpha parameters
 - change maximum belt length - DONE
 - when all resources are used - no penalty (only if game lost fr) - TEST
-- maybe update physics
-- only one belt per gear and wheel (especially wheel i think gear is solved)
+- maybe update physics - DONE to some extent
+- only one belt per gear and wheel (especially wheel i think gear is solved) - DONE

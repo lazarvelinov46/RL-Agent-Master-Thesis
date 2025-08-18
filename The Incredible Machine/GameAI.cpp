@@ -62,11 +62,11 @@ void GameAI::updateActionState()
 		this->isPlaying = true;
 		level->setIsPlaying(this->isPlaying);
 		this->stateId = 1;
-		this->actionId = 248;
+		//this->actionId = 248;
 		double eps = GameAI::linearDecay(this->E_START, this->E_END, this->iterations, this->E_DECAY);
 		//FORBIDDEN ACTION
 		this->forbiddenActions = this->level->getBallZonesPassed();
-		//this->actionId = this->table.getAction(this->stateId, eps,this->forbiddenActions);
+		this->actionId = this->table.getAction(this->stateId, eps,this->forbiddenActions);
 		this->lastExecutedAction = this->actionId;
 		return;
 	}
@@ -75,7 +75,7 @@ void GameAI::updateActionState()
 		//FORBIDDEN ACTION
 		
 		this->forbiddenActions = this->level->getBallZonesPassed();
-		
+		/*
 		for (int a : this->forbiddenActions) {
 			std::cout << a << " ";
 		}
@@ -89,8 +89,8 @@ void GameAI::updateActionState()
 			this->actionId = 255;
 			break;
 		case 23:
-			//this->actionId = 270;
-			this->actionId = 252;
+			this->actionId = 270;
+			//this->actionId = 252;
 			break;
 		case 55:
 			this->actionId = 265;
@@ -98,7 +98,8 @@ void GameAI::updateActionState()
 		default:
 			this->actionId = this->table.getAction(this->nextStateId, 0.1, this->forbiddenActions);
 		}
-		//this->actionId = this->table.getAction(this->nextStateId, 0.1,this->forbiddenActions);
+		*/
+		this->actionId = this->table.getAction(this->nextStateId, 0.1,this->forbiddenActions);
 		std::cout << "ACTION " << this->actionId << std::endl;
 		this->stateId = this->nextStateId;
 		this->lastExecutedAction = this->actionId;
