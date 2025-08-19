@@ -30,7 +30,7 @@ private:
 	const double ALPHA_START = 0.2;
 	const double ALPHA_END = 0.05;
 	const int ALPHA_DECAY = 10000;
-	const double GAMMA = 0.95;
+	const double GAMMA = 0.9;
 	//UI panel on right side on the screen (consists of user action and resource elements
 	sf::RectangleShape panel;
 	//Play button that starts the simulation

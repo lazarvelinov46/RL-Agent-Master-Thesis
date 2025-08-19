@@ -54,6 +54,8 @@ void GameAI::initQTable()
 	actionsNum += Level::getNumberOfGearsStatic() * Level::getNumberOfWheels();//belt placements between gear and wheel
 	actionsNum += ActionRL::combination(Level::getNumberOfWheels(), 2);//belt placements between two wheels
 	this->table = QTable(statesNum, actionsNum, "qtable.txt");
+	this->table.setAlpha(GameAI::ALPHA_START);
+	this->table.setGamma(GameAI::GAMMA);
 }
 
 void GameAI::updateActionState()
@@ -99,7 +101,8 @@ void GameAI::updateActionState()
 			this->actionId = this->table.getAction(this->nextStateId, 0.1, this->forbiddenActions);
 		}
 		*/
-		this->actionId = this->table.getAction(this->nextStateId, 0.1,this->forbiddenActions);
+		double eps = GameAI::linearDecay(this->E_START, this->E_END, this->iterations, this->E_DECAY);
+		this->actionId = this->table.getAction(this->nextStateId, eps,this->forbiddenActions);
 		std::cout << "ACTION " << this->actionId << std::endl;
 		this->stateId = this->nextStateId;
 		this->lastExecutedAction = this->actionId;
@@ -134,12 +137,14 @@ bool GameAI::updateState()
 			this->nextStateId = 1;
 			this->table.updateValidActions(0,0);
 			this->forbiddenActions.clear();
-			if (this->iterations % 10 == 0) {
+			if (this->iterations % 100 == 0) {
 				this->table.printTable("qtable.txt",this->iterations);
 				std::string csvFilename = "qtable" + std::to_string(this->iterations) + ".csv";
 				std::cout << csvFilename << std::endl;
 				this->table.saveQTableCSV(csvFilename);
 			}
+			double alphaCap = linearDecay(ALPHA_START, ALPHA_END, iterations, ALPHA_DECAY);
+			this->table.setAlpha(alphaCap);
 		}
 		return true;
 	}
