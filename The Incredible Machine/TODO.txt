@@ -4,3 +4,4 @@
 - when all resources are used - no penalty (only if game lost fr) - TEST
 - maybe update physics - DONE to some extent
 - only one belt per gear and wheel (especially wheel i think gear is solved) - DONE
+- when target is hit, no lost game penalty (when all balls stop)

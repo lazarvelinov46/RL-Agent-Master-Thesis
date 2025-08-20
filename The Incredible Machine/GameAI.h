@@ -26,11 +26,11 @@ class GameAI : public State
 private:
 	const double E_START = 0.6;
 	const double E_END = 0.05;
-	const int E_DECAY = 5000;
-	const double ALPHA_START = 0.2;
-	const double ALPHA_END = 0.05;
+	const int E_DECAY = 10000;
+	const double ALPHA_START = 0.4;
+	const double ALPHA_END = 0.1;
 	const int ALPHA_DECAY = 10000;
-	const double GAMMA = 0.9;
+	const double GAMMA = 0.95;
 	//UI panel on right side on the screen (consists of user action and resource elements
 	sf::RectangleShape panel;
 	//Play button that starts the simulation
@@ -72,6 +72,8 @@ private:
 	int nextStateId;
 	//ID of currently executed action
 	int actionId;
+	//current sum of rewards before state change
+	float currentReward = 0.0f;
 	/// <summary>
 	/// Id of last executed action
 	/// waits until state is changed to update qtable

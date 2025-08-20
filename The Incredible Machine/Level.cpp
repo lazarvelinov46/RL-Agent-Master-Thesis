@@ -458,7 +458,7 @@ void Level::updateBalls(float deltaTime)
 	if (this->state.getBallMoving() != ballsMovingPreUpdate) {
 		this->stateChanged = true;
 		if (!this->state.getBallMoving()) {
-			this->reward = LOST_GAME;
+			this->reward += LOST_GAME_BASE-((Level::NUMBER_OF_GEARS-this->currentNumberOfGears)+(Level::NUMBER_OF_BELTS-this->currentNumberOfBelts))*0.6;
 		}
 	}
 }
@@ -872,7 +872,9 @@ sf::Vector2f Level::getWheelLocation(int wheelId)
 
 double Level::getReward()
 {
-	return this->reward;
+	float reward = this->reward;
+	this->reward = 0;
+	return reward;
 }
 
 int Level::getNumberOfBelts()

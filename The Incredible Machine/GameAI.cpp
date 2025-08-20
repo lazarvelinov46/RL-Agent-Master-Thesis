@@ -119,14 +119,16 @@ bool GameAI::updateState()
 	if (this->level->getStateChanged()) {
 		//TODO: add reward getter from level
 		this->nextStateId = this->level->getStatusChange().getStateId();
-		std::cout << this->stateId << " s " << this->nextStateId << " r " << this->level->getReward() << std::endl;
+		this->currentReward += this->level->getReward();
+		std::cout << this->stateId << " s " << this->nextStateId << " r " << this->currentReward << std::endl;
 		if (this->nextStateId != this->stateId) {
 			this->table.updateValidActions(
 				Level::getNumberOfGearsStatic()-this->level->getNumberOfGears(),
 				Level::getNumberOfBeltsStatic()-this->level->getNumberOfBelts());
 			bool terminalState = this->nextStateId % 2 == 0 || this->nextStateId > 127;
-			this->table.updateQValue(this->stateId, this->lastExecutedAction, this->level->getReward(), this->nextStateId,terminalState);
+			this->table.updateQValue(this->stateId, this->lastExecutedAction, this->currentReward, this->nextStateId,terminalState);
 			this->episode.push_back(new Transition({ this->stateId,this->lastExecutedAction,0.0,-1 }));
+			this->currentReward = 0;
 		}
 		if (nextStateId%2 == 0) {
 			this->gameOver = true;
@@ -236,7 +238,8 @@ void GameAI::update(float deltaTime)
 		if (!level->tryGearPlacement(sf::Vector2f(coordinates.first*50, coordinates.second*50))) {
 		//if (this->stateId==0&&!level->tryGearPlacement(sf::Vector2f(0*50, 13*50))) {
 			//TODO: apply penalty
-			this->table.updateQValue(this->stateId, this->actionId, WRONG_GEAR_PLACEMENT, this->stateId);
+			//this->table.updateQValue(this->stateId, this->actionId, WRONG_GEAR_PLACEMENT, this->stateId);
+			this->currentReward += WRONG_BELT_PLACEMENT;
 		}
 		/*
 		if (this->stateId != 0 && !level->tryGearPlacement(sf::Vector2f(coordinates.first * 50, coordinates.second * 50))) {
@@ -273,7 +276,8 @@ void GameAI::update(float deltaTime)
 				end = this->level->getWheelLocation(beltActionInfo.second.idElement);
 			}
 			if (start.x == -2 || end.x == -2) {
-				this->table.updateQValue(this->stateId, this->actionId, WRONG_BELT_PLACEMENT, this->stateId);
+				//this->table.updateQValue(this->stateId, this->actionId, WRONG_BELT_PLACEMENT, this->stateId);
+				this->currentReward += WRONG_BELT_PLACEMENT;
 				std::cout << "NMZ" << std::endl;
 			}
 			std::cout << sqrt(powf(abs(start.x - end.x), 2) + powf(abs(start.y - end.y), 2)) << std::endl;
@@ -282,11 +286,13 @@ void GameAI::update(float deltaTime)
 				end.x = -1;
 			}
 			if (start.x == -1 || end.x == -1) {
-				this->table.updateQValue(this->stateId, this->actionId, WRONG_BELT_PLACEMENT, this->stateId);
+				this->currentReward += WRONG_BELT_PLACEMENT;
+				//this->table.updateQValue(this->stateId, this->actionId, WRONG_BELT_PLACEMENT, this->stateId);
 			}
 			else {
 				if (!this->level->placeBelt(start, end, beltActionInfo.first.isElementGear)) {
-					this->table.updateQValue(this->stateId, this->actionId, WRONG_BELT_PLACEMENT, this->stateId);
+					//this->table.updateQValue(this->stateId, this->actionId, WRONG_BELT_PLACEMENT, this->stateId);
+					this->currentReward += WRONG_BELT_PLACEMENT;
 				}
 			}
 		}
