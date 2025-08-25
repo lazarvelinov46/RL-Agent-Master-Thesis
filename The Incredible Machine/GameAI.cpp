@@ -2,6 +2,37 @@
 #include "GameAI.h"
 
 
+bool GameAI::loadQTableFromFile(const std::string& filename)
+{
+	std::ifstream in(filename);
+	if (!in.is_open())return false;
+
+	auto read_after_coma = [&](std::string& line)->std::string {
+		std::getline(in, line);
+		if (line.empty())return {};
+		size_t c = line.find(',');
+		return (c == std::string::npos) ? std::string{} : line.substr(c + 1);
+	};
+	return false;
+
+	std::string line, s;
+	s = read_after_coma(line);
+	if (s.empty()) {
+		return false;
+	}
+	this->iterations = std::stoi(s);
+	s = read_after_coma(line);
+	if (s.empty()) {
+		return false;
+	}
+	s = read_after_coma(line);
+	if (s.empty()) {
+		return false;
+	}
+	bool ok = this->table.loadQTableCSV(in);
+	return ok;
+}
+
 void GameAI::initFont()
 {
 	if (!font.loadFromFile("assets/Fonts/ARIAL.TTF")) {
@@ -54,8 +85,18 @@ void GameAI::initQTable()
 	actionsNum += Level::getNumberOfGearsStatic() * Level::getNumberOfWheels();//belt placements between gear and wheel
 	actionsNum += ActionRL::combination(Level::getNumberOfWheels(), 2);//belt placements between two wheels
 	this->table = QTable(statesNum, actionsNum, "qtable.txt");
-	this->table.setAlpha(GameAI::ALPHA_START);
+	this->iterations = 0;
+	if (this->loadQTableFromFile("qtable490000.csv")) {
+		std::cout << "Loaded QTable from file qtable4900.csv" << std::endl;
+		double alphaCap = linearDecay(ALPHA_START, ALPHA_END, iterations, ALPHA_DECAY);
+		this->table.setAlpha(alphaCap);
+	}
+	else {
+		std::cout << "Started with default QTable" << std::endl;
+		this->table.setAlpha(GameAI::ALPHA_START);
+	}
 	this->table.setGamma(GameAI::GAMMA);
+
 }
 
 void GameAI::updateActionState()
@@ -70,6 +111,9 @@ void GameAI::updateActionState()
 		this->forbiddenActions = this->level->getBallZonesPassed();
 		this->actionId = this->table.getAction(this->stateId, eps,this->forbiddenActions);
 		this->lastExecutedAction = this->actionId;
+		this->episodeStartTime = std::chrono::system_clock::now();
+		this->currentReward = 0.0f;
+		this->episode.clear();
 		return;
 	}
 	if (this->selectAction) {
@@ -130,8 +174,23 @@ bool GameAI::updateState()
 			this->episode.push_back(new Transition({ this->stateId,this->lastExecutedAction,0.0,-1 }));
 			this->currentReward = 0;
 		}
-		if (nextStateId%2 == 0) {
+		if (nextStateId%2 == 0||this->nextStateId>127) {
+			auto now = std::chrono::system_clock::now();
+			double duration = 0.0;
+			if (this->episodeStartTime.time_since_epoch().count() != 0) {
+				duration = std::chrono::duration<double>(now - this->episodeStartTime).count();
+			}
+			std::pair<double,double> qstats = this->table.getQStats();
+			int uniqueVisited = this->table.getUniqueVisitsCount();
+			double eps = GameAI::linearDecay(this->E_START, this->E_END, this->iterations, this->E_DECAY);
+			double alphaCap = linearDecay(ALPHA_START, ALPHA_END, iterations, ALPHA_DECAY);
+			int win = this->nextStateId > 127 ? 1 : 0;
+			int steps = static_cast<int>(this->episode.size());
+			GameAI::appendEpisodeLog(this->iterations, eps, alphaCap, this->currentReward, win, steps, duration,
+				uniqueVisited, qstats.first, qstats.second);
 			this->gameOver = true;
+			if (win)std::cout << "WON GAME" << std::endl;
+			else std::cout << "LOST GAME" << std::endl;
 			this->iterations++;
 			this->resetResources();
 			this->stateId = -1;
@@ -143,15 +202,56 @@ bool GameAI::updateState()
 				this->table.printTable("qtable.txt",this->iterations);
 				std::string csvFilename = "qtable" + std::to_string(this->iterations) + ".csv";
 				std::cout << csvFilename << std::endl;
-				this->table.saveQTableCSV(csvFilename);
+				this->table.saveQTableCSV(csvFilename,iterations,alphaCap,0.0);
 			}
-			double alphaCap = linearDecay(ALPHA_START, ALPHA_END, iterations, ALPHA_DECAY);
+			alphaCap = linearDecay(ALPHA_START, ALPHA_END, iterations, ALPHA_DECAY);
 			this->table.setAlpha(alphaCap);
+			if (this->iterations == 5000) {
+				this->nextState = new Menu();
+			}
 		}
 		return true;
 	}
 	return false;
 }
+
+std::string GameAI::isoTimestampNow()
+{
+	auto now = std::chrono::system_clock::now();
+	std::time_t time = std::chrono::system_clock::to_time_t(now);
+	std::tm tm;
+	localtime_s(&tm, &time);
+	auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) % 1000;
+	std::ostringstream oss;
+	oss << std::put_time(&tm, "%Y-%m-%dT%H:%M:%S") << '.' << std::setw(3) << std::setfill('0') << ms.count();
+	return oss.str();
+}
+
+void GameAI::appendEpisodeLog(int episode, double eps, double alphaCap, double totalReward, int win, int steps, double duration_s, int unique_sa_visited, double q_max, double q_mean)
+{
+	const std::string fname = "training_log.csv";
+	bool needHeader = false;
+	std::ifstream fin(fname);
+	if (!fin.good())needHeader = true;
+	fin.close();
+	std::ofstream f(fname, std::ios::app);
+	if (!f.is_open())return;
+	if (needHeader) {
+		f << "episode,timestamp,eps,alphaCap,total_reward,win,steps,episode_duration_s,unique_sa_visited,q_max,q_mean\n";
+	}
+	f << episode << ",";
+	f << isoTimestampNow() << ",";
+	f << std::fixed << std::setprecision(6) << eps << ",";
+	f << std::fixed << std::setprecision(6) << alphaCap << ",";
+	f << std::fixed << std::setprecision(6) << totalReward << ",";
+	f << win << ",";
+	f << steps << ",";
+	f << std::fixed << std::setprecision(3) << duration_s << ",";
+	f << unique_sa_visited << ",";
+	f << std::fixed << std::setprecision(6) << q_max << "," << q_mean << "\n";
+	f.close();
+}
+
 
 void GameAI::resetResources()
 {

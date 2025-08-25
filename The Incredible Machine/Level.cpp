@@ -457,7 +457,7 @@ void Level::updateBalls(float deltaTime)
 	}
 	if (this->state.getBallMoving() != ballsMovingPreUpdate) {
 		this->stateChanged = true;
-		if (!this->state.getBallMoving()) {
+		if (!this->state.getBallMoving()&&!this->state.getTargetHit()) {
 			this->reward += LOST_GAME_BASE-((Level::NUMBER_OF_GEARS-this->currentNumberOfGears)+(Level::NUMBER_OF_BELTS-this->currentNumberOfBelts))*0.6;
 		}
 	}

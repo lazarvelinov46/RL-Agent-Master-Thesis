@@ -24,11 +24,11 @@ typedef struct Transition {
 class GameAI : public State
 {
 private:
-	const double E_START = 0.6;
+	double E_START = 0.6;
 	const double E_END = 0.05;
-	const int E_DECAY = 10000;
-	const double ALPHA_START = 0.4;
-	const double ALPHA_END = 0.1;
+	const int E_DECAY = 5000;
+	double ALPHA_START = 0.3;
+	const double ALPHA_END = 0.05;
 	const int ALPHA_DECAY = 10000;
 	const double GAMMA = 0.95;
 	//UI panel on right side on the screen (consists of user action and resource elements
@@ -63,8 +63,12 @@ private:
 	//sets of actions which are forbidden
 	std::unordered_set<int> forbiddenActions;
 
+	//episode start time for keeping record
+	std::chrono::time_point<std::chrono::system_clock> episodeStartTime;
+
 	//Resets game resources before new iteration of the game
 	void resetResources();
+
 
 	//Current stateId used in QLearning
 	int stateId;
@@ -87,6 +91,8 @@ private:
 	//Vector with all transitions within one episode
 	std::vector<Transition*> episode;
 
+	bool loadQTableFromFile(const std::string& filename);
+
 	//Loads font from file
 	void initFont();
 	//Initializes text elements
@@ -108,6 +114,14 @@ private:
 	/// Updates nextStateId if environment state changes
 	/// </summary>
 	bool updateState();
+	/// <summary>
+	/// Gets timestape of now
+	/// </summary>
+	/// <returns>timestape of now in string format</returns>
+	static std::string isoTimestampNow();
+	static void appendEpisodeLog(int episode, double eps, double alphaCap,
+		double totalReward, int win, int steps, double duration_s, 
+		int unique_sa_visited, double q_max, double q_mean);
 public:
 	/// <summary>
 	/// Initializes everything needed: GameAI state, QTable, level and RLAgent

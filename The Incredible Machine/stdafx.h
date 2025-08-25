@@ -14,6 +14,9 @@
 #include <random>
 #include <chrono>
 #include <unordered_set>
+#include <sstream>
+#include <filesystem>
+#include <iomanip>
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
 #include <SFML/Audio.hpp>

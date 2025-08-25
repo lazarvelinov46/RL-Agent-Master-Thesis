@@ -119,9 +119,14 @@ void QTable::printTable(const std::string& filename,int iteration)
 	outFile.close();
 }
 
-void QTable::saveQTableCSV(const std::string& filename) {
+void QTable::saveQTableCSV(const std::string& filename,int iteration,double alpha,double epsilon) {
 	std::ofstream outFile(filename);
 	if (!outFile.is_open()) return;
+
+	outFile << "iteration," << iteration << "\n";
+	outFile << "alpha," << alpha << "\n";
+	outFile << "epsilon," << epsilon << "\n";
+	outFile << "qtable\n";
 
 	for (int s = 0; s < this->numStates; ++s) {
 		for (int a = 0; a < this->numActions; ++a) {
@@ -161,4 +166,55 @@ void QTable::updateValidActions(int gearsPlaced, int beltsPlaced)
 			}
 		}
 	}
+}
+
+std::pair<double, double> QTable::getQStats() const
+{
+	double qmax = -std::numeric_limits<double>::infinity();
+	double qsum = 0;
+	long count = 0;
+	for (int i = 0; i < this->numStates; i++) {
+		for (int j = 0; j < this->numActions; j++) {
+			qsum += this->values[i][j];
+			count++;
+			if (this->values[i][j] > qmax)qmax = this->values[i][j];
+		}
+	}
+	double qmean = (count > 0) ? (qsum / (double)count) : 0.0;
+	if (qmax == -std::numeric_limits<double>::infinity())qmax = 0.0;
+	return { qmax,qmean };
+}
+
+int QTable::getUniqueVisitsCount() const
+{
+	int count = 0;
+	for (int i = 0; i < this->numStates; i++) {
+		for (int j = 0; j < this->numActions; j++) {
+			if (this->visits[i][j] > 0)count++;
+		}
+	}
+	return count;
+}
+
+bool QTable::loadQTableCSV(std::istream &in)
+{
+	this->values.clear();
+	this->visits.clear();
+	std::string line;
+	while (std::getline(in, line)) {
+		if (line.empty())continue;
+		std::stringstream ss(line);
+		std::vector<double> row;
+		std::string cell;
+		while (std::getline(ss, cell, ',')) {
+			if(!cell.empty())row.push_back(std::stod(cell));
+		}
+		if(!row.empty())this->values.push_back(row);
+	}
+	if (this->values.empty())return false;
+	this->numStates = this->values.size();
+	this->numActions = values.empty() ? 0 : values[0].size();
+	this->visits.assign(this->numStates, std::vector<int>(this->numActions, 0));
+	std::cout << "Loaded QTable from " << filename << std::endl;
+	return true;
 }
