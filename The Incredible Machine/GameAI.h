@@ -1,7 +1,7 @@
 #pragma once
 
 #include "State.h"
-#include "Level.h"
+#include "MediumLevel.h"
 #include "Menu.h"
 #include "AgentRL.h"
 #include "QTable.h"

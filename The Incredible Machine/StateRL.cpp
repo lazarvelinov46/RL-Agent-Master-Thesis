@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "StateRL.h"
-#include "Level.h"
+#include "MediumLevel.h"
 
 StateRL::StateRL()
 {

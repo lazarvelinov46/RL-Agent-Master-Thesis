@@ -1,5 +1,5 @@
 #pragma once
-#include "Level.h"
+#include "MediumLevel.h"
 
 typedef struct BeltActionInfo {
 	bool isElementGear;

@@ -1,6 +1,6 @@
 #pragma once
 #include "State.h"
-#include "Level.h"
+#include "MediumLevel.h"
 #include "Menu.h"
 
 /**
