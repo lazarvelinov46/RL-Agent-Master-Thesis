@@ -20,9 +20,10 @@ void Menu::initText()
 	std::vector<std::string> menuOptions = {
 		"Play as Human",
 		"Play as AI",
-		"Select Level",
+		"Easy",
 		"Quit"
 	};
+
 
 	//Creates sf::Text element for each menu entry
 	for (size_t i = 0; i < menuOptions.size(); i++) {
@@ -33,13 +34,13 @@ void Menu::initText()
 		option.setPosition(100, 150 + i * 50);
 		this->options.push_back(option);
 	}
-
 	this->selectedOption = MenuOption::PLAYER;
 }
 
 Menu::Menu()
 {
 	this->nextState = nullptr;
+	this->selectedDifficulty = LevelDifficulty::EASY;
 	this->initFont();
 	this->initText();
 }
@@ -78,7 +79,7 @@ void Menu::handleInput(sf::RenderWindow& window)
 					this->nextState = new GameAI();
 					break;
 				case LEVEL:
-					// TODO: Implement level selector
+					this->selectedDifficulty = (LevelDifficulty)((this->selectedDifficulty + 1) % LevelDifficulty::NUM);
 					break;
 				case QUIT:
 					window.close();
@@ -96,6 +97,20 @@ void Menu::update(float deltaTime)
 	//Highlight currently selected option
 	for (size_t i = 0; i < this->options.size(); i++) {
 		this->options[i].setFillColor(i == this->selectedOption ? sf::Color::Blue : sf::Color::White);
+	}
+	switch (this->selectedDifficulty)
+	{
+	case EASY:
+		this->options[2].setString("Easy");
+		break;
+	case MEDIUM:
+		this->options[2].setString("Medium");
+		break;
+	case HARD:
+		this->options[2].setString("Hard");
+		break;
+	default:
+		break;
 	}
 }
 

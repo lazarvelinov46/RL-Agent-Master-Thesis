@@ -17,6 +17,16 @@ enum MenuOption{
 	QUIT
 };
 
+/// <summary>
+/// Enum which represents selected level difficulty
+/// </summary>
+enum LevelDifficulty {
+	EASY,
+	MEDIUM,
+	HARD,
+	NUM
+};
+
 /**
 * @class Menu
 * @brief Implements menu state of the game
@@ -35,6 +45,8 @@ private:
 	std::vector<sf::Text> options;
 	//Currently highlighted menu entry
 	MenuOption selectedOption;
+	//Selected level (difficulty)
+	LevelDifficulty selectedDifficulty;
 	//Next state for transition
 	State* nextState;
 	/// <summary>
