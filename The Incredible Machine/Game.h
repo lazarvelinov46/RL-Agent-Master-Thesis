@@ -1,6 +1,8 @@
 #pragma once
 #include "State.h"
 #include "MediumLevel.h"
+#include "EasyLevel.h"
+#include "HardLevel.h"
 #include "Menu.h"
 
 /**

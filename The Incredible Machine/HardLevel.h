@@ -6,7 +6,7 @@
 /// Interactions between objects
 /// AI state management
 /// </summary>
-class MediumLevel : public Level
+class HardLevel : public Level
 {
 private:
 
@@ -18,9 +18,9 @@ private:
 	void initResources()override;
 
 public:
-	MediumLevel(bool mode=false);
-	
-	virtual ~MediumLevel() override;
+	HardLevel(bool mode = false);
+
+	virtual ~HardLevel() override;
 
 };
 

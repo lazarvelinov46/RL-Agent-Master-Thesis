@@ -146,8 +146,10 @@
     <ClCompile Include="ActionRL.cpp" />
     <ClCompile Include="AgentRL.cpp" />
     <ClCompile Include="DynamicObject.cpp" />
+    <ClCompile Include="EasyLevel.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameAI.cpp" />
+    <ClCompile Include="HardLevel.cpp" />
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="MediumLevel.cpp" />
     <ClCompile Include="main.cpp" />
@@ -169,8 +171,10 @@
     <ClInclude Include="ActionRL.h" />
     <ClInclude Include="AgentRL.h" />
     <ClInclude Include="DynamicObject.h" />
+    <ClInclude Include="EasyLevel.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameAI.h" />
+    <ClInclude Include="HardLevel.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="MediumLevel.h" />
     <ClInclude Include="Menu.h" />

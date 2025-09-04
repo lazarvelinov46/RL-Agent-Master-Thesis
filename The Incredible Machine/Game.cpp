@@ -51,7 +51,7 @@ Game::Game()
 	this->initGameScreen();
 	this->initPanel();
 	this->initTextures();
-	this->level = new MediumLevel();
+	this->level = new HardLevel();
 	this->level->initLevel();
 	this->nextState = nullptr;
 }

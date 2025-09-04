@@ -153,7 +153,7 @@ void Level::updateBalls(float deltaTime)
 {
 	if (!isPlaying)return;
 	bool ballsMovingPreUpdate = this->state->getBallMoving();
-	bool bMPU[4];
+	bool bMPU[5];
 	for (size_t i = 0; i < this->dynamicObjects.size(); i++) {
 		DynamicObject* ball = this->dynamicObjects[i];
 		bMPU[i] = this->state->getBallMoving(i);
