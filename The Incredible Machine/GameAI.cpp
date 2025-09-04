@@ -83,9 +83,10 @@ void GameAI::initQTable()
 	int actionsNum = ActionRL::getGridWidth() * ActionRL::getGridHeight();//gear placements
 	actionsNum += level->getStartingNumberOfGears() * level->getNumberOfWheels();//belt placements between gear and wheel
 	actionsNum += ActionRL::combination(level->getNumberOfWheels(), 2);//belt placements between two wheels
+	std::cout << "States: " << statesNum << " Actions: " << actionsNum<<std::endl;
 	this->table = QTable(statesNum, actionsNum, "qtable.txt");
 	this->iterations = 0;
-	if (this->loadQTableFromFile("qtable4900.csv")) {
+	if (this->loadQTableFromFile("qtable490000.csv")) {
 		std::cout << "Loaded QTable from file qtable4900.csv" << std::endl;
 		double alphaCap = linearDecay(ALPHA_START, ALPHA_END, iterations, ALPHA_DECAY);
 		this->table.setAlpha(alphaCap);
@@ -397,7 +398,7 @@ void GameAI::update(float deltaTime)
 				std::cout << "NMZ" << std::endl;
 			}
 			std::cout << sqrt(powf(abs(start.x - end.x), 2) + powf(abs(start.y - end.y), 2)) << std::endl;
-			if (sqrt(powf(abs(start.x - end.x), 2) + powf(abs(start.y - end.y), 2)) > 350.0) {
+			if (sqrt(powf(abs(start.x - end.x), 2) + powf(abs(start.y - end.y), 2)) > level->getMaxBeltDistance()) {
 				start.x = -1;
 				end.x = -1;
 			}

@@ -35,7 +35,8 @@ void Level::resetStaticObjects()
 		this->staticObjects.pop_back();
 	}
 	for (int i = 0; i < this->staticObjects.size(); i++) {
-		if (this->staticObjects[i]->getObjectType() == StaticObjectType::PLATFORM) {
+		if (this->staticObjects[i]->getObjectType() == StaticObjectType::PLATFORM_RIGHT||
+			this->staticObjects[i]->getObjectType() == StaticObjectType::PLATFORM_LEFT) {
 			this->staticObjects[i]->stop();
 		}
 	}
@@ -54,15 +55,19 @@ void Level::startPlatform(const StaticObject* object)
 		if (object->getGlobalBounds().contains(belt[0].position)) {
 			int i = 0;
 			for (StaticObject* platform : this->staticObjects) {
-				if (!platform->getMoving() && platform->getObjectType() == StaticObjectType::PLATFORM &&
+				if (!platform->getMoving() && 
+					(platform->getObjectType() == StaticObjectType::PLATFORM_RIGHT||
+						platform->getObjectType()==StaticObjectType::PLATFORM_LEFT) &&
 					platform->getGlobalBounds().contains(belt[1].position)) {
-					platform->move(5.f);
+					float movingSpeed = platform->getObjectType() == StaticObjectType::PLATFORM_RIGHT ? 5.f : -5.f;
+					platform->move(movingSpeed);
 					this->state->setWheelStarted(i, true);
 					this->stateChanged = true;
 					this->reward = WHEEL_ACTIVATED;
 
 				}
-				if (platform->getObjectType() == StaticObjectType::PLATFORM)i++;
+				if (platform->getObjectType() == StaticObjectType::PLATFORM_RIGHT||
+					platform->getObjectType() == StaticObjectType::PLATFORM_LEFT)i++;
 			}
 		}
 	}
@@ -175,7 +180,8 @@ void Level::updateBalls(float deltaTime)
 				noGravity = true;
 
 				for (const StaticObject* platformObject : this->staticObjects) {
-					if (object->getObjectType() == StaticObjectType::PLATFORM && object->getMoving()) {
+					if ((object->getObjectType() == StaticObjectType::PLATFORM_RIGHT||
+						object->getObjectType()==StaticObjectType::PLATFORM_LEFT) && object->getMoving()) {
 						onMovingPlatform = true;
 					}
 				}
@@ -217,7 +223,7 @@ void Level::updateBalls(float deltaTime)
 				else if (leftCollision < topCollision && leftCollision < bottomCollision) {
 					//left collision
 					for (const StaticObject* platformObject : this->staticObjects) {
-						if (platformObject->getObjectType() == StaticObjectType::PLATFORM && platformObject->getMoving() &&
+						if (platformObject->getObjectType() == StaticObjectType::PLATFORM_RIGHT && platformObject->getMoving() &&
 							ballBounds.top + ballBounds.height == platformObject->getGlobalBounds().top &&
 							ballBounds.left + ballBounds.width / 2 >= platformObject->getGlobalBounds().left &&
 							ballBounds.left + ballBounds.width / 2 <= platformObject->getGlobalBounds().left + platformObject->getGlobalBounds().width) {
@@ -237,8 +243,23 @@ void Level::updateBalls(float deltaTime)
 				}
 				else if (rightCollision < topCollision && rightCollision < bottomCollision) {
 					//left collision
-					newPosition.x = objectRight;
-					ball->setVelocity(sf::Vector2f(ball->getVelocity().x * -0.9f, ball->getVelocity().y));
+					for (const StaticObject* platformObject : this->staticObjects) {
+						if (platformObject->getObjectType() == StaticObjectType::PLATFORM_LEFT && platformObject->getMoving() &&
+							ballBounds.top + ballBounds.height == platformObject->getGlobalBounds().top &&
+							ballBounds.left + ballBounds.width / 2 >= platformObject->getGlobalBounds().left &&
+							ballBounds.left + ballBounds.width / 2 <= platformObject->getGlobalBounds().left + platformObject->getGlobalBounds().width) {
+							onMovingPlatform = true;
+						}
+					}
+					if (!onMovingPlatform) {
+						newPosition.x = objectRight;
+						ball->setVelocity(sf::Vector2f(ball->getVelocity().x * -0.9f, ball->getVelocity().y));
+					}
+					else {
+						newPosition.x = objectBounds.left+objectBounds.width  + 1.0f;
+						ball->setStoppedOnPlatform(true);
+						ball->setVelocity(sf::Vector2f(0.f, 0.f));
+					}
 				}
 				if (object->getObjectType() == StaticObjectType::GEAR) {
 					if (!this->state->getGearStarted(gears)) {
@@ -421,13 +442,14 @@ void Level::markForbiddenFromBall(DynamicObject* ball)
 	}
 }
 
-Level::Level(int numberOfBalls,int numberOfWheels,int numberOfGears,int numberOfBelts)
+Level::Level(int numberOfBalls,int numberOfWheels,int numberOfGears,int numberOfBelts,float maxBeltDistance)
 {
 	this->startingNumberOfGears = numberOfGears;
 	this->startingNumberOfBelts = numberOfBelts;
 	this->numberOfWheels = numberOfWheels;
 	this->numberOfBalls = numberOfBalls;
 	this->state = new StateRL(numberOfBalls, numberOfGears, numberOfWheels);
+	this->maxBeltDistance = maxBeltDistance;
 }
 
 
@@ -539,8 +561,9 @@ void Level::handleClick(sf::Vector2f& mousePosition)
 		}
 		else if (this->selectedResoureceIndex == 0 &&
 			this->activeBeltPlacement &&
-			Level::distance(this->endPointsBelt[0].position, this->endPointsBelt[1].position) <= 400.0) {
+			Level::distance(this->endPointsBelt[0].position, this->endPointsBelt[1].position) <= this->maxBeltDistance) {
 			//placing belt second time
+			std::cout << "Placed belt " << Level::distance(this->endPointsBelt[0].position, this->endPointsBelt[1].position) << std::endl;
 			this->validBeltPlacement = false;
 			this->startBeltGear = false;
 			StaticWheel* wheelToPlace = nullptr;
@@ -614,7 +637,7 @@ void Level::handleClick(sf::Vector2f& mousePosition)
 				updating variables and UI elements
 				*/
 				if (alignedPosition.x < 900 && alignedPosition.y < 700) {
-					this->staticObjects.push_back(new StaticObject(*this->selectedResource, this->selectedResoureceIndex == 1 ? StaticObjectType::GEAR : StaticObjectType::PLATFORM));
+					this->staticObjects.push_back(new StaticObject(*this->selectedResource, this->selectedResoureceIndex == 1 ? StaticObjectType::GEAR : StaticObjectType::PLATFORM_RIGHT));
 					this->resourceNumbersText[this->selectedResoureceIndex].setString(std::to_string(--this->resourceNumbers[this->selectedResoureceIndex]));
 				}
 				//FORBIDDEN ACTIONS
@@ -650,7 +673,7 @@ void Level::update(float deltaTime)
 		bool overWheel = false;
 		for (const StaticWheel* wheel : this->staticWheels) {
 			if (wheel->getGlobalBounds().contains(this->endPointsBelt[1].position)) {
-				if (beltLength <= 400.f) {
+				if (beltLength <= this->maxBeltDistance) {
 					this->endPointsBelt[0].color = sf::Color::Green;
 					this->endPointsBelt[1].color = sf::Color::Green;
 					overWheel = true;
@@ -805,6 +828,11 @@ double Level::getReward()
 	float reward = this->reward;
 	this->reward = 0;
 	return reward;
+}
+
+float Level::getMaxBeltDistance()
+{
+	return this->maxBeltDistance;
 }
 
 int Level::getNumberOfBelts()

@@ -9,24 +9,24 @@ void EasyLevel::initStaticObjects()
 {
 	this->staticObjects.push_back(new StaticObject(0, 760, 1000, 50, StaticObjectType::FLOOR));
 
-	this->staticObjects.push_back(new StaticObject(100, 600, 150, 20, StaticObjectType::PLATFORM));
-	this->staticObjects.push_back(new StaticObject(600, 300, 150, 20, StaticObjectType::PLATFORM));
+	this->staticObjects.push_back(new StaticObject(300, 500, 150, 20, StaticObjectType::PLATFORM_RIGHT));
+	this->staticObjects.push_back(new StaticObject(600, 300, 150, 20, StaticObjectType::PLATFORM_RIGHT));
 
-	this->staticObjects.push_back(new StaticObject(830, 400, 20, 40, StaticObjectType::WALL));
-	this->staticObjects.push_back(new StaticObject(830, 440, 160, 20, StaticObjectType::GOAL));
-	this->staticObjects.push_back(new StaticObject(970, 400, 20, 40, StaticObjectType::WALL));
+	this->staticObjects.push_back(new StaticObject(780, 350, 20, 40, StaticObjectType::WALL));
+	this->staticObjects.push_back(new StaticObject(780, 390, 160, 20, StaticObjectType::GOAL));
+	this->staticObjects.push_back(new StaticObject(920, 350, 20, 40, StaticObjectType::WALL));
 }
 
 void EasyLevel::initStaticWheels()
 {
-	this->staticWheels.push_back(new StaticWheel(200, 610.f));
+	this->staticWheels.push_back(new StaticWheel(400, 510.f));
 	this->staticWheels.push_back(new StaticWheel(700, 310.f));
 }
 
 void EasyLevel::initDynamicObjects()
 {
-	this->dynamicObjects.push_back(new DynamicObject(25, 470, false));
-	this->dynamicObjects.push_back(new DynamicObject(100, 550, false));
+	this->dynamicObjects.push_back(new DynamicObject(100, 500, false));
+	this->dynamicObjects.push_back(new DynamicObject(300, 450, false));
 	this->dynamicObjects.push_back(new DynamicObject(600, 250, true));
 }
 
@@ -75,7 +75,7 @@ void EasyLevel::initResources()
 	}
 }
 
-EasyLevel::EasyLevel(bool mode) :Level(3, 2, 2, 2)
+EasyLevel::EasyLevel(bool mode) :Level(3, 2, 2, 2,500.f)
 {
 	this->modeAI = mode;
 }

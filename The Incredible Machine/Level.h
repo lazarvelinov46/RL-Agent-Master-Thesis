@@ -39,6 +39,7 @@ protected:
 	std::vector<StaticWheel*> staticWheels;
 	/* Belt objects (graphic representation on level screen) */
 	std::vector<std::vector<sf::Vertex>> belts;
+	float maxBeltDistance;
 
 	/* Vector of resources which could be placed */
 	std::vector<Resource*> resources;
@@ -118,7 +119,7 @@ protected:
 	/// <param name="ball">Object which location is taken into consideration</param>
 	void markForbiddenFromBall(DynamicObject* ball);
 public:
-	Level(int numberOfBalls, int numberOfWheels, int numberOfGears, int numberOfBelts);
+	Level(int numberOfBalls, int numberOfWheels, int numberOfGears, int numberOfBelts, float maxBeltDistance);
 	virtual ~Level();
 
 	virtual void initLevel();
@@ -168,6 +169,12 @@ public:
 	/// </summary>
 	/// <returns>reward value</returns>
 	virtual double getReward();
+
+	/// <summary>
+	/// Returns max belt distance
+	/// </summary>
+	/// <returns>Maximum possible belt distance</returns>
+	float getMaxBeltDistance();
 
 	virtual int getNumberOfBelts();
 	virtual bool placeBelt(sf::Vector2f start, sf::Vector2f end, bool startBeltGear);

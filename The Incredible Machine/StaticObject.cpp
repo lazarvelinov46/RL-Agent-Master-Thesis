@@ -13,8 +13,17 @@ void StaticObject::setTexture()
 			static_cast<int>(this->object.getGlobalBounds().height)));
 		break;
 	}
-	case StaticObjectType::PLATFORM: {
+	case StaticObjectType::PLATFORM_RIGHT: {
 		sf::Texture& tex = TextureManager::getTexture("assets/Textures/platform.jpg");
+		tex.setRepeated(true);
+		this->object.setTexture(&tex);
+		this->object.setTextureRect(sf::IntRect(0, 0, static_cast<int>(this->object.getGlobalBounds().width),
+			static_cast<int>(this->object.getGlobalBounds().height)));
+		break;
+		break;
+	}
+	case StaticObjectType::PLATFORM_LEFT: {
+		sf::Texture& tex = TextureManager::getTexture("assets/Textures/platform_left.jpg");
 		tex.setRepeated(true);
 		this->object.setTexture(&tex);
 		this->object.setTextureRect(sf::IntRect(0, 0, static_cast<int>(this->object.getGlobalBounds().width),

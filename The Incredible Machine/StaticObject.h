@@ -6,7 +6,8 @@
 /// Types of static objects that could appear on level
 /// </summary>
 enum StaticObjectType {
-	PLATFORM,
+	PLATFORM_RIGHT,
+	PLATFORM_LEFT,
 	GEAR,
 	FLOOR,
 	WALL,

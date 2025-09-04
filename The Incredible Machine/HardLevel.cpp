@@ -9,31 +9,31 @@ void HardLevel::initStaticObjects()
 {
 	this->staticObjects.push_back(new StaticObject(0, 760, 1000, 50, StaticObjectType::FLOOR));
 
-	this->staticObjects.push_back(new StaticObject(100, 300, 150, 20, StaticObjectType::PLATFORM));
-	this->staticObjects.push_back(new StaticObject(300, 600, 150, 20, StaticObjectType::PLATFORM));
-	this->staticObjects.push_back(new StaticObject(450, 400, 150, 20, StaticObjectType::PLATFORM));
-	this->staticObjects.push_back(new StaticObject(600, 300, 150, 20, StaticObjectType::PLATFORM));
+	this->staticObjects.push_back(new StaticObject(101, 650, 148, 20, StaticObjectType::PLATFORM_RIGHT));
+	this->staticObjects.push_back(new StaticObject(451, 500, 148, 20, StaticObjectType::PLATFORM_LEFT));
+	this->staticObjects.push_back(new StaticObject(201, 300, 148, 20, StaticObjectType::PLATFORM_RIGHT));
+	this->staticObjects.push_back(new StaticObject(501, 200, 148, 20, StaticObjectType::PLATFORM_RIGHT));
 
-	this->staticObjects.push_back(new StaticObject(830, 400, 20, 40, StaticObjectType::WALL));
-	this->staticObjects.push_back(new StaticObject(830, 440, 160, 20, StaticObjectType::GOAL));
-	this->staticObjects.push_back(new StaticObject(970, 400, 20, 40, StaticObjectType::WALL));
+	this->staticObjects.push_back(new StaticObject(830, 300, 20, 40, StaticObjectType::WALL));
+	this->staticObjects.push_back(new StaticObject(830, 340, 160, 20, StaticObjectType::GOAL));
+	this->staticObjects.push_back(new StaticObject(970, 300, 20, 40, StaticObjectType::WALL));
 }
 
 void HardLevel::initStaticWheels()
 {
-	this->staticWheels.push_back(new StaticWheel(200, 310.f));
-	this->staticWheels.push_back(new StaticWheel(400, 610.f));
-	this->staticWheels.push_back(new StaticWheel(550, 410.f));
-	this->staticWheels.push_back(new StaticWheel(700, 310.f));
+	this->staticWheels.push_back(new StaticWheel(200, 660.f));
+	this->staticWheels.push_back(new StaticWheel(475, 510.f));
+	this->staticWheels.push_back(new StaticWheel(300, 310.f));
+	this->staticWheels.push_back(new StaticWheel(600, 210.f));
 }
 
 void HardLevel::initDynamicObjects()
 {
 	this->dynamicObjects.push_back(new DynamicObject(25, 470, false));
-	this->dynamicObjects.push_back(new DynamicObject(100, 250, false));
-	this->dynamicObjects.push_back(new DynamicObject(300, 550, false));
-	this->dynamicObjects.push_back(new DynamicObject(450, 350, false));
-	this->dynamicObjects.push_back(new DynamicObject(600, 250, true));
+	this->dynamicObjects.push_back(new DynamicObject(100, 600, false));
+	this->dynamicObjects.push_back(new DynamicObject(540, 450, false));
+	this->dynamicObjects.push_back(new DynamicObject(200, 250, false));
+	this->dynamicObjects.push_back(new DynamicObject(500, 150, true));
 }
 
 void HardLevel::initForbiddenActions()
@@ -81,7 +81,7 @@ void HardLevel::initResources()
 	}
 }
 
-HardLevel::HardLevel(bool mode) :Level(5, 4,4,4)
+HardLevel::HardLevel(bool mode) :Level(5, 4,4,4,250.f)
 {
 	this->modeAI = mode;
 }

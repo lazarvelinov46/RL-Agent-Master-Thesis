@@ -9,9 +9,9 @@ void MediumLevel::initStaticObjects()
 {
 	this->staticObjects.push_back(new StaticObject(0, 760, 1000, 50, StaticObjectType::FLOOR));
 
-	this->staticObjects.push_back(new StaticObject(100, 600, 150, 20, StaticObjectType::PLATFORM));
-	this->staticObjects.push_back(new StaticObject(350, 500, 150, 20, StaticObjectType::PLATFORM));
-	this->staticObjects.push_back(new StaticObject(600, 300, 150, 20, StaticObjectType::PLATFORM));
+	this->staticObjects.push_back(new StaticObject(100, 600, 150, 20, StaticObjectType::PLATFORM_RIGHT));
+	this->staticObjects.push_back(new StaticObject(350, 500, 150, 20, StaticObjectType::PLATFORM_RIGHT));
+	this->staticObjects.push_back(new StaticObject(600, 300, 150, 20, StaticObjectType::PLATFORM_RIGHT));
 
 	this->staticObjects.push_back(new StaticObject(830, 400, 20, 40, StaticObjectType::WALL));
 	this->staticObjects.push_back(new StaticObject(830, 440, 160, 20, StaticObjectType::GOAL));
@@ -78,7 +78,7 @@ void MediumLevel::initResources()
 	}
 }
 
-MediumLevel::MediumLevel(bool mode):Level(4,3,3,3)
+MediumLevel::MediumLevel(bool mode):Level(4,3,3,3,350.f)
 {
 	this->modeAI = mode;
 }
