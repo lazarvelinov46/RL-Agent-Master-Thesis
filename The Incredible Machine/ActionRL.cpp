@@ -2,6 +2,12 @@
 #include "ActionRL.h"
 
 
+ActionRL::ActionRL(int numberOfWheels, int numberOfGears)
+{
+    this->numberOfWheels = numberOfWheels;
+    this->numberOfGears = numberOfGears;
+}
+
 std::pair<int, int> ActionRL::getGearPlaced(int gearId) const
 {
     return this->gearPlaced[gearId];
@@ -58,13 +64,13 @@ std::pair<BeltActionInfo, BeltActionInfo> ActionRL::getBeltPlacement(int beltAct
     beltActionId -= ActionRL::GRID_WIDTH * ActionRL::GRID_HEIGHT;
     BeltActionInfo beggining;
     BeltActionInfo end;
-    int crossCombinations = Level::getNumberOfGearsStatic() * Level::getNumberOfBeltsStatic();
-    int wheelCombinations = ActionRL::combination(Level::getNumberOfWheels(), 2);
+    int crossCombinations = this->numberOfWheels * this->numberOfGears;
+    int wheelCombinations = ActionRL::combination(this->numberOfWheels, 2);
     if (beltActionId < crossCombinations) {
         beggining.isElementGear = true;
-        beggining.idElement = beltActionId / Level::getNumberOfGearsStatic();
+        beggining.idElement = beltActionId / this->numberOfGears;
         end.isElementGear = false;
-        end.idElement = beltActionId % Level::getNumberOfBeltsStatic();
+        end.idElement = beltActionId % this->numberOfWheels;
     }
     /*
     else if(beltActionId<gearCombinations+crossCombinations){
@@ -91,8 +97,8 @@ std::pair<BeltActionInfo, BeltActionInfo> ActionRL::getBeltPlacement(int beltAct
         int startWheels = crossCombinations;
         int wheelNumber = beltActionId - startWheels;
         int count = 0;
-        for (int i = 0; i < Level::getNumberOfWheels(); i++) {
-            for (int j = i + 1; j < Level::getNumberOfWheels(); j++) {
+        for (int i = 0; i <this->numberOfWheels; i++) {
+            for (int j = i + 1; j < this->numberOfWheels; j++) {
                 if (count == wheelNumber) {
                     idBeggining = i;
                     idEnd = j;

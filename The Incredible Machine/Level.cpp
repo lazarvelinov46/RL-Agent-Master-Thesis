@@ -2,11 +2,11 @@
 #include "Level.h"
 #include "QTable.h"
 
-float Level::GEAR_WIDTH = 100.0;
+const float Level::GEAR_WIDTH = 100.0;
 
 void Level::initState()
 {
-	this->state.setInitialState();
+	this->state->setInitialState();
 	this->stateChanged = false;
 	this->reward = 0.0f;
 }
@@ -26,80 +26,6 @@ void Level::initTextures()
 
 	if (!this->gearTexture.loadFromFile("assets/Textures/gear.png")) {
 		std::cout << "ERROR: Could not load texture" << std::endl;
-	}
-}
-
-void Level::initStaticObjects()
-{
-	this->staticObjects.push_back(new StaticObject(0, 760, 1000, 50, StaticObjectType::FLOOR));
-
-	this->staticObjects.push_back(new StaticObject(100, 600, 150, 20, StaticObjectType::PLATFORM));
-	this->staticObjects.push_back(new StaticObject(350, 500, 150, 20, StaticObjectType::PLATFORM));
-	this->staticObjects.push_back(new StaticObject(600, 300, 150, 20, StaticObjectType::PLATFORM));
-
-	this->staticObjects.push_back(new StaticObject(830, 400, 20, 40, StaticObjectType::WALL));
-	this->staticObjects.push_back(new StaticObject(830, 440, 160, 20, StaticObjectType::GOAL));
-	this->staticObjects.push_back(new StaticObject(970, 400, 20, 40, StaticObjectType::WALL));
-}
-
-void Level::initStaticWheels()
-{
-	/*
-	this->staticWheels.push_back(new StaticWheel(200, 610.f, 10.f));
-	this->staticWheels.push_back(new StaticWheel(400, 510.f, 10.f));
-	this->staticWheels.push_back(new StaticWheel(700, 310.f, 10.f));
-	*/
-	this->staticWheels.push_back(new StaticWheel(200, 610.f));
-	this->staticWheels.push_back(new StaticWheel(450, 510.f));
-	this->staticWheels.push_back(new StaticWheel(700, 310.f));
-}
-
-void Level::initDynamicObjects()
-{
-	this->dynamicObjects.push_back(new DynamicObject(25, 470, false));
-	this->dynamicObjects.push_back(new DynamicObject(100, 550, false));
-	this->dynamicObjects.push_back(new DynamicObject(350, 450, false));
-	this->dynamicObjects.push_back(new DynamicObject(600, 250, true));
-}
-
-void Level::initResources()
-{
-	this->currentNumberOfBelts = Level::startingNumberOfBelts;
-	this->currentNumberOfGears = Level::NUMBER_OF_GEARS;
-	this->currentNumberOfResources = 0;
-	for (size_t i = 0; i < this->currentNumberOfBelts; i++) {
-		sf::Sprite* beltSprite = new sf::Sprite(this->beltTexture);
-		beltSprite->setScale(0.5f, 0.5f);
-		beltSprite->setPosition(1050, 150);
-
-		this->resources.push_back(new Resource(beltSprite, this->currentNumberOfResources, this->currentNumberOfBelts));
-	}
-	this->currentNumberOfResources++;
-	for (size_t i = 0; i < this->currentNumberOfGears; i++) {
-		sf::Sprite* gearSprite = new sf::Sprite(this->gearTexture);
-		gearSprite->setScale(0.19531f, 0.19531f);
-		gearSprite->setPosition(1050, 350);
-		sf::Text gearText;
-		gearText.setFont(font);
-		gearText.setString("3");
-		gearText.setCharacterSize(18);
-		gearText.setPosition(gearSprite->getPosition().x + gearSprite->getGlobalBounds().width / 2 - 18, gearSprite->getPosition().y + gearSprite->getGlobalBounds().height);
-		gearText.setFillColor(sf::Color::Black);
-
-		this->resources.push_back(new Resource(gearSprite, this->currentNumberOfResources, this->currentNumberOfGears));
-	}
-	this->currentNumberOfResources++;
-	for (size_t i = 0; i < this->currentNumberOfResources; i++) {
-		const Resource* res = this->getResourceById(i);
-		sf::Text text;
-		text.setFont(font);
-		text.setString(std::to_string(res->maxNum));
-		text.setCharacterSize(18);
-		text.setPosition(res->sprite->getPosition().x + res->sprite->getGlobalBounds().width / 2 - 18,
-			res->sprite->getPosition().y + res->sprite->getGlobalBounds().height);
-		text.setFillColor(sf::Color::Black);
-		this->resourceNumbers.push_back(res->maxNum);
-		this->resourceNumbersText.push_back(text);
 	}
 }
 
@@ -131,7 +57,7 @@ void Level::startPlatform(const StaticObject* object)
 				if (!platform->getMoving() && platform->getObjectType() == StaticObjectType::PLATFORM &&
 					platform->getGlobalBounds().contains(belt[1].position)) {
 					platform->move(5.f);
-					this->state.setWheelStarted(i, true);
+					this->state->setWheelStarted(i, true);
 					this->stateChanged = true;
 					this->reward = WHEEL_ACTIVATED;
 
@@ -226,11 +152,11 @@ const sf::Vector2f& Level::alignToGrid(const sf::Vector2f& pos) const
 void Level::updateBalls(float deltaTime)
 {
 	if (!isPlaying)return;
-	bool ballsMovingPreUpdate = this->state.getBallMoving();
+	bool ballsMovingPreUpdate = this->state->getBallMoving();
 	bool bMPU[4];
 	for (size_t i = 0; i < this->dynamicObjects.size(); i++) {
 		DynamicObject* ball = this->dynamicObjects[i];
-		bMPU[i] = this->state.getBallMoving(i);
+		bMPU[i] = this->state->getBallMoving(i);
 		sf::Vector2f oldVelocity = ball->getVelocity();
 		sf::Vector2f newPosition = ball->getPosition() + oldVelocity;
 		sf::FloatRect ballBounds = ball->getGlobalBounds();
@@ -273,8 +199,8 @@ void Level::updateBalls(float deltaTime)
 
 
 					if (object->getObjectType() == StaticObjectType::GOAL) {
-						if (!this->state.getTargetHit()) {
-							this->state.setTargetHit(true);
+						if (!this->state->getTargetHit()) {
+							this->state->setTargetHit(true);
 							this->stateChanged = true;
 							this->reward = WON_GAME;
 							std::cout << "cilj" << std::endl;
@@ -315,10 +241,10 @@ void Level::updateBalls(float deltaTime)
 					ball->setVelocity(sf::Vector2f(ball->getVelocity().x * -0.9f, ball->getVelocity().y));
 				}
 				if (object->getObjectType() == StaticObjectType::GEAR) {
-					if (!this->state.getGearStarted(gears)) {
-						this->state.setGearStarted(gears, true);
+					if (!this->state->getGearStarted(gears)) {
+						this->state->setGearStarted(gears, true);
 						this->stateChanged = true;
-						std::cout << this->state.getStateId() << std::endl;
+						std::cout << this->state->getStateId() << std::endl;
 						this->reward = GEAR_ACTIVATED;
 						std::cout << "zupcanik" << std::endl;
 						this->startPlatform(object);
@@ -363,11 +289,11 @@ void Level::updateBalls(float deltaTime)
 			if (!onMovingPlatform)this->applyDrag(ball);
 		}
 		if (oldVelocity.x == 0.0f && oldVelocity.y == 0.0f && ((abs(ball->getVelocity().x) > 1) || abs(ball->getVelocity().y) > 1)) {
-			this->state.setBallMoving(i, true);
+			this->state->setBallMoving(i, true);
 
 		}
 		else if ((abs(oldVelocity.x > 1) || abs(oldVelocity.y > 1)) && ball->getVelocity().x == 0.0f && ball->getVelocity().y == 0.0f) {
-			this->state.setBallMoving(i, false);
+			this->state->setBallMoving(i, false);
 
 		}
 
@@ -455,10 +381,10 @@ void Level::updateBalls(float deltaTime)
 			*/
 
 	}
-	if (this->state.getBallMoving() != ballsMovingPreUpdate) {
+	if (this->state->getBallMoving() != ballsMovingPreUpdate) {
 		this->stateChanged = true;
-		if (!this->state.getBallMoving() && !this->state.getTargetHit()) {
-			this->reward += LOST_GAME_BASE - ((Level::NUMBER_OF_GEARS - this->currentNumberOfGears) + (Level::startingNumberOfBelts - this->currentNumberOfBelts)) * 0.6;
+		if (!this->state->getBallMoving() && !this->state->getTargetHit()) {
+			this->reward += LOST_GAME_BASE - ((this->startingNumberOfGears - this->currentNumberOfGears) + (this->startingNumberOfBelts - this->currentNumberOfBelts)) * 0.6;
 		}
 	}
 }
@@ -495,9 +421,13 @@ void Level::markForbiddenFromBall(DynamicObject* ball)
 	}
 }
 
-Level::Level(bool mode)
+Level::Level(int numberOfBalls,int numberOfWheels,int numberOfGears,int numberOfBelts)
 {
-	this->modeAI = true;
+	this->startingNumberOfGears = numberOfGears;
+	this->startingNumberOfBelts = numberOfBelts;
+	this->numberOfWheels = numberOfWheels;
+	this->numberOfBalls = numberOfBalls;
+	this->state = new StateRL(numberOfBalls, numberOfGears, numberOfWheels);
 }
 
 
@@ -658,7 +588,7 @@ void Level::handleClick(sf::Vector2f& mousePosition)
 				this->resourceNumbersText[this->selectedResoureceIndex].setString(std::to_string(--this->resourceNumbers[this->selectedResoureceIndex]));
 				//FORBIDDEN ACTIONS
 				if (this->resourceNumbers[this->selectedResoureceIndex] == 0) {
-					int numActions = Level::getNumberOfGearsStatic() * Level::getNumberOfWheels() + ActionRL::combination(Level::getNumberOfWheels(), 2);
+					int numActions = this->startingNumberOfGears * Level::getNumberOfWheels() + ActionRL::combination(Level::getNumberOfWheels(), 2);
 					for (int i = ActionRL::getGridHeight() * ActionRL::getGridWidth(); i < numActions; i++) {
 						this->forbiddenActions.insert(i);
 					}
@@ -809,7 +739,7 @@ bool Level::tryGearPlacement(sf::Vector2f position)
 			this->resourceNumbersText[1].setString(std::to_string(--this->resourceNumbers[1]));
 			this->resources.pop_back();
 			if (--this->currentNumberOfGears == 0) {
-				int numActions = Level::getNumberOfGearsStatic() * Level::getNumberOfWheels() + ActionRL::combination(Level::getNumberOfWheels(), 2);
+				int numActions = this->startingNumberOfGears * Level::getNumberOfWheels() + ActionRL::combination(Level::getNumberOfWheels(), 2);
 				for (int i = 0; i < ActionRL::getGridWidth() * ActionRL::getGridHeight(); i++) {
 					this->forbiddenActions.insert(i);
 				}
@@ -952,7 +882,7 @@ bool Level::placeBelt(sf::Vector2f start, sf::Vector2f end, bool startBeltGear)
 			if (object->getObjectType() == StaticObjectType::GEAR) {
 				//maybe start and end
 				if (object->getGlobalBounds().contains(start)) {
-					if (this->state.getGearStarted(gears)) {
+					if (this->state->getGearStarted(gears)) {
 						object->setAttached(true);
 						this->startPlatform(object);
 					}
@@ -982,7 +912,7 @@ bool Level::placeBelt(sf::Vector2f start, sf::Vector2f end, bool startBeltGear)
 	return true;
 }
 
-StateRL Level::getStatusChange()
+StateRL* Level::getStatusChange()
 {
 	return this->state;
 }
@@ -1000,15 +930,16 @@ float Level::distance(const sf::Vector2f& a, const sf::Vector2f& b)
 		(b.y - a.y) * (b.y - a.y));
 }
 
-int Level::getNumberOfGearsStatic()
+int Level::getStartingNumberOfGears()
 {
-	return Level::NUMBER_OF_GEARS;
+	return this->startingNumberOfGears;
 }
 
-int Level::getNumberOfBeltsStatic()
+int Level::getStartingNumberOfBelts()
 {
-	return Level::startingNumberOfBelts;
+	return this->startingNumberOfBelts;
 }
+
 
 const sf::FloatRect& Level::getBouds() const
 {
@@ -1036,4 +967,5 @@ Level::~Level()
 	for (size_t i = 0; i < this->staticWheels.size(); i++) {
 		delete this->staticWheels[i];
 	}
+	delete this->state;
 }

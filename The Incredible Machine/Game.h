@@ -24,7 +24,7 @@ private:
 	sf::RectangleShape gameScreen;
 
 	//Level object managing game and logic of specific level
-	Level level;
+	Level* level;
 	//Next state object to transition to
 	State* nextState;
 	
@@ -46,6 +46,7 @@ public:
 	/// Initializes all elements of the game
 	/// </summary>
 	Game();
+	~Game();
 	/// <summary>
 	/// Handles user input events such as pressing keyboard buttons and mouse clicks
 	/// </summary>

@@ -1,9 +1,6 @@
 #pragma once
 #include "Level.h"
-
-
-
-
+#include "MediumLevel.h"
 /// <summary>
 /// Manages gameplay area
 /// Placement of resources
@@ -21,15 +18,10 @@ private:
 	void initForbiddenActions()override;
 	void initResources()override;
 
-
 public:
 	MediumLevel(bool mode=false);
 	
 	virtual ~MediumLevel() override;
 
-	static int getNumberOfGearsStatic();
-	static int getNumberOfBeltsStatic();
-	static int getNumberOfWheels();
-	static int getNumberOfBalls();
 };
 

@@ -47,7 +47,7 @@ public:
 	/// balls moving
 	/// target not hit
 	/// </summary>
-	StateRL();
+	StateRL(int numberOfBalls, int numberOfGears, int numberOfWheels);
 
 	/// <summary>
 	/// Info if specific wheel is started

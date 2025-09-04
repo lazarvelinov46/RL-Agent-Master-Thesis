@@ -51,8 +51,14 @@ Game::Game()
 	this->initGameScreen();
 	this->initPanel();
 	this->initTextures();
-	this->level.initLevel();
+	this->level = new MediumLevel();
+	this->level->initLevel();
 	this->nextState = nullptr;
+}
+
+Game::~Game()
+{
+	delete this->level;
 }
 
 void Game::handleInput(sf::RenderWindow& window)
@@ -60,7 +66,7 @@ void Game::handleInput(sf::RenderWindow& window)
 	sf::Event ev;
 	while (window.pollEvent(ev)) {
 
-		level.handleInput(window);
+		level->handleInput(window);
 		if (ev.type == sf::Event::Closed) {
 			window.close();
 		}
@@ -74,13 +80,13 @@ void Game::handleInput(sf::RenderWindow& window)
 			if (playButton.getGlobalBounds().contains(position)) {
 				std::cout << "PLAY pressed " << std::endl;
 				this->isPlaying = true;
-				level.setIsPlaying(this->isPlaying);
+				level->setIsPlaying(this->isPlaying);
 			}
 
-			level.handleClick(position);
+			level->handleClick(position);
 		}
 		if (ev.type == sf::Event::MouseButtonPressed && ev.mouseButton.button == sf::Mouse::Right) {
-			level.handleRightClick();
+			level->handleRightClick();
 		}
 	}
 	//handle input on level side
@@ -88,7 +94,7 @@ void Game::handleInput(sf::RenderWindow& window)
 
 void Game::update(float deltaTime)
 {
-	this->level.update(deltaTime);
+	this->level->update(deltaTime);
 }
 
 void Game::render(sf::RenderTarget& target)
@@ -96,7 +102,7 @@ void Game::render(sf::RenderTarget& target)
 	target.clear(sf::Color::White);
 	target.draw(this->panel);
 	target.draw(this->gameScreen);
-	this->level.render(target);
+	this->level->render(target);
 	target.draw(this->playButton);
 	target.draw(this->playButtonText);
 }

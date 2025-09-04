@@ -1,5 +1,4 @@
 #pragma once
-#include "MediumLevel.h"
 
 typedef struct BeltActionInfo {
 	bool isElementGear;
@@ -23,7 +22,10 @@ private:
 	std::vector<std::pair<int, int>> beltPlaced;
 	const static int GRID_WIDTH = 19;
 	const static int GRID_HEIGHT = 14;
+	int numberOfWheels;
+	int numberOfGears;
 public:
+	ActionRL(int numberOfWheels, int numberOfGears);
 	/*
 	bool operator==(const ActionRL& action)const {
 		return this->gear == action.gear && this->gearPosition == action.gearPosition && this->beltPositions == action.beltPositions;

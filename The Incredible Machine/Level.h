@@ -21,12 +21,12 @@ typedef struct Resource {
 }Resource;
 
 class Level {
+private:
 protected:
-	int startingNumberOfGears = 3;
-	int startingNumberOfBelts = 3;
-	int numberOfWheels = 3;
-	int numberOfBalls = 4;
-	static const float GEAR_WIDTH;
+	int startingNumberOfGears;
+	int startingNumberOfBelts;
+	int numberOfWheels;
+	int numberOfBalls ;
 
 	int currentNumberOfGears=0;
 	int currentNumberOfBelts=0;
@@ -85,7 +85,7 @@ protected:
 	//AI
 	bool modeAI = false;
 	/* Tracking in which state agent currently is */
-	StateRL state;
+	StateRL* state;
 	double reward;
 	/* Variable that is true when there is change in state of agent */
 	bool stateChanged;
@@ -118,7 +118,7 @@ protected:
 	/// <param name="ball">Object which location is taken into consideration</param>
 	void markForbiddenFromBall(DynamicObject* ball);
 public:
-	Level();
+	Level(int numberOfBalls, int numberOfWheels, int numberOfGears, int numberOfBelts);
 	virtual ~Level();
 
 	virtual void initLevel();
@@ -171,17 +171,18 @@ public:
 
 	virtual int getNumberOfBelts();
 	virtual bool placeBelt(sf::Vector2f start, sf::Vector2f end, bool startBeltGear);
-	virtual StateRL getStatusChange();
+	virtual StateRL* getStatusChange();
 	virtual bool getStateChanged();
 	//calculates distance between two points
 	static float distance(const sf::Vector2f& a, const sf::Vector2f& b);
-	static int getNumberOfGearsStatic();
-	static int getNumberOfBeltsStatic();
-	static int getNumberOfWheels();
-	static int getNumberOfBalls();
+	int getStartingNumberOfGears();
+	int getStartingNumberOfBelts();
+	int getNumberOfWheels();
+	int getNumberOfBalls();
 	/// <summary>
 	/// Set which contains ids of forbidden actions
 	/// </summary>
 	/// <returns>unordered sets of forbidden actions</returns>
 	std::unordered_set<int> getBallZonesPassed();
+	static const float GEAR_WIDTH;
 };

@@ -50,7 +50,7 @@ private:
 	AgentRL* agent;
 
 	//test
-	ActionRL actionFunctions;
+	ActionRL* actionFunctions;
 
 	//Flag which indicates if simulation is running
 	bool isPlaying = false;
