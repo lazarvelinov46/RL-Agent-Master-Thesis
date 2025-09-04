@@ -1,5 +1,5 @@
 #pragma once
-
+#include "State.h"
 #include "Game.h"
 #include "GameAI.h"
 
@@ -20,12 +20,6 @@ enum MenuOption{
 /// <summary>
 /// Enum which represents selected level difficulty
 /// </summary>
-enum LevelDifficulty {
-	EASY,
-	MEDIUM,
-	HARD,
-	NUM
-};
 
 /**
 * @class Menu

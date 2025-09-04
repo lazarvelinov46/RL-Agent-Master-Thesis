@@ -25,6 +25,8 @@ private:
 	//Main game screen
 	sf::RectangleShape gameScreen;
 
+	//Selected level
+	LevelDifficulty selectedLevel;
 	//Level object managing game and logic of specific level
 	Level* level;
 	//Next state object to transition to
@@ -47,7 +49,7 @@ public:
 	/// <summary>
 	/// Initializes all elements of the game
 	/// </summary>
-	Game();
+	Game(LevelDifficulty difficulty);
 	~Game();
 	/// <summary>
 	/// Handles user input events such as pressing keyboard buttons and mouse clicks

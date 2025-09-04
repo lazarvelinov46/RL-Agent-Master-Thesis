@@ -73,10 +73,10 @@ void Menu::handleInput(sf::RenderWindow& window)
 				switch (selectedOption)
 				{
 				case PLAYER:
-					this->nextState = new Game();
+					this->nextState = new Game(this->selectedDifficulty);
 					break;
 				case AI:
-					this->nextState = new GameAI();
+					this->nextState = new GameAI(this->selectedDifficulty);
 					break;
 				case LEVEL:
 					this->selectedDifficulty = (LevelDifficulty)((this->selectedDifficulty + 1) % LevelDifficulty::NUM);

@@ -258,8 +258,9 @@ void GameAI::resetResources()
 	this->level = new MediumLevel();
 	this->level->initLevel();
 }
-GameAI::GameAI()
+GameAI::GameAI(LevelDifficulty difficulty)
 {
+	this->selectedLevel = difficulty;
 	this->stateId = -1;
 	this->actionId = -1;
 	this->nextStateId = 1;
@@ -268,7 +269,21 @@ GameAI::GameAI()
 	this->initGameScreen();
 	this->initPanel();
 	this->initTextures();
-	this->level = new MediumLevel();
+	switch (this->selectedLevel)
+	{
+	case LevelDifficulty::EASY:
+		this->level = new EasyLevel();
+		break;
+	case LevelDifficulty::MEDIUM:
+		this->level = new MediumLevel();
+		break;
+	case LevelDifficulty::HARD:
+		this->level = new HardLevel();
+		break;
+	default:
+		this->level = new MediumLevel();
+		break;
+	}
 	this->initQTable();
 	this->level->initLevel();
 	this->actionFunctions=new ActionRL(this->level->getNumberOfWheels(),this->level->getStartingNumberOfGears());

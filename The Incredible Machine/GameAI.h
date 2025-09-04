@@ -42,6 +42,8 @@ private:
 	//Main game screen
 	sf::RectangleShape gameScreen;
 
+	//Selected level
+	LevelDifficulty selectedLevel;
 	//Level object managing game and logic of specific level
 	Level* level;
 	//Next state object to transition to
@@ -126,7 +128,7 @@ public:
 	/// <summary>
 	/// Initializes everything needed: GameAI state, QTable, level and RLAgent
 	/// </summary>
-	GameAI();
+	GameAI(LevelDifficulty difficulty);
 	/// <summary>
 	/// Frees everything from memory
 	/// </summary>

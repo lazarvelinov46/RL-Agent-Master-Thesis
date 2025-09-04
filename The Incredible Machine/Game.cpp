@@ -44,14 +44,29 @@ void Game::initTextures()
 	this->playButton.setTexture(&texturePlay);
 }
 
-Game::Game()
+Game::Game(LevelDifficulty difficulty)
 {
+	this->selectedLevel = difficulty;
 	this->initFont();
 	//this->initText();
 	this->initGameScreen();
 	this->initPanel();
 	this->initTextures();
-	this->level = new HardLevel();
+	switch (this->selectedLevel)
+	{
+	case LevelDifficulty::EASY:
+		this->level = new EasyLevel();
+		break;
+	case LevelDifficulty::MEDIUM:
+		this->level = new MediumLevel();
+		break;
+	case LevelDifficulty::HARD:
+		this->level = new HardLevel();
+		break;
+	default:
+		this->level = new MediumLevel();
+		break;
+	}
 	this->level->initLevel();
 	this->nextState = nullptr;
 }

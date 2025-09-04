@@ -1,6 +1,14 @@
 #pragma once
 
 #include "stdafx.h"
+
+
+enum LevelDifficulty {
+	EASY,
+	MEDIUM,
+	HARD,
+	NUM
+};
 /// <summary>
 /// Abstract class State which represents all the states (screens)
 /// which can be shown in the game
