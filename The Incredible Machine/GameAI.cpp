@@ -13,7 +13,6 @@ bool GameAI::loadQTableFromFile(const std::string& filename)
 		size_t c = line.find(',');
 		return (c == std::string::npos) ? std::string{} : line.substr(c + 1);
 	};
-	return false;
 
 	std::string line, s;
 	s = read_after_coma(line);
@@ -80,13 +79,13 @@ void GameAI::initTextures()
 
 void GameAI::initQTable()
 {
-	int statesNum = std::pow(2,Level::getNumberOfGearsStatic() + Level::getNumberOfWheels() + 1 + 1);
+	int statesNum = std::pow(2,level->getStartingNumberOfGears() + level->getNumberOfWheels() + 1 + 1);
 	int actionsNum = ActionRL::getGridWidth() * ActionRL::getGridHeight();//gear placements
-	actionsNum += Level::getNumberOfGearsStatic() * Level::getNumberOfWheels();//belt placements between gear and wheel
-	actionsNum += ActionRL::combination(Level::getNumberOfWheels(), 2);//belt placements between two wheels
+	actionsNum += level->getStartingNumberOfGears() * level->getNumberOfWheels();//belt placements between gear and wheel
+	actionsNum += ActionRL::combination(level->getNumberOfWheels(), 2);//belt placements between two wheels
 	this->table = QTable(statesNum, actionsNum, "qtable.txt");
 	this->iterations = 0;
-	if (this->loadQTableFromFile("qtable490000.csv")) {
+	if (this->loadQTableFromFile("qtable4900.csv")) {
 		std::cout << "Loaded QTable from file qtable4900.csv" << std::endl;
 		double alphaCap = linearDecay(ALPHA_START, ALPHA_END, iterations, ALPHA_DECAY);
 		this->table.setAlpha(alphaCap);
@@ -162,13 +161,13 @@ bool GameAI::updateState()
 	//get state changed
 	if (this->level->getStateChanged()) {
 		//TODO: add reward getter from level
-		this->nextStateId = this->level->getStatusChange().getStateId();
+		this->nextStateId = this->level->getStatusChange()->getStateId();
 		this->currentReward += this->level->getReward();
 		std::cout << this->stateId << " s " << this->nextStateId << " r " << this->currentReward << std::endl;
 		if (this->nextStateId != this->stateId) {
 			this->table.updateValidActions(
-				Level::getNumberOfGearsStatic()-this->level->getNumberOfGears(),
-				Level::getNumberOfBeltsStatic()-this->level->getNumberOfBelts());
+				level->getStartingNumberOfGears() - this->level->getNumberOfGears(),
+				level->getStartingNumberOfBelts() - this->level->getNumberOfBelts());
 			bool terminalState = this->nextStateId % 2 == 0 || this->nextStateId > 127;
 			this->table.updateQValue(this->stateId, this->lastExecutedAction, this->currentReward, this->nextStateId,terminalState);
 			this->episode.push_back(new Transition({ this->stateId,this->lastExecutedAction,0.0,-1 }));
@@ -256,7 +255,7 @@ void GameAI::appendEpisodeLog(int episode, double eps, double alphaCap, double t
 void GameAI::resetResources()
 {
 	delete this->level;
-	this->level = new Level();
+	this->level = new MediumLevel();
 	this->level->initLevel();
 }
 GameAI::GameAI()
@@ -269,9 +268,10 @@ GameAI::GameAI()
 	this->initGameScreen();
 	this->initPanel();
 	this->initTextures();
+	this->level = new MediumLevel();
 	this->initQTable();
-	this->level = new Level();
 	this->level->initLevel();
+	this->actionFunctions=new ActionRL(this->level->getNumberOfWheels(),this->level->getStartingNumberOfGears());
 	this->nextState = nullptr;
 	this->agent=new AgentRL();
 	
@@ -281,6 +281,7 @@ GameAI::~GameAI()
 {
 	delete this->nextState;
 	delete this->agent;
+	delete this->actionFunctions;
 }
 
 void GameAI::handleInput(sf::RenderWindow& window)
@@ -331,10 +332,10 @@ void GameAI::update(float deltaTime)
 	if ((level->getNumberOfBelts() + level->getNumberOfGears())==0) {
 		this->actionId = -1;
 	}
-	AgentAction actionType=this->actionFunctions.getActionType(this->actionId);
+	AgentAction actionType=this->actionFunctions->getActionType(this->actionId);
 	if (actionType == AgentAction::PLACE_GEAR) {
 		//gear placement
-		std::pair<int,int> coordinates=this->actionFunctions.getGearCoordinates(this->actionId);
+		std::pair<int,int> coordinates=this->actionFunctions->getGearCoordinates(this->actionId);
 		if (!level->tryGearPlacement(sf::Vector2f(coordinates.first*50, coordinates.second*50))) {
 		//if (this->stateId==0&&!level->tryGearPlacement(sf::Vector2f(0*50, 13*50))) {
 			//TODO: apply penalty
@@ -356,7 +357,7 @@ void GameAI::update(float deltaTime)
 		*/
 		try {
 			std::cout << "Belt " <<actionId<< std::endl;
-			std::pair<BeltActionInfo, BeltActionInfo> beltActionInfo = this->actionFunctions.getBeltPlacement(actionId);
+			std::pair<BeltActionInfo, BeltActionInfo> beltActionInfo = this->actionFunctions->getBeltPlacement(actionId);
 			std::cout << "Is start gear " << beltActionInfo.first.isElementGear << " id " << beltActionInfo.first.idElement << std::endl;
 			std::cout << "Is end gear " << beltActionInfo.second.isElementGear << " id " << beltActionInfo.second.idElement << std::endl;
 			sf::Vector2f start, end;

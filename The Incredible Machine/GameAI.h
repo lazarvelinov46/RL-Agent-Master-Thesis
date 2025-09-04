@@ -1,7 +1,7 @@
 #pragma once
 
 #include "State.h"
-#include "Level.h"
+#include "MediumLevel.h"
 #include "Menu.h"
 #include "AgentRL.h"
 #include "QTable.h"
@@ -50,7 +50,7 @@ private:
 	AgentRL* agent;
 
 	//test
-	ActionRL actionFunctions;
+	ActionRL* actionFunctions;
 
 	//Flag which indicates if simulation is running
 	bool isPlaying = false;

@@ -5,7 +5,6 @@
 #include "StateRL.h"
 #include "ActionRL.h"
 
-
 /// <summary>
 /// Represents resources which user/agent can place on the level screen
 /// </summary>
@@ -14,31 +13,24 @@ typedef struct Resource {
 	int id;				///< resource id
 	int maxNum;			///< max number of resources available on level
 
-	Resource(sf::Sprite* res, int i,int mn) {
+	Resource(sf::Sprite* res, int i, int mn) {
 		sprite = res;
 		id = i;
 		maxNum = mn;
 	}
 }Resource;
 
-/// <summary>
-/// Manages gameplay area
-/// Placement of resources
-/// Interactions between objects
-/// AI state management
-/// </summary>
-class Level
-{
+class Level {
 private:
-	static const int NUMBER_OF_GEARS = 3;
-	static const int NUMBER_OF_BELTS = 3;
-	static const int NUMBER_OF_WHEELS = 3;
-	static const int NUMBER_OF_BALLS = 4;
-	static const float GEAR_WIDTH;
+protected:
+	int startingNumberOfGears;
+	int startingNumberOfBelts;
+	int numberOfWheels;
+	int numberOfBalls ;
 
-	int currentNumberOfGears;
-	int currentNumberOfBelts;
-	int currentNumberOfResources;
+	int currentNumberOfGears=0;
+	int currentNumberOfBelts=0;
+	int currentNumberOfResources=0;
 	/* Non moving parts of level, already placed when level opens unlike resources */
 	std::vector<StaticObject*> staticObjects;
 	/* Movable objects (balls) */
@@ -57,13 +49,13 @@ private:
 	/* Pointer to Sprite of selected resource to place */
 	sf::Sprite* selectedResource;
 	/* Font used for text */
-	sf::Font font;	
+	sf::Font font;
 
 	/* Start position when placing the belt */
 	sf::Vector2f beltStart;
 	/* Visual endpoints for belt */
 	sf::Vertex endPointsBelt[2];
-	
+
 	/* Represents how much resources user has left */
 	std::vector<int> resourceNumbers;
 	/* Text on screen which represents resources left */
@@ -89,27 +81,26 @@ private:
 
 	/* Represents if physics has started */
 	bool isPlaying = false;
-	
+
 	//AI
 	bool modeAI = false;
 	/* Tracking in which state agent currently is */
-	StateRL state;
+	StateRL* state;
 	double reward;
 	/* Variable that is true when there is change in state of agent */
 	bool stateChanged;
 
-	void initState();
+	virtual void initState()=0;
 	void initFont();
 	void initTextures();
-	void initStaticObjects();
-	void initStaticWheels();
-	void initDynamicObjects();
-	void initForbiddenActions();
-	void initResources();
+	virtual void initStaticObjects()=0;
+	virtual void initStaticWheels()=0;
+	virtual void initDynamicObjects()=0;
+	virtual void initForbiddenActions()=0;
+	virtual void initResources()=0;
 
 	void resetStaticObjects();
 	void resetDynamicObjects();
-	void resetResources();
 
 	void startPlatform(const StaticObject* object);
 	bool hasWheel(const StaticObject* object);
@@ -127,75 +118,71 @@ private:
 	/// <param name="ball">Object which location is taken into consideration</param>
 	void markForbiddenFromBall(DynamicObject* ball);
 public:
-	Level(bool mode=false);
-	/// <summary>
-	/// Calls all init functions
-	/// </summary>
-	void initLevel();
+	Level(int numberOfBalls, int numberOfWheels, int numberOfGears, int numberOfBelts);
+	virtual ~Level();
+
+	virtual void initLevel();
 	/// <summary>
 	/// Resets level when game is over (used for AI)
 	/// Reverts everything to starting values
 	/// </summary>
-	void resetLevel();
+	virtual void resetLevel();
 	/// <summary>
 	/// Updates position of clicked resource (if there is one)
 	/// </summary>
 	/// <param name="window"> Reference to main render window</param>
-	void handleInput(sf::RenderWindow& window);
+	virtual void handleInput(sf::RenderWindow& window);
 	/// <summary>
 	/// Handles mouse click on level screen
 	/// </summary>
 	/// <param name="mousePosition">Coordinates where mouse click happened</param>
-	void handleClick(sf::Vector2f& mousePosition);
-	void handleRightClick();
-	void update(float deltaTime=0);
-	void render(sf::RenderTarget& target);
-
-
+	virtual void handleClick(sf::Vector2f& mousePosition);
+	virtual void handleRightClick();
+	virtual void update(float deltaTime = 0);
+	virtual void render(sf::RenderTarget& target);
 
 	const sf::FloatRect& getBouds()const;
 	void setIsPlaying(bool playing);
-	virtual ~Level();
 
 	//AI Game functions 
-	bool tryGearPlacement(sf::Vector2f position);
-	int getNumberOfGears();
-	std::vector<StaticObject*> getStaticObjects();
-	std::vector<StaticWheel*> getStaticWheels();
+	virtual bool tryGearPlacement(sf::Vector2f position);
+	virtual int getNumberOfGears();
+	virtual std::vector<StaticObject*> getStaticObjects();
+	virtual std::vector<StaticWheel*> getStaticWheels();
 	/// <summary>
 	/// Gets gear location based on gear Id
 	/// gear id - lowest id for earliest placed gear etc
 	/// </summary>
 	/// <param name="gearId">id of gear</param>
 	/// <returns>Location of gear for belt placement</returns>
-	sf::Vector2f getGearLocation(int gearId);
+	virtual sf::Vector2f getGearLocation(int gearId);
 	/// <summary>
 	/// Gets wheel location based on wheel id
 	/// wheel id - leftmost wheel lowest id etc
 	/// </summary>
 	/// <param name="wheelId">id of wheel</param>
 	/// <returns>Location of static wheel for belt placement</returns>
-	sf::Vector2f getWheelLocation(int wheelId);
+	virtual sf::Vector2f getWheelLocation(int wheelId);
 	/// <summary>
 	/// Returns reward after every state change
 	/// </summary>
 	/// <returns>reward value</returns>
-	double getReward();
+	virtual double getReward();
 
-	int getNumberOfBelts();
-	bool placeBelt(sf::Vector2f start, sf::Vector2f end, bool startBeltGear);
-	StateRL getStatusChange();
-	bool getStateChanged();
+	virtual int getNumberOfBelts();
+	virtual bool placeBelt(sf::Vector2f start, sf::Vector2f end, bool startBeltGear);
+	virtual StateRL* getStatusChange();
+	virtual bool getStateChanged();
 	//calculates distance between two points
 	static float distance(const sf::Vector2f& a, const sf::Vector2f& b);
-	static int getNumberOfGearsStatic();
-	static int getNumberOfBeltsStatic();
-	static int getNumberOfWheels();
-	static int getNumberOfBalls();
+	int getStartingNumberOfGears();
+	int getStartingNumberOfBelts();
+	int getNumberOfWheels();
+	int getNumberOfBalls();
 	/// <summary>
 	/// Set which contains ids of forbidden actions
 	/// </summary>
 	/// <returns>unordered sets of forbidden actions</returns>
 	std::unordered_set<int> getBallZonesPassed();
+	static const float GEAR_WIDTH;
 };
-

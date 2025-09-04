@@ -202,7 +202,7 @@ bool QTable::loadQTableCSV(std::istream &in)
 	this->visits.clear();
 	std::string line;
 	while (std::getline(in, line)) {
-		if (line.empty())continue;
+		if (line.empty()||line=="qtable")continue;
 		std::stringstream ss(line);
 		std::vector<double> row;
 		std::string cell;
