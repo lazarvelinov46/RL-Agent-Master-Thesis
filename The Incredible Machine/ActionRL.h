@@ -9,7 +9,7 @@ typedef struct BeltActionInfo {
 /// <summary>
 /// Enumerates descrete actions which agent could take
 /// </summary>
-enum AgentAction { PLACE_GEAR, PLACE_BELT, number, NO_ACTION};
+enum AgentAction { PLACE_GEAR, PLACE_BELT, PLACE_BOX, number, NO_ACTION};
 class ActionRL
 {
 private:
@@ -55,6 +55,12 @@ public:
 	/// <param name="gearActionId">Id from QTable that refers to gear placement action</param>
 	/// <returns>pair of integers that represent x and y coordinates</returns>
 	std::pair<int,int> getGearCoordinates(int gearActionId);
+	/// <summary>
+	/// Gets box coordinates based on action id that represents box placemenet
+	/// </summary>
+	/// <param name="boxActionId"></param>
+	/// <returns></returns>
+	std::pair<int, int> getBoxCoordinates(int boxActionId);
 	/// <summary>
 	/// Gets belt placement info based on action id that represents belt placement
 	/// </summary>

@@ -84,9 +84,11 @@ void GameAI::initQTable()
 	actionsNum += level->getStartingNumberOfGears() * level->getNumberOfWheels();//belt placements between gear and wheel
 	actionsNum += ActionRL::combination(level->getNumberOfWheels(), 2);//belt placements between two wheels
 	if (this->selectedLevel == LevelDifficulty::HARD) {
-		actionsNum += ActionRL::getGridWidthBox() * ActionRL::getGridHeight();
+		actionsNum += ActionRL::getGridWidthBox() * ActionRL::getGridHeightBox();
 	}
 	std::cout << "States: " << statesNum << " Actions: " << actionsNum<<std::endl;
+	this->statesNum = statesNum;
+	this->actionsNum = actionsNum;
 	this->table = QTable(statesNum, actionsNum, "qtable.txt");
 	this->iterations = 0;
 	if (this->loadQTableFromFile("qtable490000.csv")) {
@@ -172,12 +174,12 @@ bool GameAI::updateState()
 			this->table.updateValidActions(
 				level->getStartingNumberOfGears() - this->level->getNumberOfGears(),
 				level->getStartingNumberOfBelts() - this->level->getNumberOfBelts());
-			bool terminalState = this->nextStateId % 2 == 0 || this->nextStateId > 127;
+			bool terminalState = this->nextStateId % 2 == 0 || this->nextStateId >= (this->statesNum/2);
 			this->table.updateQValue(this->stateId, this->lastExecutedAction, this->currentReward, this->nextStateId,terminalState);
 			this->episode.push_back(new Transition({ this->stateId,this->lastExecutedAction,0.0,-1 }));
 			this->currentReward = 0;
 		}
-		if (nextStateId%2 == 0||this->nextStateId>127) {
+		if (nextStateId % 2 == 0 || this->nextStateId >= (this->statesNum/2)) {
 			auto now = std::chrono::system_clock::now();
 			double duration = 0.0;
 			if (this->episodeStartTime.time_since_epoch().count() != 0) {
@@ -187,9 +189,9 @@ bool GameAI::updateState()
 			int uniqueVisited = this->table.getUniqueVisitsCount();
 			double eps = GameAI::linearDecay(this->E_START, this->E_END, this->iterations, this->E_DECAY);
 			double alphaCap = linearDecay(ALPHA_START, ALPHA_END, iterations, ALPHA_DECAY);
-			int win = this->nextStateId > 127 ? 1 : 0;
+			int win = this->nextStateId >= (this->statesNum / 2) ? 1 : 0;
 			int steps = static_cast<int>(this->episode.size());
-			GameAI::appendEpisodeLog(this->iterations, eps, alphaCap, this->currentReward, win, steps, duration,
+			this->appendEpisodeLog(this->iterations, eps, alphaCap, this->currentReward, win, steps, duration,
 				uniqueVisited, qstats.first, qstats.second);
 			this->gameOver = true;
 			if (win)std::cout << "WON GAME" << std::endl;
@@ -202,8 +204,7 @@ bool GameAI::updateState()
 			this->table.updateValidActions(0,0);
 			this->forbiddenActions.clear();
 			if (this->iterations % 100 == 0) {
-				this->table.printTable("qtable.txt",this->iterations);
-				std::string csvFilename = "qtable" + std::to_string(this->iterations) + ".csv";
+				std::string csvFilename = this->selectedLevel+"qtable" + std::to_string(this->iterations) + ".csv";
 				std::cout << csvFilename << std::endl;
 				this->table.saveQTableCSV(csvFilename,iterations,alphaCap,0.0);
 			}
@@ -232,7 +233,7 @@ std::string GameAI::isoTimestampNow()
 
 void GameAI::appendEpisodeLog(int episode, double eps, double alphaCap, double totalReward, int win, int steps, double duration_s, int unique_sa_visited, double q_max, double q_mean)
 {
-	const std::string fname = "training_log.csv";
+	const std::string fname = this->selectedLevel+"training_log.csv";
 	bool needHeader = false;
 	std::ifstream fin(fname);
 	if (!fin.good())needHeader = true;
@@ -315,6 +316,7 @@ GameAI::~GameAI()
 	delete this->nextState;
 	delete this->agent;
 	delete this->actionFunctions;
+	delete this->level;
 }
 
 void GameAI::handleInput(sf::RenderWindow& window)
@@ -362,7 +364,7 @@ void GameAI::update(float deltaTime)
 	}
 	*/
 	this->updateActionState();
-	if ((level->getNumberOfBelts() + level->getNumberOfGears())==0) {
+	if ((level->getNumberOfBelts() + level->getNumberOfGears()+this->level->getNumberOfBoxes())==0) {
 		this->actionId = -1;
 	}
 	AgentAction actionType=this->actionFunctions->getActionType(this->actionId);
@@ -373,7 +375,7 @@ void GameAI::update(float deltaTime)
 		//if (this->stateId==0&&!level->tryGearPlacement(sf::Vector2f(0*50, 13*50))) {
 			//TODO: apply penalty
 			//this->table.updateQValue(this->stateId, this->actionId, WRONG_GEAR_PLACEMENT, this->stateId);
-			this->currentReward += WRONG_BELT_PLACEMENT;
+			this->currentReward += WRONG_GEAR_PLACEMENT;
 		}
 		/*
 		if (this->stateId != 0 && !level->tryGearPlacement(sf::Vector2f(coordinates.first * 50, coordinates.second * 50))) {
@@ -434,6 +436,22 @@ void GameAI::update(float deltaTime)
 			std::cout << e.what() << std::endl;
 		}
 		
+	}
+	else {
+		//box placement
+		std::pair<int, int> coordinates = this->actionFunctions->getGearCoordinates(this->actionId);
+		if (!level->tryGearPlacement(sf::Vector2f(coordinates.first * 100, coordinates.second * 100))) {
+			//if (this->stateId==0&&!level->tryGearPlacement(sf::Vector2f(0*50, 13*50))) {
+				//TODO: apply penalty
+				//this->table.updateQValue(this->stateId, this->actionId, WRONG_GEAR_PLACEMENT, this->stateId);
+			this->currentReward += WRONG_GEAR_PLACEMENT;
+		}
+		/*
+		if (this->stateId != 0 && !level->tryGearPlacement(sf::Vector2f(coordinates.first * 50, coordinates.second * 50))) {
+
+			this->table.updateQValue(this->stateId, this->actionId, WRONG_GEAR_PLACEMENT, this->stateId);
+		}
+		*/
 	}
 	this->level->update(deltaTime);
 	this->selectAction=this->updateState();

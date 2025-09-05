@@ -3,6 +3,9 @@
 
 StateRL::StateRL(int numberOfBalls,int numberOfGears,int numberOfWheels)
 {
+    this->numberOfBalls = numberOfBalls;
+    this->numberOfGears = numberOfGears;
+    this->numberOfWheels = numberOfWheels;
     this->ballsMoving.push_back(true);
     for (int i = 0;i < numberOfBalls -1;i++) {
         this->ballsMoving.push_back(false);
@@ -120,10 +123,10 @@ void StateRL::setInitialState()
     }
     */
     this->allBallsMoving = true;
-    for (int i = 0;i < 3;i++) {
+    for (int i = 0;i < this->numberOfGears;i++) {
         this->gearsStarted.at(i) = false;
     }
-    for (int i = 0;i < 3;i++) {
+    for (int i = 0;i < this->numberOfWheels;i++) {
         this->wheelsStarted.at(i) = false;
     }
     this->targetHit = false;

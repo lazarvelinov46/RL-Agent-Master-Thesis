@@ -47,8 +47,13 @@ AgentAction ActionRL::getActionType(int actionId)
     if (actionId < ActionRL::GRID_WIDTH * ActionRL::GRID_HEIGHT) {
         return AgentAction::PLACE_GEAR;
     }
-    else {
+    else if(actionId<(ActionRL::GRID_WIDTH * ActionRL::GRID_HEIGHT+
+        this->numberOfGears*this->numberOfWheels+
+        ActionRL::combination(this->numberOfWheels,2))){
         return AgentAction::PLACE_BELT;
+    }
+    else {
+        return AgentAction::PLACE_BOX;
     }
 }
 
@@ -57,6 +62,16 @@ std::pair<int, int> ActionRL::getGearCoordinates(int gearActionId)
     int x = gearActionId / ActionRL::GRID_WIDTH;
     int y = gearActionId % ActionRL::GRID_WIDTH;
     return std::pair<int, int>(y, x);
+}
+
+std::pair<int, int> ActionRL::getBoxCoordinates(int boxActionId)
+{
+    boxActionId-= ActionRL::GRID_WIDTH * ActionRL::GRID_HEIGHT;
+    boxActionId -= this->numberOfWheels * this->numberOfGears;
+    boxActionId-= ActionRL::combination(this->numberOfWheels, 2);
+    int x = boxActionId / ActionRL::GRID_HEIGHT_BOX;
+    int y = boxActionId % ActionRL::GRID_WIDTH_BOX;
+    return std::pair<int, int>();
 }
 
 std::pair<BeltActionInfo, BeltActionInfo> ActionRL::getBeltPlacement(int beltActionId)

@@ -22,6 +22,13 @@ private:
 	std::vector<bool> wheelStarted;
 	std::vector<bool> ballMoving;
 	*/
+	//number of gears
+	int numberOfGears;
+	//number of wheels
+	int numberOfWheels;
+	//number of balls
+	int numberOfBalls;
+
 	//flags for each wheel activation
 	std::vector<bool> wheelsStarted;
 	//flags for each gear activation

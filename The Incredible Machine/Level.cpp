@@ -781,7 +781,7 @@ bool Level::tryGearPlacement(sf::Vector2f position)
 	if (this->currentNumberOfGears == 0) {
 		return false;
 	}
-	this->selectedResource = this->resources.back()->sprite;
+	this->selectedResource = this->resources.at(this->currentNumberOfBelts)->sprite;
 
 	sf::Vector2f alignedPosition = this->alignToGridGear(position);
 	this->selectedResource->setPosition(alignedPosition);
@@ -795,7 +795,51 @@ bool Level::tryGearPlacement(sf::Vector2f position)
 		if (alignedPosition.x < 900 && alignedPosition.y < 700) {
 			this->staticObjects.push_back(new StaticObject(*this->selectedResource, StaticObjectType::GEAR));
 			this->resourceNumbersText[1].setString(std::to_string(--this->resourceNumbers[1]));
-			this->resources.pop_back();
+			this->resources.erase(this->resources.begin()+this->currentNumberOfBelts);
+			if (--this->currentNumberOfGears == 0) {
+				int numActions = this->startingNumberOfGears * Level::getNumberOfWheels() + ActionRL::combination(Level::getNumberOfWheels(), 2);
+				for (int i = 0; i < ActionRL::getGridWidth() * ActionRL::getGridHeight(); i++) {
+					this->forbiddenActions.insert(i);
+				}
+			}
+		}
+		/*
+		std::cout << "STAVLJENO " << this->selectedResource->getGlobalBounds().left << this->selectedResource->getGlobalBounds().top
+			<< this->selectedResource->getGlobalBounds().height << this->selectedResource->getGlobalBounds().width << std::endl;
+			*/
+		return true;
+	}
+	else {
+		this->selectedResource->setPosition(1050, 350);
+		return false;
+	}
+}
+
+bool Level::tryBoxPlacement(sf::Vector2f position)
+{
+	nije gotovo vrv
+	/*
+	Selects box from resources
+	Aligns it to the grid
+	*/
+	if (this->currentNumberOfBoxes == 0) {
+		return false;
+	}
+	this->selectedResource = this->resources.back()->sprite;
+
+	sf::Vector2f alignedPosition = this->alignToGridBox(position);
+	this->selectedResource->setPosition(alignedPosition);
+	//std::cout << "x " << this->selectedResource->getPosition().x << " y " << this->selectedResource->getPosition().y << std::endl;
+	if (this->checkOverlaping(*this->selectedResource)) {
+		/*
+		* If it does not overlap anything it places gear in appropriate place
+		* Adds it to static objects on level map
+		* Lowers the resources
+		*/
+		if (alignedPosition.x < 900 && alignedPosition.y < 700) {
+			this->staticObjects.push_back(new StaticObject(*this->selectedResource, StaticObjectType::GEAR));
+			this->resourceNumbersText[1].setString(std::to_string(--this->resourceNumbers[1]));
+			this->resources.erase(this->resources.begin() + this->currentNumberOfBelts);
 			if (--this->currentNumberOfGears == 0) {
 				int numActions = this->startingNumberOfGears * Level::getNumberOfWheels() + ActionRL::combination(Level::getNumberOfWheels(), 2);
 				for (int i = 0; i < ActionRL::getGridWidth() * ActionRL::getGridHeight(); i++) {
@@ -883,6 +927,11 @@ int Level::getNumberOfWheels()
 int Level::getNumberOfBalls()
 {
 	return this->numberOfBalls;
+}
+
+int Level::getNumberOfBoxes()
+{
+	return this->currentNumberOfBoxes;
 }
 
 std::unordered_set<int> Level::getBallZonesPassed()
@@ -1001,6 +1050,11 @@ int Level::getStartingNumberOfGears()
 int Level::getStartingNumberOfBelts()
 {
 	return this->startingNumberOfBelts;
+}
+
+int Level::getStartingNumberOfBoxes()
+{
+	return this->startingNumberOfBoxes;
 }
 
 

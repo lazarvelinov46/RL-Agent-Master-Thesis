@@ -71,6 +71,11 @@ private:
 	//Resets game resources before new iteration of the game
 	void resetResources();
 
+	//numberOfStates
+	int statesNum;
+
+	//numberOfActions
+	int actionsNum;
 
 	//Current stateId used in QLearning
 	int stateId;
@@ -121,7 +126,7 @@ private:
 	/// </summary>
 	/// <returns>timestape of now in string format</returns>
 	static std::string isoTimestampNow();
-	static void appendEpisodeLog(int episode, double eps, double alphaCap,
+	void appendEpisodeLog(int episode, double eps, double alphaCap,
 		double totalReward, int win, int steps, double duration_s, 
 		int unique_sa_visited, double q_max, double q_mean);
 public:

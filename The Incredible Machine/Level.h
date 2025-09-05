@@ -152,6 +152,7 @@ public:
 
 	//AI Game functions 
 	virtual bool tryGearPlacement(sf::Vector2f position);
+	virtual bool tryBoxPlacement(sf::Vector2f position);
 	virtual int getNumberOfGears();
 	virtual std::vector<StaticObject*> getStaticObjects();
 	virtual std::vector<StaticWheel*> getStaticWheels();
@@ -189,8 +190,10 @@ public:
 	static float distance(const sf::Vector2f& a, const sf::Vector2f& b);
 	int getStartingNumberOfGears();
 	int getStartingNumberOfBelts();
+	int getStartingNumberOfBoxes();
 	int getNumberOfWheels();
 	int getNumberOfBalls();
+	int getNumberOfBoxes();
 	/// <summary>
 	/// Set which contains ids of forbidden actions
 	/// </summary>
