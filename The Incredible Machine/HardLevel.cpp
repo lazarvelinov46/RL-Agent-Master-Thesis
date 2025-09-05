@@ -1,8 +1,25 @@
 #include "stdafx.h"
 #include "HardLevel.h"
 
+const float HardLevel::IN_GAME_BOX_SIZE = 100.0;
+
 void HardLevel::initState()
 {
+}
+
+void HardLevel::initTextures()
+{
+	Level::initTextures();
+	if (this->modeAI) {
+		if (!this->boxTexture.loadFromFile("assets/Textures/box_ai.png")) {
+			std::cout << "ERROR: Could not load texture" << std::endl;
+		}
+	}
+	else {
+		if (!this->boxTexture.loadFromFile("assets/Textures/box.png")) {
+			std::cout << "ERROR: Could not load texture" << std::endl;
+		}
+	}
 }
 
 void HardLevel::initStaticObjects()
@@ -44,6 +61,7 @@ void HardLevel::initResources()
 {
 	this->currentNumberOfBelts = this->startingNumberOfBelts;
 	this->currentNumberOfGears = this->startingNumberOfGears;
+	this->currentNumberOfBoxes = this->startingNumberOfBoxes;
 	this->currentNumberOfResources = 0;
 	for (size_t i = 0; i < this->currentNumberOfBelts; i++) {
 		sf::Sprite* beltSprite = new sf::Sprite(this->beltTexture);
@@ -67,6 +85,19 @@ void HardLevel::initResources()
 		this->resources.push_back(new Resource(gearSprite, this->currentNumberOfResources, this->currentNumberOfGears));
 	}
 	this->currentNumberOfResources++;
+	sf::Sprite* boxSprite = new sf::Sprite(this->boxTexture);
+	float scaleX = HardLevel::IN_GAME_BOX_SIZE / this->boxTexture.getSize().x;
+	float scaleY = HardLevel::IN_GAME_BOX_SIZE / this->boxTexture.getSize().y;
+	boxSprite->setScale(scaleX, scaleY);
+	boxSprite->setPosition(1050, 550);
+	sf::Text boxText;
+	boxText.setFont(font);
+	boxText.setString("1");
+	boxText.setCharacterSize(18);
+	boxText.setPosition(boxSprite->getPosition().x + boxSprite->getGlobalBounds().width / 2 - 18, boxSprite->getPosition().y + boxSprite->getGlobalBounds().height);
+	boxText.setFillColor(sf::Color::Black);
+	this->resources.push_back(new Resource(boxSprite, this->currentNumberOfResources, this->currentNumberOfBoxes));
+	this->currentNumberOfResources++;
 	for (size_t i = 0; i < this->currentNumberOfResources; i++) {
 		const Resource* res = this->getResourceById(i);
 		sf::Text text;
@@ -81,7 +112,7 @@ void HardLevel::initResources()
 	}
 }
 
-HardLevel::HardLevel(bool mode) :Level(5, 4,4,4,250.f)
+HardLevel::HardLevel(bool mode) :Level(5, 4,4,4,250.f,1)
 {
 	this->modeAI = mode;
 }

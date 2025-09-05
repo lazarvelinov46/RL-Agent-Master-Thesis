@@ -22,6 +22,8 @@ private:
 	std::vector<std::pair<int, int>> beltPlaced;
 	const static int GRID_WIDTH = 19;
 	const static int GRID_HEIGHT = 14;
+	const static int GRID_WIDTH_BOX = 9;
+	const static int GRID_HEIGHT_BOX = 7;
 	int numberOfWheels;
 	int numberOfGears;
 public:
@@ -70,5 +72,7 @@ public:
 	static long long combination(int n, int r);
 	static int getGridWidth() { return ActionRL::GRID_WIDTH; }
 	static int getGridHeight() { return ActionRL::GRID_HEIGHT; }
+	static int getGridWidthBox() { return ActionRL::GRID_WIDTH_BOX; }
+	static int getGridHeightBox() { return ActionRL::GRID_HEIGHT_BOX; }
 };
 

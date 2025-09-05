@@ -9,6 +9,7 @@ enum StaticObjectType {
 	PLATFORM_RIGHT,
 	PLATFORM_LEFT,
 	GEAR,
+	BOX,
 	FLOOR,
 	WALL,
 	GOAL

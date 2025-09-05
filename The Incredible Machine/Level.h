@@ -25,9 +25,12 @@ private:
 protected:
 	int startingNumberOfGears;
 	int startingNumberOfBelts;
+	int startingNumberOfBoxes=0;
 	int numberOfWheels;
 	int numberOfBalls ;
 
+
+	int currentNumberOfBoxes = 0;
 	int currentNumberOfGears=0;
 	int currentNumberOfBelts=0;
 	int currentNumberOfResources=0;
@@ -93,7 +96,7 @@ protected:
 
 	virtual void initState()=0;
 	void initFont();
-	void initTextures();
+	virtual void initTextures();
 	virtual void initStaticObjects()=0;
 	virtual void initStaticWheels()=0;
 	virtual void initDynamicObjects()=0;
@@ -110,7 +113,8 @@ protected:
 
 	const Resource* getResourceById(const int id)const;
 
-	const sf::Vector2f& alignToGrid(const sf::Vector2f& pos)const;
+	const sf::Vector2f& alignToGridGear(const sf::Vector2f& pos)const;
+	const sf::Vector2f& alignToGridBox(const sf::Vector2f& pos)const;
 
 	void updateBalls(float deltaTime = 0);
 	/// <summary>
@@ -119,7 +123,8 @@ protected:
 	/// <param name="ball">Object which location is taken into consideration</param>
 	void markForbiddenFromBall(DynamicObject* ball);
 public:
-	Level(int numberOfBalls, int numberOfWheels, int numberOfGears, int numberOfBelts, float maxBeltDistance);
+	Level(int numberOfBalls, int numberOfWheels, int numberOfGears, 
+		int numberOfBelts, float maxBeltDistance,int startingNumberOfBoxes=0);
 	virtual ~Level();
 
 	virtual void initLevel();

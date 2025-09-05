@@ -27,6 +27,8 @@ void Level::initTextures()
 	if (!this->gearTexture.loadFromFile("assets/Textures/gear.png")) {
 		std::cout << "ERROR: Could not load texture" << std::endl;
 	}
+
+	
 }
 
 void Level::resetStaticObjects()
@@ -147,10 +149,17 @@ const Resource* Level::getResourceById(int id) const
 	}
 }
 
-const sf::Vector2f& Level::alignToGrid(const sf::Vector2f& pos) const
+const sf::Vector2f& Level::alignToGridGear(const sf::Vector2f& pos) const
 {
 	float x = (float)(pos.x - (int)pos.x % 50);
 	float y = (float)(pos.y - (int)pos.y % 50);
+	return sf::Vector2f(x, y);
+}
+
+const sf::Vector2f& Level::alignToGridBox(const sf::Vector2f& pos) const
+{
+	float x = (float)(pos.x - (int)pos.x % 100);
+	float y = (float)(pos.y - (int)pos.y % 100);
 	return sf::Vector2f(x, y);
 }
 
@@ -442,8 +451,9 @@ void Level::markForbiddenFromBall(DynamicObject* ball)
 	}
 }
 
-Level::Level(int numberOfBalls,int numberOfWheels,int numberOfGears,int numberOfBelts,float maxBeltDistance)
+Level::Level(int numberOfBalls,int numberOfWheels,int numberOfGears,int numberOfBelts,float maxBeltDistance,int startingNumberOfBoxes)
 {
+	this->startingNumberOfBoxes = startingNumberOfBoxes;
 	this->startingNumberOfGears = numberOfGears;
 	this->startingNumberOfBelts = numberOfBelts;
 	this->numberOfWheels = numberOfWheels;
@@ -624,11 +634,11 @@ void Level::handleClick(sf::Vector2f& mousePosition)
 			}
 
 		}
-		else {
+		else if(this->selectedResoureceIndex==1){
 			/*
 			placing gear, aligning it to grid first
 			*/
-			sf::Vector2f alignedPosition = this->alignToGrid(mousePosition);
+			sf::Vector2f alignedPosition = this->alignToGridGear(mousePosition);
 
 			this->selectedResource->setPosition(alignedPosition);
 			if (this->checkOverlaping(*this->selectedResource)) {
@@ -637,12 +647,37 @@ void Level::handleClick(sf::Vector2f& mousePosition)
 				updating variables and UI elements
 				*/
 				if (alignedPosition.x < 900 && alignedPosition.y < 700) {
-					this->staticObjects.push_back(new StaticObject(*this->selectedResource, this->selectedResoureceIndex == 1 ? StaticObjectType::GEAR : StaticObjectType::PLATFORM_RIGHT));
+					this->staticObjects.push_back(new StaticObject(*this->selectedResource, this->selectedResoureceIndex == 1 ? StaticObjectType::GEAR : StaticObjectType::BOX));
 					this->resourceNumbersText[this->selectedResoureceIndex].setString(std::to_string(--this->resourceNumbers[this->selectedResoureceIndex]));
 				}
 				//FORBIDDEN ACTIONS
 				if (this->resourceNumbers[this->selectedResoureceIndex] == 0) {
 					for (int i = 0; i < ActionRL::getGridHeight() * ActionRL::getGridWidth(); i++) {
+						this->forbiddenActions.insert(i);
+					}
+				}
+				this->clickedResource = false;
+				this->selectedResoureceIndex = -1;
+			}
+		}
+		else if (this->selectedResoureceIndex == 2) {
+			sf::Vector2f alignedPosition = this->alignToGridBox(mousePosition);
+			this->selectedResource->setPosition(alignedPosition);
+			if (this->checkOverlaping(*this->selectedResource)) {
+				/*
+				if it does not overlap anything, gear can be placed
+				updating variables and UI elements
+				*/
+				if (alignedPosition.x < 900 && alignedPosition.y < 700) {
+					this->staticObjects.push_back(new StaticObject(*this->selectedResource, this->selectedResoureceIndex == 2 ? StaticObjectType::BOX : StaticObjectType::GEAR));
+					this->resourceNumbersText[this->selectedResoureceIndex].setString(std::to_string(--this->resourceNumbers[this->selectedResoureceIndex]));
+				}
+				if (this->resourceNumbers[this->selectedResoureceIndex] == 0) {
+					int gearActions = ActionRL::getGridHeight() * ActionRL::getGridWidth();
+					int beltActions = this->startingNumberOfGears * this->numberOfWheels;
+					beltActions += ActionRL::combination(this->numberOfWheels, 2);//belt placements between two wheels
+					int boxActions = ActionRL::getGridWidthBox() * ActionRL::getGridWidthBox();
+					for (int i = gearActions + beltActions; i < gearActions + beltActions + boxActions; i++) {
 						this->forbiddenActions.insert(i);
 					}
 				}
@@ -748,7 +783,7 @@ bool Level::tryGearPlacement(sf::Vector2f position)
 	}
 	this->selectedResource = this->resources.back()->sprite;
 
-	sf::Vector2f alignedPosition = this->alignToGrid(position);
+	sf::Vector2f alignedPosition = this->alignToGridGear(position);
 	this->selectedResource->setPosition(alignedPosition);
 	//std::cout << "x " << this->selectedResource->getPosition().x << " y " << this->selectedResource->getPosition().y << std::endl;
 	if (this->checkOverlaping(*this->selectedResource)) {

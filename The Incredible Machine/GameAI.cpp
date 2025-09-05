@@ -83,6 +83,9 @@ void GameAI::initQTable()
 	int actionsNum = ActionRL::getGridWidth() * ActionRL::getGridHeight();//gear placements
 	actionsNum += level->getStartingNumberOfGears() * level->getNumberOfWheels();//belt placements between gear and wheel
 	actionsNum += ActionRL::combination(level->getNumberOfWheels(), 2);//belt placements between two wheels
+	if (this->selectedLevel == LevelDifficulty::HARD) {
+		actionsNum += ActionRL::getGridWidthBox() * ActionRL::getGridHeight();
+	}
 	std::cout << "States: " << statesNum << " Actions: " << actionsNum<<std::endl;
 	this->table = QTable(statesNum, actionsNum, "qtable.txt");
 	this->iterations = 0;
@@ -256,7 +259,21 @@ void GameAI::appendEpisodeLog(int episode, double eps, double alphaCap, double t
 void GameAI::resetResources()
 {
 	delete this->level;
-	this->level = new MediumLevel();
+	switch (this->selectedLevel)
+	{
+	case LevelDifficulty::EASY:
+		this->level = new EasyLevel(true);
+		break;
+	case LevelDifficulty::MEDIUM:
+		this->level = new MediumLevel(true);
+		break;
+	case LevelDifficulty::HARD:
+		this->level = new HardLevel(true);
+		break;
+	default:
+		this->level = new MediumLevel(true);
+		break;
+	}
 	this->level->initLevel();
 }
 GameAI::GameAI(LevelDifficulty difficulty)
@@ -273,16 +290,16 @@ GameAI::GameAI(LevelDifficulty difficulty)
 	switch (this->selectedLevel)
 	{
 	case LevelDifficulty::EASY:
-		this->level = new EasyLevel();
+		this->level = new EasyLevel(true);
 		break;
 	case LevelDifficulty::MEDIUM:
-		this->level = new MediumLevel();
+		this->level = new MediumLevel(true);
 		break;
 	case LevelDifficulty::HARD:
-		this->level = new HardLevel();
+		this->level = new HardLevel(true);
 		break;
 	default:
-		this->level = new MediumLevel();
+		this->level = new MediumLevel(true);
 		break;
 	}
 	this->initQTable();
