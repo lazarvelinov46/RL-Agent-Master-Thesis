@@ -204,7 +204,22 @@ bool GameAI::updateState()
 			this->table.updateValidActions(0,0);
 			this->forbiddenActions.clear();
 			if (this->iterations % 100 == 0) {
-				std::string csvFilename = this->selectedLevel+"qtable" + std::to_string(this->iterations) + ".csv";
+				std::string lvl;
+				switch (this->selectedLevel)
+				{
+				case EASY:
+					lvl = "easy";
+					break;
+				case MEDIUM:
+					lvl = "medium";
+					break;
+				case HARD:
+					lvl = "hard";
+					break;
+				default:
+					break;
+				}
+				std::string csvFilename = lvl+"_qtable" + std::to_string(this->iterations) + ".csv";
 				std::cout << csvFilename << std::endl;
 				this->table.saveQTableCSV(csvFilename,iterations,alphaCap,0.0);
 			}
@@ -233,7 +248,22 @@ std::string GameAI::isoTimestampNow()
 
 void GameAI::appendEpisodeLog(int episode, double eps, double alphaCap, double totalReward, int win, int steps, double duration_s, int unique_sa_visited, double q_max, double q_mean)
 {
-	const std::string fname = this->selectedLevel+"training_log.csv";
+	std::string lvl;
+	switch (this->selectedLevel)
+	{
+	case EASY:
+		lvl = "easy";
+		break;
+	case MEDIUM:
+		lvl = "medium";
+		break;
+	case HARD:
+		lvl = "hard";
+		break;
+	default:
+		break;
+	}
+	const std::string fname = lvl+"_training_log.csv";
 	bool needHeader = false;
 	std::ifstream fin(fname);
 	if (!fin.good())needHeader = true;
@@ -437,10 +467,10 @@ void GameAI::update(float deltaTime)
 		}
 		
 	}
-	else {
+	else if(actionType == AgentAction::PLACE_BOX){
 		//box placement
-		std::pair<int, int> coordinates = this->actionFunctions->getGearCoordinates(this->actionId);
-		if (!level->tryGearPlacement(sf::Vector2f(coordinates.first * 100, coordinates.second * 100))) {
+		std::pair<int, int> coordinates = this->actionFunctions->getBoxCoordinates(this->actionId);
+		if (!level->tryBoxPlacement(sf::Vector2f(coordinates.first * 100, coordinates.second * 100))) {
 			//if (this->stateId==0&&!level->tryGearPlacement(sf::Vector2f(0*50, 13*50))) {
 				//TODO: apply penalty
 				//this->table.updateQValue(this->stateId, this->actionId, WRONG_GEAR_PLACEMENT, this->stateId);

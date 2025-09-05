@@ -803,10 +803,9 @@ bool Level::tryGearPlacement(sf::Vector2f position)
 				}
 			}
 		}
-		/*
-		std::cout << "STAVLJENO " << this->selectedResource->getGlobalBounds().left << this->selectedResource->getGlobalBounds().top
-			<< this->selectedResource->getGlobalBounds().height << this->selectedResource->getGlobalBounds().width << std::endl;
-			*/
+		std::cout << "Stavljen zupcanik na poziciju X: " << this->selectedResource->getGlobalBounds().left <<
+			" Y: " << this->selectedResource->getGlobalBounds().top << std::endl;
+						
 		return true;
 	}
 	else {
@@ -817,7 +816,6 @@ bool Level::tryGearPlacement(sf::Vector2f position)
 
 bool Level::tryBoxPlacement(sf::Vector2f position)
 {
-	nije gotovo vrv
 	/*
 	Selects box from resources
 	Aligns it to the grid
@@ -836,25 +834,25 @@ bool Level::tryBoxPlacement(sf::Vector2f position)
 		* Adds it to static objects on level map
 		* Lowers the resources
 		*/
-		if (alignedPosition.x < 900 && alignedPosition.y < 700) {
-			this->staticObjects.push_back(new StaticObject(*this->selectedResource, StaticObjectType::GEAR));
-			this->resourceNumbersText[1].setString(std::to_string(--this->resourceNumbers[1]));
-			this->resources.erase(this->resources.begin() + this->currentNumberOfBelts);
-			if (--this->currentNumberOfGears == 0) {
+		if (alignedPosition.x <= 900 && alignedPosition.y <= 700) {
+			this->staticObjects.push_back(new StaticObject(*this->selectedResource, StaticObjectType::BOX));
+			this->resourceNumbersText[2].setString(std::to_string(--this->resourceNumbers[2]));
+			this->resources.erase(this->resources.begin() + this->currentNumberOfBelts+this->currentNumberOfGears);
+			if (--this->currentNumberOfBoxes == 0) {
 				int numActions = this->startingNumberOfGears * Level::getNumberOfWheels() + ActionRL::combination(Level::getNumberOfWheels(), 2);
-				for (int i = 0; i < ActionRL::getGridWidth() * ActionRL::getGridHeight(); i++) {
+				numActions += ActionRL::getGridWidth() * ActionRL::getGridHeight();
+				for (int i = numActions; i < numActions+ActionRL::getGridWidthBox() * ActionRL::getGridHeightBox(); i++) {
 					this->forbiddenActions.insert(i);
 				}
 			}
 		}
-		/*
-		std::cout << "STAVLJENO " << this->selectedResource->getGlobalBounds().left << this->selectedResource->getGlobalBounds().top
-			<< this->selectedResource->getGlobalBounds().height << this->selectedResource->getGlobalBounds().width << std::endl;
-			*/
+		std::cout << "Stavljena kutija na poziciju X: " << this->selectedResource->getGlobalBounds().left <<
+			" Y: " << this->selectedResource->getGlobalBounds().top << std::endl;
+			
 		return true;
 	}
 	else {
-		this->selectedResource->setPosition(1050, 350);
+		this->selectedResource->setPosition(1050, 550);
 		return false;
 	}
 }

@@ -71,7 +71,7 @@ std::pair<int, int> ActionRL::getBoxCoordinates(int boxActionId)
     boxActionId-= ActionRL::combination(this->numberOfWheels, 2);
     int x = boxActionId / ActionRL::GRID_HEIGHT_BOX;
     int y = boxActionId % ActionRL::GRID_WIDTH_BOX;
-    return std::pair<int, int>();
+    return std::pair<int, int>(y,x);
 }
 
 std::pair<BeltActionInfo, BeltActionInfo> ActionRL::getBeltPlacement(int beltActionId)
