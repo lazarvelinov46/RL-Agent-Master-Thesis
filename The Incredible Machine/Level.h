@@ -27,7 +27,7 @@ protected:
 	int startingNumberOfBelts;
 	int startingNumberOfBoxes=0;
 	int numberOfWheels;
-	int numberOfBalls ;
+	int numberOfBalls;
 
 
 	int currentNumberOfBoxes = 0;
@@ -93,6 +93,8 @@ protected:
 	double reward;
 	/* Variable that is true when there is change in state of agent */
 	bool stateChanged;
+	//indicates how much value lost reward has based on elements put
+	float penaltyPerPlacedResource=0.6;
 
 	virtual void initState()=0;
 	void initFont();
@@ -194,6 +196,9 @@ public:
 	int getNumberOfWheels();
 	int getNumberOfBalls();
 	int getNumberOfBoxes();
+
+	float getPenaltyPerPlacedResource()const;
+	void setPenaltyPerPlacedResource(float penalty);
 	/// <summary>
 	/// Set which contains ids of forbidden actions
 	/// </summary>

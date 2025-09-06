@@ -65,7 +65,7 @@ void Level::startPlatform(const StaticObject* object)
 					platform->move(movingSpeed);
 					this->state->setWheelStarted(i, true);
 					this->stateChanged = true;
-					this->reward = WHEEL_ACTIVATED;
+					this->reward = QTable::GetWheelActivatedReward();
 
 				}
 				if (platform->getObjectType() == StaticObjectType::PLATFORM_RIGHT||
@@ -217,7 +217,7 @@ void Level::updateBalls(float deltaTime)
 						if (!this->state->getTargetHit()) {
 							this->state->setTargetHit(true);
 							this->stateChanged = true;
-							this->reward = WON_GAME;
+							this->reward = QTable::GetWonGameReward();
 							std::cout << "cilj" << std::endl;
 						}
 					}
@@ -275,8 +275,7 @@ void Level::updateBalls(float deltaTime)
 						this->state->setGearStarted(gears, true);
 						this->stateChanged = true;
 						std::cout << this->state->getStateId() << std::endl;
-						this->reward = GEAR_ACTIVATED;
-						std::cout << "zupcanik" << std::endl;
+						this->reward = QTable::GetGearActivatedReward();
 						this->startPlatform(object);
 					}
 				}
@@ -414,7 +413,9 @@ void Level::updateBalls(float deltaTime)
 	if (this->state->getBallMoving() != ballsMovingPreUpdate) {
 		this->stateChanged = true;
 		if (!this->state->getBallMoving() && !this->state->getTargetHit()) {
-			this->reward += LOST_GAME_BASE - ((this->startingNumberOfGears - this->currentNumberOfGears) + (this->startingNumberOfBelts - this->currentNumberOfBelts)) * 0.6;
+			this->reward += QTable::GetLostGameBaseReward() - ((this->startingNumberOfGears - this->currentNumberOfGears)
+				+ (this->startingNumberOfBelts - this->currentNumberOfBelts)+
+				(this->startingNumberOfBoxes-this->currentNumberOfBoxes)) * this->penaltyPerPlacedResource;
 		}
 	}
 }
@@ -1053,6 +1054,16 @@ int Level::getStartingNumberOfBelts()
 int Level::getStartingNumberOfBoxes()
 {
 	return this->startingNumberOfBoxes;
+}
+
+void Level::setPenaltyPerPlacedResource(float penalty)
+{
+	this->penaltyPerPlacedResource = penalty;
+}
+
+float Level::getPenaltyPerPlacedResource() const
+{
+	return this->penaltyPerPlacedResource;
 }
 
 

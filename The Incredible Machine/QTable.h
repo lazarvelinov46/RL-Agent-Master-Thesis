@@ -1,18 +1,17 @@
 #pragma once
 
 #include "stdafx.h"
-
-#define WRONG_GEAR_PLACEMENT -1.0
-#define WRONG_BELT_PLACEMENT -0.5
-#define LOST_GAME_BASE -1.0
-#define GEAR_ACTIVATED 1.0
-#define WHEEL_ACTIVATED 2.0
-#define WON_GAME 12.0
-
+#include "State.h"
 
 class QTable
 {
 private:
+	static float WRONG_GEAR_PLACEMENT;
+	static float WRONG_BELT_PLACEMENT;
+	static float LOST_GAME_BASE;
+	static float GEAR_ACTIVATED;
+	static float WHEEL_ACTIVATED;
+	static float WON_GAME;
 	std::vector<std::vector<double>> values;
 	std::vector<std::vector<int>> visits;
 	std::vector<int> validActions;
@@ -25,7 +24,7 @@ private:
 	std::mt19937 rng;
 public:
 	QTable();
-	QTable(int numberOfStates, int numberOfActions, std::string filename);
+	QTable(int numberOfStates, int numberOfActions, std::string filename,LevelDifficulty dfficulty);
 	
 
 	double getQValue(int stateId, int actionId)const;
@@ -48,5 +47,12 @@ public:
 	int getUniqueVisitsCount() const;
 
 	bool loadQTableCSV(std::istream& in);
+
+	static float GetWrongGearPlacementReward();
+	static float GetWrongBeltPlacementReward();
+	static float GetLostGameBaseReward();
+	static float GetGearActivatedReward();
+	static float GetWheelActivatedReward();
+	static float GetWonGameReward();
 };
 

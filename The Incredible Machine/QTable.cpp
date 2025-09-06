@@ -1,15 +1,57 @@
 #include "stdafx.h"
 #include "QTable.h"
 
+float QTable::WRONG_GEAR_PLACEMENT=-1.0;
+float QTable::WRONG_BELT_PLACEMENT=-0.5;
+float QTable::LOST_GAME_BASE=-1.0;
+float QTable::GEAR_ACTIVATED=1.0;
+float QTable::WHEEL_ACTIVATED=2.0;
+float QTable::WON_GAME=12.0;
+
 QTable::QTable()
 {
 	this->alpha = 0.1;
 	this->gamma = 0.9;
 }
 
-QTable::QTable(int numberOfStates, int numberOfActions,std::string filename):
+QTable::QTable(int numberOfStates, int numberOfActions,std::string filename,LevelDifficulty difficulty):
 	rng(static_cast<unsigned>(std::chrono::high_resolution_clock::now().time_since_epoch().count()))
 {
+	switch (difficulty)
+	{
+	case EASY:
+		QTable::WRONG_GEAR_PLACEMENT = -1.0;
+		QTable::WRONG_BELT_PLACEMENT = -0.5;
+		QTable::LOST_GAME_BASE = -1.0;
+		QTable::GEAR_ACTIVATED = 1.0;
+		QTable::WHEEL_ACTIVATED = 2.0;
+		QTable::WON_GAME = 8.0;
+		this->alpha = 3.5;
+		this->gamma = 0.95;
+		break;
+	case MEDIUM:
+		QTable::WRONG_GEAR_PLACEMENT = -1.0;
+		QTable::WRONG_BELT_PLACEMENT = -0.5;
+		QTable::LOST_GAME_BASE = -1.0;
+		QTable::GEAR_ACTIVATED = 1.0;
+		QTable::WHEEL_ACTIVATED = 2.0;
+		QTable::WON_GAME = 12.0;
+		this->alpha = 3.0;
+		this->gamma = 0.95;
+		break;
+	case HARD:
+		QTable::WRONG_GEAR_PLACEMENT = -1.0;
+		QTable::WRONG_BELT_PLACEMENT = -0.5;
+		QTable::LOST_GAME_BASE = -1.0;
+		QTable::GEAR_ACTIVATED = 1.0;
+		QTable::WHEEL_ACTIVATED = 2.0;
+		QTable::WON_GAME = 16.0;
+		this->alpha = 2.5;
+		this->gamma = 0.96;
+		break;
+	default:
+		break;
+	}
 	double initVal = 0.5;
 	this->values.assign(numberOfStates, std::vector<double>(numberOfActions, 0.5));
 	this->visits.assign(numberOfStates, std::vector<int>(numberOfActions, 0));
@@ -217,4 +259,34 @@ bool QTable::loadQTableCSV(std::istream &in)
 	this->visits.assign(this->numStates, std::vector<int>(this->numActions, 0));
 	std::cout << "Loaded QTable from " << filename << std::endl;
 	return true;
+}
+
+
+float QTable::GetWrongGearPlacementReward()
+{
+	return QTable::WRONG_GEAR_PLACEMENT;
+}
+
+float QTable::GetWrongBeltPlacementReward()
+{
+	return QTable::WRONG_BELT_PLACEMENT;
+}
+
+float QTable::GetLostGameBaseReward()
+{
+	return QTable::LOST_GAME_BASE;
+}
+
+float QTable::GetGearActivatedReward()
+{
+	return QTable::GEAR_ACTIVATED;
+}
+float QTable::GetWheelActivatedReward()
+{
+	return QTable::WHEEL_ACTIVATED;
+}
+
+float QTable::GetWonGameReward()
+{
+	return QTable::WON_GAME;
 }
