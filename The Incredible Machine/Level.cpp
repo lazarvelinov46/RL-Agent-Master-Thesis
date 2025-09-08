@@ -572,7 +572,11 @@ void Level::handleClick(sf::Vector2f& mousePosition)
 		}
 		else if (this->selectedResoureceIndex == 0 &&
 			this->activeBeltPlacement &&
-			Level::distance(this->endPointsBelt[0].position, this->endPointsBelt[1].position) <= this->maxBeltDistance) {
+			((this->startingNumberOfBoxes==0&&
+				Level::distance(this->endPointsBelt[0].position, this->endPointsBelt[1].position) <= this->maxBeltDistance)||
+				(this->startingNumberOfBoxes == 1 &&
+					abs(this->endPointsBelt[0].position.y-this->endPointsBelt[1].position.y) <= 250)
+				)) {
 			//placing belt second time
 			std::cout << "Placed belt " << Level::distance(this->endPointsBelt[0].position, this->endPointsBelt[1].position) << std::endl;
 			this->validBeltPlacement = false;

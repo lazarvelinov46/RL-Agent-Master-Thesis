@@ -162,24 +162,31 @@ void QTable::printTable(const std::string& filename,int iteration)
 }
 
 void QTable::saveQTableCSV(const std::string& filename,int iteration,double alpha,double epsilon) {
-	std::ofstream outFile(filename);
-	if (!outFile.is_open()) return;
+	std::vector<std::vector<double>> valuesCopy = this->values;
+	int states = this->numStates;
+	int actions = this->numActions;
+	std::thread([valuesCopy, states, actions, filename, iteration, alpha, epsilon]() {
+		std::ofstream outFile(filename);
+		if (!outFile.is_open()) return;
 
-	outFile << "iteration," << iteration << "\n";
-	outFile << "alpha," << alpha << "\n";
-	outFile << "epsilon," << epsilon << "\n";
-	outFile << "qtable\n";
+		outFile << "iteration," << iteration << "\n";
+		outFile << "alpha," << alpha << "\n";
+		outFile << "epsilon," << epsilon << "\n";
+		outFile << "qtable\n";
 
-	for (int s = 0; s < this->numStates; ++s) {
-		for (int a = 0; a < this->numActions; ++a) {
-			outFile << this->values[s][a];
-			if (a != this->numActions - 1)
-				outFile << ",";
+		for (int s = 0; s < states; ++s) {
+			for (int a = 0; a < actions; ++a) {
+				outFile << valuesCopy[s][a];
+				if (a != actions - 1)
+					outFile << ",";
+			}
+			outFile << "\n";
 		}
-		outFile << "\n";
-	}
 
-	outFile.close();
+		outFile.close();
+
+		}).detach();
+	
 }
 
 void QTable::updateValidActions(int gearsPlaced, int beltsPlaced)

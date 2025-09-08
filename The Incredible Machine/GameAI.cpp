@@ -91,7 +91,7 @@ void GameAI::initQTable()
 	this->actionsNum = actionsNum;
 	this->table = QTable(statesNum, actionsNum, "qtable.txt",this->selectedLevel);
 	this->iterations = 0;
-	if (this->loadQTableFromFile("necu.csv")) {
+	if (this->loadQTableFromFile("hard_qtable1600.csv")) {
 		std::cout << "Loaded QTable from file qtable4900.csv" << std::endl;
 		double alphaCap = linearDecay(ALPHA_START, ALPHA_END, iterations, ALPHA_DECAY);
 		this->table.setAlpha(alphaCap);
@@ -110,7 +110,7 @@ void GameAI::updateActionState()
 		this->isPlaying = true;
 		level->setIsPlaying(this->isPlaying);
 		this->stateId = 1;
-		//this->actionId = 248;
+		//this->actionId = 247;
 		double eps = GameAI::linearDecay(this->E_START, this->E_END, this->iterations, this->E_DECAY);
 		//FORBIDDEN ACTION
 		this->forbiddenActions = this->level->getBallZonesPassed();
@@ -128,24 +128,31 @@ void GameAI::updateActionState()
 		
 		this->forbiddenActions = this->level->getBallZonesPassed();
 		/*
-		for (int a : this->forbiddenActions) {
-			std::cout << a << " ";
-		}
-		
-		std::cout<<std::endl;
 		switch (this->nextStateId) {
 		case 3:
 			this->actionId = 266;
 			break;
-		case 19:
-			this->actionId = 255;
+		case 35:
+			this->actionId = 235;
 			break;
-		case 23:
-			this->actionId = 270;
+		case 39:
+			this->actionId = 271;
 			//this->actionId = 252;
 			break;
-		case 55:
-			this->actionId = 265;
+		case 103:
+			this->actionId = 160;
+			break;
+		case 111:
+			this->actionId = 276;
+			break;
+		case 239:
+			this->actionId = 122;
+			break;
+		case 255:
+			this->actionId = 281;
+			break;
+		case 511:
+			this->actionId = 313;
 			break;
 		default:
 			this->actionId = this->table.getAction(this->nextStateId, 0.1, this->forbiddenActions);
@@ -447,7 +454,13 @@ void GameAI::update(float deltaTime)
 				std::cout << "NMZ" << std::endl;
 			}
 			std::cout << sqrt(powf(abs(start.x - end.x), 2) + powf(abs(start.y - end.y), 2)) << std::endl;
-			if (sqrt(powf(abs(start.x - end.x), 2) + powf(abs(start.y - end.y), 2)) > level->getMaxBeltDistance()) {
+			if (this->selectedLevel!=LevelDifficulty::HARD&&
+				(powf(abs(start.x - end.x), 2) + powf(abs(start.y - end.y), 2)) > level->getMaxBeltDistance()) {
+				start.x = -1;
+				end.x = -1;
+			}
+			else if(this->selectedLevel == LevelDifficulty::HARD&&
+				abs(start.y-end.y)>250.f){
 				start.x = -1;
 				end.x = -1;
 			}

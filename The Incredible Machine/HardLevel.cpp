@@ -27,30 +27,30 @@ void HardLevel::initStaticObjects()
 	this->staticObjects.push_back(new StaticObject(0, 760, 1000, 50, StaticObjectType::FLOOR));
 
 	this->staticObjects.push_back(new StaticObject(101, 650, 148, 20, StaticObjectType::PLATFORM_RIGHT));
-	this->staticObjects.push_back(new StaticObject(451, 500, 148, 20, StaticObjectType::PLATFORM_LEFT));
-	this->staticObjects.push_back(new StaticObject(201, 300, 148, 20, StaticObjectType::PLATFORM_RIGHT));
-	this->staticObjects.push_back(new StaticObject(501, 200, 148, 20, StaticObjectType::PLATFORM_RIGHT));
+	this->staticObjects.push_back(new StaticObject(431, 500, 148, 20, StaticObjectType::PLATFORM_LEFT));
+	this->staticObjects.push_back(new StaticObject(221, 300, 148, 20, StaticObjectType::PLATFORM_RIGHT));
+	this->staticObjects.push_back(new StaticObject(501, 150, 148, 20, StaticObjectType::PLATFORM_RIGHT));
 
-	this->staticObjects.push_back(new StaticObject(830, 300, 20, 40, StaticObjectType::WALL));
-	this->staticObjects.push_back(new StaticObject(830, 340, 160, 20, StaticObjectType::GOAL));
-	this->staticObjects.push_back(new StaticObject(970, 300, 20, 40, StaticObjectType::WALL));
+	this->staticObjects.push_back(new StaticObject(830, 250, 20, 40, StaticObjectType::WALL));
+	this->staticObjects.push_back(new StaticObject(830, 290, 160, 20, StaticObjectType::GOAL));
+	this->staticObjects.push_back(new StaticObject(970, 250, 20, 40, StaticObjectType::WALL));
 }
 
 void HardLevel::initStaticWheels()
 {
 	this->staticWheels.push_back(new StaticWheel(200, 660.f));
-	this->staticWheels.push_back(new StaticWheel(475, 510.f));
-	this->staticWheels.push_back(new StaticWheel(300, 310.f));
-	this->staticWheels.push_back(new StaticWheel(600, 210.f));
+	this->staticWheels.push_back(new StaticWheel(455, 510.f));
+	this->staticWheels.push_back(new StaticWheel(320, 310.f));
+	this->staticWheels.push_back(new StaticWheel(600, 160.f));
 }
 
 void HardLevel::initDynamicObjects()
 {
 	this->dynamicObjects.push_back(new DynamicObject(25, 470, false));
 	this->dynamicObjects.push_back(new DynamicObject(100, 600, false));
-	this->dynamicObjects.push_back(new DynamicObject(540, 450, false));
-	this->dynamicObjects.push_back(new DynamicObject(200, 250, false));
-	this->dynamicObjects.push_back(new DynamicObject(500, 150, true));
+	this->dynamicObjects.push_back(new DynamicObject(520, 450, false));
+	this->dynamicObjects.push_back(new DynamicObject(220, 250, false));
+	this->dynamicObjects.push_back(new DynamicObject(500, 100, true));
 }
 
 void HardLevel::initForbiddenActions()

@@ -25,7 +25,7 @@ void EasyLevel::initStaticWheels()
 
 void EasyLevel::initDynamicObjects()
 {
-	this->dynamicObjects.push_back(new DynamicObject(100, 500, false));
+	this->dynamicObjects.push_back(new DynamicObject(100, 480, false));
 	this->dynamicObjects.push_back(new DynamicObject(300, 450, false));
 	this->dynamicObjects.push_back(new DynamicObject(600, 250, true));
 }
