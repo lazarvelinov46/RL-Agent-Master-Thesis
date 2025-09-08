@@ -997,6 +997,7 @@ bool Level::placeBelt(sf::Vector2f start, sf::Vector2f end, bool startBeltGear)
 			if (object->getObjectType() == StaticObjectType::GEAR) {
 				//maybe start and end
 				if (object->getGlobalBounds().contains(start)) {
+					//if (this->state->getGearStarted(gears)&&(this->startingNumberOfGears-this->currentNumberOfGears-1)==gears) {
 					if (this->state->getGearStarted(gears)) {
 						object->setAttached(true);
 						this->startPlatform(object);
