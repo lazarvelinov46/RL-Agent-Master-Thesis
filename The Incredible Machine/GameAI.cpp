@@ -91,8 +91,8 @@ void GameAI::initQTable()
 	this->actionsNum = actionsNum;
 	this->table = QTable(statesNum, actionsNum, "qtable.txt",this->selectedLevel);
 	this->iterations = 0;
-	if (this->loadQTableFromFile("hard_qtable4100.csv")) {
-		std::cout << "Loaded QTable from file hard_qtable4100.csv" << std::endl;
+	if (this->loadQTableFromFile("hard_qtable5300.csv")) {
+		std::cout << "Loaded QTable from file hard_qtable5100.csv" << std::endl;
 		double alphaCap = linearDecay(ALPHA_START, ALPHA_END, iterations, ALPHA_DECAY);
 		this->table.setAlpha(alphaCap);
 	}
@@ -125,7 +125,6 @@ void GameAI::updateActionState()
 	if (this->selectAction) {
 		
 		//FORBIDDEN ACTION
-		
 		this->forbiddenActions = this->level->getBallZonesPassed();
 		/*
 		switch (this->nextStateId) {
@@ -146,10 +145,10 @@ void GameAI::updateActionState()
 			this->actionId = 276;
 			break;
 		case 239:
-			this->actionId = 122;
+			this->actionId = 82;
 			break;
 		case 255:
-			this->actionId = 281;
+			this->actionId = 300;
 			break;
 		case 511:
 			this->actionId = 313;

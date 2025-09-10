@@ -321,7 +321,7 @@ void Level::updateBalls(float deltaTime)
 			this->state->setBallMoving(i, true);
 
 		}
-		else if ((abs(oldVelocity.x > 1) || abs(oldVelocity.y > 1)) && ball->getVelocity().x == 0.0f && ball->getVelocity().y == 0.0f) {
+		else if ((abs(oldVelocity.x) > 1 || abs(oldVelocity.y) > 1) && ball->getVelocity().x == 0.0f && ball->getVelocity().y == 0.0f) {
 			this->state->setBallMoving(i, false);
 
 		}
