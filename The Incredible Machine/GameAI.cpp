@@ -139,16 +139,16 @@ void GameAI::updateActionState()
 			//this->actionId = 252;
 			break;
 		case 103:
-			this->actionId = 160;
+			this->actionId = 155;
 			break;
 		case 111:
 			this->actionId = 276;
 			break;
 		case 239:
-			this->actionId = 82;
+			this->actionId = 81;
 			break;
 		case 255:
-			this->actionId = 300;
+			this->actionId = 281;
 			break;
 		case 511:
 			this->actionId = 313;
@@ -459,7 +459,7 @@ void GameAI::update(float deltaTime)
 				end.x = -1;
 			}
 			else if(this->selectedLevel == LevelDifficulty::HARD&&
-				abs(start.y-end.y)>250.f){
+				abs(start.y-end.y)>250.f||abs(start.x-end.x)>350.f){
 				start.x = -1;
 				end.x = -1;
 			}

@@ -4,7 +4,7 @@
 
 void Game::initFont()
 {
-	if (!font.loadFromFile("assets/Fonts/ARIAL.TTF")) {
+	if (!font.loadFromFile("assets/Fonts/retro.TTF")) {
 		std::cout << "ERROR: Could not load font" << std::endl;
 	}
 }

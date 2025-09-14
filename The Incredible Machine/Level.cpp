@@ -13,7 +13,7 @@ void Level::initState()
 
 void Level::initFont()
 {
-	if (!font.loadFromFile("assets/Fonts/ARIAL.TTF")) {
+	if (!font.loadFromFile("assets/Fonts/retro.TTF")) {
 		std::cout << "ERROR: Could not load font" << std::endl;
 	}
 }
@@ -575,10 +575,11 @@ void Level::handleClick(sf::Vector2f& mousePosition)
 			((this->startingNumberOfBoxes==0&&
 				Level::distance(this->endPointsBelt[0].position, this->endPointsBelt[1].position) <= this->maxBeltDistance)||
 				(this->startingNumberOfBoxes == 1 &&
-					abs(this->endPointsBelt[0].position.y-this->endPointsBelt[1].position.y) <= 250)
+					abs(this->endPointsBelt[0].position.y-this->endPointsBelt[1].position.y) <= 250&&
+					abs(this->endPointsBelt[0].position.x - this->endPointsBelt[1].position.x) <= 350)
 				)) {
 			//placing belt second time
-			std::cout << "Placed belt " << Level::distance(this->endPointsBelt[0].position, this->endPointsBelt[1].position) << std::endl;
+			std::cout << "Placed belt " << this->endPointsBelt[1].position.x-this->endPointsBelt[0].position.x<< std::endl;
 			this->validBeltPlacement = false;
 			this->startBeltGear = false;
 			StaticWheel* wheelToPlace = nullptr;

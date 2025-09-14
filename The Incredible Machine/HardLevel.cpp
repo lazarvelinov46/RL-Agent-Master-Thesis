@@ -26,8 +26,8 @@ void HardLevel::initStaticObjects()
 {
 	this->staticObjects.push_back(new StaticObject(0, 760, 1000, 50, StaticObjectType::FLOOR));
 
-	this->staticObjects.push_back(new StaticObject(100, 650, 150, 20, StaticObjectType::PLATFORM_RIGHT));
-	this->staticObjects.push_back(new StaticObject(410, 500, 150, 20, StaticObjectType::PLATFORM_LEFT));
+	this->staticObjects.push_back(new StaticObject(140, 650, 150, 20, StaticObjectType::PLATFORM_RIGHT));
+	this->staticObjects.push_back(new StaticObject(340, 500, 150, 20, StaticObjectType::PLATFORM_LEFT));
 	this->staticObjects.push_back(new StaticObject(200, 300, 150, 20, StaticObjectType::PLATFORM_RIGHT));
 	this->staticObjects.push_back(new StaticObject(500, 150, 150, 20, StaticObjectType::PLATFORM_RIGHT));
 
@@ -38,8 +38,8 @@ void HardLevel::initStaticObjects()
 
 void HardLevel::initStaticWheels()
 {
-	this->staticWheels.push_back(new StaticWheel(200, 660.f));
-	this->staticWheels.push_back(new StaticWheel(435, 510.f));
+	this->staticWheels.push_back(new StaticWheel(240, 660.f));
+	this->staticWheels.push_back(new StaticWheel(365, 510.f));
 	this->staticWheels.push_back(new StaticWheel(300, 310.f));
 	this->staticWheels.push_back(new StaticWheel(600, 160.f));
 }
@@ -47,8 +47,8 @@ void HardLevel::initStaticWheels()
 void HardLevel::initDynamicObjects()
 {
 	this->dynamicObjects.push_back(new DynamicObject(25, 470, false));
-	this->dynamicObjects.push_back(new DynamicObject(100, 600, false));
-	this->dynamicObjects.push_back(new DynamicObject(510, 450, false));
+	this->dynamicObjects.push_back(new DynamicObject(140, 600, false));
+	this->dynamicObjects.push_back(new DynamicObject(440, 450, false));
 	this->dynamicObjects.push_back(new DynamicObject(200, 250, false));
 	this->dynamicObjects.push_back(new DynamicObject(500, 100, true));
 }

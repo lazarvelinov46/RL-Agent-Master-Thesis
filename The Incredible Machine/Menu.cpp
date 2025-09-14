@@ -3,7 +3,7 @@
 
 void Menu::initFont()
 {
-	if (!font.loadFromFile("assets/Fonts/ARIAL.TTF")) {
+	if (!font.loadFromFile("assets/Fonts/retro.ttf")) {
 		std::cout << "ERROR: Could not load font" << std::endl;
 	}
 }
@@ -12,7 +12,7 @@ void Menu::initText()
 {
 	//Title configuration
 	this->title.setFont(font);
-	this->title.setString("Title");
+	this->title.setString("The Incredible Machine");
 	this->title.setCharacterSize(48);
 	this->title.setPosition(100, 50);
 
