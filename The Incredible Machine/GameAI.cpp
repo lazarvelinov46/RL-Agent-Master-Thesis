@@ -91,7 +91,7 @@ void GameAI::initQTable()
 	this->actionsNum = actionsNum;
 	this->table = QTable(statesNum, actionsNum, "qtable.txt",this->selectedLevel);
 	this->iterations = 0;
-	if (this->loadQTableFromFile("hard_qtable5300.csv")) {
+	if (this->loadQTableFromFile("medium_qtable200.csv")) {
 		std::cout << "Loaded QTable from file hard_qtable5100.csv" << std::endl;
 		double alphaCap = linearDecay(ALPHA_START, ALPHA_END, iterations, ALPHA_DECAY);
 		this->table.setAlpha(alphaCap);
@@ -110,7 +110,7 @@ void GameAI::updateActionState()
 		this->isPlaying = true;
 		level->setIsPlaying(this->isPlaying);
 		this->stateId = 1;
-		//this->actionId = 247;
+		//this->actionId = 228;
 		double eps = GameAI::linearDecay(this->E_START, this->E_END, this->iterations, this->E_DECAY);
 		//FORBIDDEN ACTION
 		this->forbiddenActions = this->level->getBallZonesPassed();
@@ -127,6 +127,7 @@ void GameAI::updateActionState()
 		//FORBIDDEN ACTION
 		this->forbiddenActions = this->level->getBallZonesPassed();
 		/*
+		//HARD
 		switch (this->nextStateId) {
 		case 3:
 			this->actionId = 266;
@@ -155,6 +156,26 @@ void GameAI::updateActionState()
 			break;
 		default:
 			this->actionId = this->table.getAction(this->nextStateId, 0.1, this->forbiddenActions);
+		}
+		*/
+		//MEDIUM
+		/*
+		switch (this->nextStateId) {
+		case 3:
+			this->actionId = 266;
+			break;
+		case 19:
+			this->actionId = 235;
+			break;
+		case 23:
+			this->actionId = 270;
+			break;
+		case 55:
+			this->actionId = 162;
+			break;
+		case 63:
+			this->actionId = 274;
+			break;
 		}
 		*/
 		double eps = GameAI::linearDecay(this->E_START, this->E_END, this->iterations, this->E_DECAY);
@@ -339,6 +360,8 @@ GameAI::GameAI(LevelDifficulty difficulty)
 		this->ALPHA_DECAY = 3000;
 		this->GAMMA = 0.95;
 		break;
+	/*
+	//OPTIMAL
 	case LevelDifficulty::MEDIUM:
 		this->level = new MediumLevel(true);
 		this->level->setPenaltyPerPlacedResource(0.6);
@@ -349,6 +372,19 @@ GameAI::GameAI(LevelDifficulty difficulty)
 		this->ALPHA_END = 0.05;
 		this->ALPHA_DECAY = 10000;
 		this->GAMMA = 0.95;
+		break;
+	*/
+	//MAYBE STUCK ON SUBOPTIMAL
+	case LevelDifficulty::MEDIUM:
+		this->level = new MediumLevel(true);
+		this->level->setPenaltyPerPlacedResource(0.6);
+		this->E_START = 0.2;
+		this->E_END = 0.05;
+		this->E_DECAY = 2000;
+		this->ALPHA_START = 0.5;
+		this->ALPHA_END = 0.05;
+		this->ALPHA_DECAY = 3000;
+		this->GAMMA = 0.9;
 		break;
 	case LevelDifficulty::HARD:
 		this->level = new HardLevel(true);
@@ -432,9 +468,6 @@ void GameAI::update(float deltaTime)
 			std::cout << "Is start gear " << beltActionInfo.first.isElementGear << " id " << beltActionInfo.first.idElement << std::endl;
 			std::cout << "Is end gear " << beltActionInfo.second.isElementGear << " id " << beltActionInfo.second.idElement << std::endl;
 			sf::Vector2f start, end;
-			if (this->stateId == 23) {
-				std::cout << "prob" << std::endl;
-			}
 			if (beltActionInfo.first.isElementGear) {
 				start = this->level->getGearLocation(beltActionInfo.first.idElement);
 			}
@@ -454,7 +487,7 @@ void GameAI::update(float deltaTime)
 			}
 			std::cout << sqrt(powf(abs(start.x - end.x), 2) + powf(abs(start.y - end.y), 2)) << std::endl;
 			if (this->selectedLevel!=LevelDifficulty::HARD&&
-				(powf(abs(start.x - end.x), 2) + powf(abs(start.y - end.y), 2)) > level->getMaxBeltDistance()) {
+				sqrt(powf(abs(start.x - end.x), 2) + powf(abs(start.y - end.y), 2)) > level->getMaxBeltDistance()) {
 				start.x = -1;
 				end.x = -1;
 			}

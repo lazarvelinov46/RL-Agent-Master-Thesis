@@ -29,6 +29,8 @@ QTable::QTable(int numberOfStates, int numberOfActions,std::string filename,Leve
 		this->alpha = 3.5;
 		this->gamma = 0.95;
 		break;
+	/*
+	//OPTIMAL
 	case MEDIUM:
 		QTable::WRONG_GEAR_PLACEMENT = -1.0;
 		QTable::WRONG_BELT_PLACEMENT = -0.5;
@@ -38,6 +40,18 @@ QTable::QTable(int numberOfStates, int numberOfActions,std::string filename,Leve
 		QTable::WON_GAME = 12.0;
 		this->alpha = 3.0;
 		this->gamma = 0.95;
+		break;
+	*/
+	//MAYBE STUCK ON SUBOPTIMAL
+	case MEDIUM:
+		QTable::WRONG_GEAR_PLACEMENT = -5.0;
+		QTable::WRONG_BELT_PLACEMENT = -0.5;
+		QTable::LOST_GAME_BASE = -1.0;
+		QTable::GEAR_ACTIVATED = 1.0;
+		QTable::WHEEL_ACTIVATED = 1.0;
+		QTable::WON_GAME = 10.0;
+		this->alpha = 0.5;
+		this->gamma = 0.9;
 		break;
 	case HARD:
 		QTable::WRONG_GEAR_PLACEMENT = -1.0;
