@@ -11,7 +11,7 @@ private:
 	static float LOST_GAME_BASE;
 	static float GEAR_ACTIVATED;
 	static float WHEEL_ACTIVATED;
-	static float WON_GAME;
+	static float WON_GAME_BASE;
 	std::vector<std::vector<double>> values;
 	std::vector<std::vector<int>> visits;
 	std::vector<int> validActions;
@@ -53,6 +53,6 @@ public:
 	static float GetLostGameBaseReward();
 	static float GetGearActivatedReward();
 	static float GetWheelActivatedReward();
-	static float GetWonGameReward();
+	static float GetWonGameBaseReward();
 };
 

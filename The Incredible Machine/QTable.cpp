@@ -6,7 +6,7 @@ float QTable::WRONG_BELT_PLACEMENT=-0.5;
 float QTable::LOST_GAME_BASE=-1.0;
 float QTable::GEAR_ACTIVATED=1.0;
 float QTable::WHEEL_ACTIVATED=2.0;
-float QTable::WON_GAME=12.0;
+float QTable::WON_GAME_BASE=2.0;
 
 QTable::QTable()
 {
@@ -17,31 +17,25 @@ QTable::QTable()
 QTable::QTable(int numberOfStates, int numberOfActions,std::string filename,LevelDifficulty difficulty):
 	rng(static_cast<unsigned>(std::chrono::high_resolution_clock::now().time_since_epoch().count()))
 {
+
+	QTable::WRONG_GEAR_PLACEMENT = -1.0;
+	QTable::WRONG_BELT_PLACEMENT = -0.5;
+	QTable::LOST_GAME_BASE = -1.0;
+	QTable::GEAR_ACTIVATED = 1.0;
+	QTable::WHEEL_ACTIVATED = 2.0;
+	QTable::WON_GAME_BASE = 2.0;
 	switch (difficulty)
 	{
 	case EASY:
-		QTable::WRONG_GEAR_PLACEMENT = -1.0;
-		QTable::WRONG_BELT_PLACEMENT = -0.5;
-		QTable::LOST_GAME_BASE = -1.0;
-		QTable::GEAR_ACTIVATED = 1.0;
-		QTable::WHEEL_ACTIVATED = 2.0;
-		QTable::WON_GAME = 8.0;
 		this->alpha = 3.5;
 		this->gamma = 0.95;
 		break;
-	/*
 	//OPTIMAL
 	case MEDIUM:
-		QTable::WRONG_GEAR_PLACEMENT = -1.0;
-		QTable::WRONG_BELT_PLACEMENT = -0.5;
-		QTable::LOST_GAME_BASE = -1.0;
-		QTable::GEAR_ACTIVATED = 1.0;
-		QTable::WHEEL_ACTIVATED = 2.0;
-		QTable::WON_GAME = 12.0;
 		this->alpha = 3.0;
 		this->gamma = 0.95;
 		break;
-	*/
+	/*
 	//MAYBE STUCK ON SUBOPTIMAL
 	case MEDIUM:
 		QTable::WRONG_GEAR_PLACEMENT = -5.0;
@@ -49,28 +43,20 @@ QTable::QTable(int numberOfStates, int numberOfActions,std::string filename,Leve
 		QTable::LOST_GAME_BASE = -1.0;
 		QTable::GEAR_ACTIVATED = 1.0;
 		QTable::WHEEL_ACTIVATED = 1.0;
-		QTable::WON_GAME = 10.0;
+		QTable::WON_GAME_BASE = 10.0;
 		this->alpha = 0.5;
 		this->gamma = 0.9;
 		break;
+	*/
 	case HARD:
-		QTable::WRONG_GEAR_PLACEMENT = -1.0;
-		QTable::WRONG_BELT_PLACEMENT = -0.5;
-		QTable::LOST_GAME_BASE = -1.0;
-		QTable::GEAR_ACTIVATED = 1.0;
-		QTable::WHEEL_ACTIVATED = 2.0;
-		QTable::WON_GAME = 16.0;
 		this->alpha = 2.5;
 		this->gamma = 0.96;
 		break;
 	default:
 		break;
 	}
-	double initVal = 0.5;
 	this->values.assign(numberOfStates, std::vector<double>(numberOfActions, 0.5));
 	this->visits.assign(numberOfStates, std::vector<int>(numberOfActions, 0));
-	this->alpha = 0.2;
-	this->gamma = 0.9;
 	this->numStates = numberOfStates;
 	this->numActions = numberOfActions;
 	this->filename = filename;
@@ -307,7 +293,7 @@ float QTable::GetWheelActivatedReward()
 	return QTable::WHEEL_ACTIVATED;
 }
 
-float QTable::GetWonGameReward()
+float QTable::GetWonGameBaseReward()
 {
-	return QTable::WON_GAME;
+	return QTable::WON_GAME_BASE;
 }

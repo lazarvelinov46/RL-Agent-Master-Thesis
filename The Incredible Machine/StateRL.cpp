@@ -10,7 +10,6 @@ StateRL::StateRL(int numberOfBalls,int numberOfGears,int numberOfWheels)
     for (int i = 0;i < numberOfBalls -1;i++) {
         this->ballsMoving.push_back(false);
     }
-    //second variant
     this->allBallsMoving = true;
     for (int i = 0;i < numberOfGears;i++) {
         this->gearsStarted.push_back(false);
@@ -60,12 +59,6 @@ int StateRL::getStateId() const
 {
     int id = 0;
     int scnt = 0;
-    /*
-    first variant
-    for (int i = 0;i < this->ballsMoving.size();i++) {
-        id |= this->ballsMoving[i] ? (1 << scnt++) : 0;
-    }
-    */
     id |= this->allBallsMoving ? (1 << scnt) : 0;
     scnt++;
     for (int i = 0;i < this->gearsStarted.size();i++) {

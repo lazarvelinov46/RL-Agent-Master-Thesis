@@ -91,8 +91,8 @@ void GameAI::initQTable()
 	this->actionsNum = actionsNum;
 	this->table = QTable(statesNum, actionsNum, "qtable.txt",this->selectedLevel);
 	this->iterations = 0;
-	if (this->loadQTableFromFile("medium_qtable200.csv")) {
-		std::cout << "Loaded QTable from file hard_qtable5100.csv" << std::endl;
+	if (this->loadQTableFromFile("medium_qtable5000.csv")) {
+		std::cout << "Loaded QTable from file medium_qtable1400.csv" << std::endl;
 		double alphaCap = linearDecay(ALPHA_START, ALPHA_END, iterations, ALPHA_DECAY);
 		this->table.setAlpha(alphaCap);
 	}
@@ -360,7 +360,6 @@ GameAI::GameAI(LevelDifficulty difficulty)
 		this->ALPHA_DECAY = 3000;
 		this->GAMMA = 0.95;
 		break;
-	/*
 	//OPTIMAL
 	case LevelDifficulty::MEDIUM:
 		this->level = new MediumLevel(true);
@@ -373,8 +372,8 @@ GameAI::GameAI(LevelDifficulty difficulty)
 		this->ALPHA_DECAY = 10000;
 		this->GAMMA = 0.95;
 		break;
-	*/
 	//MAYBE STUCK ON SUBOPTIMAL
+	/*
 	case LevelDifficulty::MEDIUM:
 		this->level = new MediumLevel(true);
 		this->level->setPenaltyPerPlacedResource(0.6);
@@ -386,6 +385,7 @@ GameAI::GameAI(LevelDifficulty difficulty)
 		this->ALPHA_DECAY = 3000;
 		this->GAMMA = 0.9;
 		break;
+		*/
 	case LevelDifficulty::HARD:
 		this->level = new HardLevel(true);
 		this->level->setPenaltyPerPlacedResource(0.8);

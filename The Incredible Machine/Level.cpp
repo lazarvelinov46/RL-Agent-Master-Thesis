@@ -206,31 +206,27 @@ void Level::updateBalls(float deltaTime)
 				float leftCollision = ballRight - objectBounds.left;
 				float rightCollision = objectRight - ballBounds.left;
 
+				//top collision
 				if (topCollision < leftCollision && topCollision < rightCollision) {
-					//top collision
 					newPosition.y = objectBounds.top - ballBounds.height;
 					ball->setVelocity(sf::Vector2f(ball->getVelocity().x, (abs(ball->getVelocity().y * -.5f) < this->velocityMinY) ? 0.f : ball->getVelocity().y * -.7f));
-
-
-
 					if (object->getObjectType() == StaticObjectType::GOAL) {
 						if (!this->state->getTargetHit()) {
 							this->state->setTargetHit(true);
 							this->stateChanged = true;
-							this->reward = QTable::GetWonGameReward();
+							this->reward = QTable::GetWonGameBaseReward()*(this->startingNumberOfGears+this->startingNumberOfBelts);
 							std::cout << "cilj" << std::endl;
 						}
 					}
 				}
-
+				//bottom collision
 				else if (bottomCollision < leftCollision && bottomCollision < rightCollision) {
-					//bottom collision
 					newPosition.y = objectBottom;
 					ball->setVelocity(sf::Vector2f(ball->getVelocity().x, -ball->getVelocity().y));
 				}
-
+				//left collision
 				else if (leftCollision < topCollision && leftCollision < bottomCollision) {
-					//left collision
+					
 					for (const StaticObject* platformObject : this->staticObjects) {
 						if (platformObject->getObjectType() == StaticObjectType::PLATFORM_RIGHT && platformObject->getMoving() &&
 							ballBounds.top + ballBounds.height == platformObject->getGlobalBounds().top &&
@@ -250,8 +246,8 @@ void Level::updateBalls(float deltaTime)
 					}
 
 				}
+				//right collision
 				else if (rightCollision < topCollision && rightCollision < bottomCollision) {
-					//left collision
 					for (const StaticObject* platformObject : this->staticObjects) {
 						if (platformObject->getObjectType() == StaticObjectType::PLATFORM_LEFT && platformObject->getMoving() &&
 							ballBounds.top + ballBounds.height == platformObject->getGlobalBounds().top &&
@@ -325,8 +321,6 @@ void Level::updateBalls(float deltaTime)
 			this->state->setBallMoving(i, false);
 
 		}
-
-
 		if (!(ball->getVelocity().y == 0 && noGravity)) {
 			ball->setVelocity(sf::Vector2f(ball->getVelocity().x, ball->getVelocity().y + this->gravity * deltaTime));
 		}
@@ -579,7 +573,6 @@ void Level::handleClick(sf::Vector2f& mousePosition)
 					abs(this->endPointsBelt[0].position.x - this->endPointsBelt[1].position.x) <= 350)
 				)) {
 			//placing belt second time
-			std::cout << "Placed belt " << this->endPointsBelt[1].position.x-this->endPointsBelt[0].position.x<< std::endl;
 			this->validBeltPlacement = false;
 			this->startBeltGear = false;
 			StaticWheel* wheelToPlace = nullptr;
@@ -625,7 +618,7 @@ void Level::handleClick(sf::Vector2f& mousePosition)
 				*/
 				this->activeBeltPlacement = false;
 				this->resourceNumbersText[this->selectedResoureceIndex].setString(std::to_string(--this->resourceNumbers[this->selectedResoureceIndex]));
-				//FORBIDDEN ACTIONS
+				//FORBIDDEN ACTIONS 
 				if (this->resourceNumbers[this->selectedResoureceIndex] == 0) {
 					int numActions = this->startingNumberOfGears * Level::getNumberOfWheels() + ActionRL::combination(Level::getNumberOfWheels(), 2);
 					for (int i = ActionRL::getGridHeight() * ActionRL::getGridWidth(); i < numActions; i++) {
@@ -714,7 +707,10 @@ void Level::update(float deltaTime)
 		bool overWheel = false;
 		for (const StaticWheel* wheel : this->staticWheels) {
 			if (wheel->getGlobalBounds().contains(this->endPointsBelt[1].position)) {
-				if (beltLength <= this->maxBeltDistance) {
+				if ((this->startingNumberOfBoxes==0&&beltLength <= this->maxBeltDistance)||
+					(this->startingNumberOfBoxes!=0&& 
+						abs(this->endPointsBelt[0].position.y-this->endPointsBelt[1].position.y) <= 250.f 
+						&& abs(this->endPointsBelt[0].position.x - this->endPointsBelt[1].position.x) <= 350.f)) {
 					this->endPointsBelt[0].color = sf::Color::Green;
 					this->endPointsBelt[1].color = sf::Color::Green;
 					overWheel = true;
@@ -729,7 +725,10 @@ void Level::update(float deltaTime)
 			}
 		}
 		if (!overWheel) {
-			if (beltLength <= 400.f) {
+			if ((this->startingNumberOfBoxes == 0 && beltLength <= this->maxBeltDistance) ||
+				(this->startingNumberOfBoxes != 0 &&
+					abs(this->endPointsBelt[0].position.y - this->endPointsBelt[1].position.y) <= 250.f
+					&& abs(this->endPointsBelt[0].position.x - this->endPointsBelt[1].position.x) <= 350.f)) {
 				this->endPointsBelt[0].color = sf::Color::Yellow;
 				this->endPointsBelt[1].color = sf::Color::Yellow;
 			}

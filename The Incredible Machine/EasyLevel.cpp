@@ -8,10 +8,8 @@ void EasyLevel::initState()
 void EasyLevel::initStaticObjects()
 {
 	this->staticObjects.push_back(new StaticObject(0, 760, 1000, 50, StaticObjectType::FLOOR));
-
 	this->staticObjects.push_back(new StaticObject(300, 500, 150, 20, StaticObjectType::PLATFORM_RIGHT));
 	this->staticObjects.push_back(new StaticObject(600, 300, 150, 20, StaticObjectType::PLATFORM_RIGHT));
-
 	this->staticObjects.push_back(new StaticObject(830, 350, 20, 40, StaticObjectType::WALL));
 	this->staticObjects.push_back(new StaticObject(830, 390, 160, 20, StaticObjectType::GOAL));
 	this->staticObjects.push_back(new StaticObject(970, 350, 20, 40, StaticObjectType::WALL));
