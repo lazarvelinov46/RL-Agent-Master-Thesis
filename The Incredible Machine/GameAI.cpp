@@ -91,7 +91,7 @@ void GameAI::initQTable()
 	this->actionsNum = actionsNum;
 	this->table = QTable(statesNum, actionsNum, "qtable.txt",this->selectedLevel);
 	this->iterations = 0;
-	if (this->loadQTableFromFile("medium_qtable5000.csv")) {
+	if (this->loadQTableFromFile("qtable1800.csv")) {
 		std::cout << "Loaded QTable from file medium_qtable1400.csv" << std::endl;
 		double alphaCap = linearDecay(ALPHA_START, ALPHA_END, iterations, ALPHA_DECAY);
 		this->table.setAlpha(alphaCap);
