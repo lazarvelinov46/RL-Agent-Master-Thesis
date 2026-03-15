@@ -85,3 +85,17 @@ Matrix Matrix::createFromVector(const std::vector<float>& v)
 	result.data = v;
 	return result;
 }
+
+// Layer Constructor
+
+Layer::Layer(int in, int out, std::mt19937& rng)
+{
+	std::normal_distribution<float> nd(0.f, std::sqrt(2.f / in));
+	W = Matrix(in, out, 0.f);
+	b = Matrix(1, out, 0.f);
+	mW = Matrix(in, out, 0.f);
+	vW = Matrix(in, out, 0.f);
+	mb = Matrix(1, out, 0.f);
+	vb = Matrix(1, out, 0.f);
+
+}
