@@ -97,5 +97,40 @@ Layer::Layer(int in, int out, std::mt19937& rng)
 	vW = Matrix(in, out, 0.f);
 	mb = Matrix(1, out, 0.f);
 	vb = Matrix(1, out, 0.f);
-
 }
+
+// Neural Network
+
+// Neural Network constructors
+
+NeuralNetwork::NeuralNetwork(const std::vector<int>& layerSizes, unsigned seed)
+	: layerSizes_(layerSizes), rng_(seed)
+{
+	assert(layerSizes.size() >= 2);
+	for (size_t i = 0; i < layerSizes.size()-1; i++) {
+		this->layers_.emplace_back(layerSizes[i], layerSizes[i + 1], rng_);
+	}
+	this->layers_fwd_ = this->layers_;
+}
+
+// Static functions for applying ReLU
+
+Matrix NeuralNetwork::applyReLU(const Matrix& matrix)
+{
+	Matrix result = matrix;
+	for (float& x : result.data) {
+		x = NeuralNetwork::ReLU(x);
+	}
+	return result;
+}
+
+Matrix NeuralNetwork::applyReLU_Derivative(const Matrix& matrix)
+{
+	Matrix result = matrix;
+	for (float& x : result.data) {
+		x = NeuralNetwork::ReLU_derivative(x);
+	}
+	return result;
+}
+
+// Forward Pass (fill layer cahces)
