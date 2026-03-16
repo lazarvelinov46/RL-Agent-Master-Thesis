@@ -134,3 +134,46 @@ Matrix NeuralNetwork::applyReLU_Derivative(const Matrix& matrix)
 }
 
 // Forward Pass (fill layer cahces)
+
+Matrix NeuralNetwork::forwardPass(const Matrix& input)
+{
+	Matrix a = input;
+	for (size_t i = 0; i < this->layers_.size(); i++) {
+		Layer& L = this->layers_[i];
+		L.x_cache = a;
+
+		//z = a dot W + b
+		Matrix z = a.dotProduct(L.W);
+		for (int i = 0; i < z.rows; i++) {
+			for (int j = 0; j < z.columns; j++) {
+				z.at(i, j) += L.b.at(0, j);
+			}
+		}
+		L.z_cache = z;
+
+		//Apply ReLU to hidden layers, not the last
+		bool isLastLayer = (i == this->layers_.size()-1);
+		a = isLastLayer ? z : NeuralNetwork::applyReLU(z);
+		L.a_cache = a;
+	}
+	return a;
+}
+
+// Evaluate (uses temporary copy of the layers)
+
+std::vector<float> NeuralNetwork::evaluate(const std::vector<float>& input) const
+{
+	this->layers_fwd_ = this->layers_;
+
+	Matrix a = Matrix::createFromVector(input);
+	for (size_t i = 0; i < this->layers_fwd_.size(); i++) {
+		const Layer& L = this->layers_fwd_[i];
+		Matrix z = a.dotProduct(L.W);
+		for (int i = 0; i < z.columns; i++) {
+			z.at(0, i) += L.b.at(0, i);
+		}
+		bool isLast = (i == this->layers_fwd_.size() - 1);
+		a = isLast ? z : NeuralNetwork::applyReLU(z);
+	}
+	return a.matrixToVector();
+}

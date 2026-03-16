@@ -154,6 +154,7 @@
     <ClCompile Include="MediumLevel.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Menu.cpp" />
+    <ClCompile Include="NeuralNetwork.cpp" />
     <ClCompile Include="QTable.cpp" />
     <ClCompile Include="State.cpp" />
     <ClCompile Include="StateRL.cpp" />
@@ -178,6 +179,7 @@
     <ClInclude Include="Level.h" />
     <ClInclude Include="MediumLevel.h" />
     <ClInclude Include="Menu.h" />
+    <ClInclude Include="NeuralNetwork.h" />
     <ClInclude Include="QTable.h" />
     <ClInclude Include="State.h" />
     <ClInclude Include="StateRL.h" />
