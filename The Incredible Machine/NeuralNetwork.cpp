@@ -177,3 +177,52 @@ std::vector<float> NeuralNetwork::evaluate(const std::vector<float>& input) cons
 	}
 	return a.matrixToVector();
 }
+
+// Backward pass (Gradient loss + weight update)
+
+void NeuralNetwork::backward(const Matrix& lossGradient) {
+	this->adamT_++;
+	float bc1 = 1.f - std::pow(this->beta1_, this->adamT_);
+	float bc2 = 1.f - std::pow(this->beta2_, this->adamT_);
+
+	Matrix dA = lossGradient;
+
+	for (int i = this->layers_.size() - 1;i >= 0;i--) {
+		Layer& L = this->layers_[i];
+		bool isLast = (i == this->layers_.size() - 1);
+
+		//dZ = dA * relu_derivative(z)
+		Matrix dZ = isLast ? dA : dA.elementMul(applyReLU_Derivative(L.z_cache));
+
+		//dW = x^T dot dZ / batch(number of rows)
+		int batch = L.x_cache.rows;
+		Matrix dW = L.x_cache.Transpose().dotProduct(dZ) * (1.f / batch);
+
+		//db = mean over batch of dZ rows
+		Matrix db = dZ.columnSum() * (1.f / batch);
+
+		//propagate gradient to previoud layer
+		dA = dZ.dotProduct(L.W.Transpose());
+
+		//Adam update for W
+		for (size_t i = 0;i < L.W.data.size();i++) {
+			float g = dW.data[i];
+			L.mW.data[i] = this->beta1_ * L.mW.data[i] + (1.f - this->beta1_) * g;
+			L.vW.data[i] = this->beta2_ * L.vW.data[i] + (1.f - this->beta2_) * g * g;
+			float mHat = L.mW.data[i] / bc1;
+			float vHat = L.vW.data[i] / bc2;
+			L.W.data[i] = L.W.data[i] - this->alpha_ * mHat / (std::sqrt(vHat) + this->eps_);
+
+		}
+		//Adam update for bias
+		for (size_t i = 0;i < L.b.columns;i++) {
+			float g = db.data[i];
+			L.mb.data[i] = this->beta1_ * L.mb.data[i] + (1.f - this->beta1_) * g;
+			L.vb.data[i] = this->beta2_ * L.vb.data[i] + (1.f - this->beta2_) * g * g;
+			float mHat = L.mb.data[i] / bc1;
+			float vHat = L.vb.data[i] / bc2;
+			L.b.data[i] = L.b.data[i] - this->alpha_ * mHat / (std::sqrt(vHat) + this->eps_);
+
+		}
+	}
+}
