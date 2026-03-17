@@ -178,6 +178,7 @@ std::vector<float> NeuralNetwork::evaluate(const std::vector<float>& input) cons
 	return a.matrixToVector();
 }
 
+
 // Backward pass (Gradient loss + weight update)
 
 void NeuralNetwork::backward(const Matrix& lossGradient) {
@@ -225,4 +226,39 @@ void NeuralNetwork::backward(const Matrix& lossGradient) {
 
 		}
 	}
+}
+
+// Training the network (user interface)
+
+void NeuralNetwork::trainStep(const std::vector<std::vector<float>>& inputs, const std::vector<std::vector<float>>& targets)
+{
+	assert(!inputs.empty());
+	int batch = inputs.size();
+	int inSize = inputs[0].size();
+	int outSize = targets[0].size();
+
+	//packing inputs into matrix; batch*inSize
+	Matrix X(batch, inSize);
+	for (int i = 0;i < batch;i++) {
+		for (int j = 0;j < inSize;j++) {
+			X.at(i, j) = inputs[i][j];
+		}
+	}
+
+	//Forward pass
+	Matrix pred = this->forwardPass(X);
+
+	//Pack targets
+	Matrix T(batch, outSize);
+	for (int i = 0;i < batch;i++) {
+		for (int j = 0;j < outSize;j++) {
+			T.at(i, j) = targets[i][j];
+		}
+	}
+
+	//MSE gradient loss: dL/dpred = 2*(pred-T)/(batch*outSize)
+	//2/N constant is implemented into learning rate so I just use pred-T
+	Matrix grad = pred - T;
+
+	this->backward(grad);
 }
