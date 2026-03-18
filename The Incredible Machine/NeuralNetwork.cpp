@@ -262,3 +262,71 @@ void NeuralNetwork::trainStep(const std::vector<std::vector<float>>& inputs, con
 
 	this->backward(grad);
 }
+
+// Target Neural Network update (weight sync)
+
+void NeuralNetwork::copyWeightsFrom(const NeuralNetwork& src)
+{
+	assert(this->layerSizes_ == src.layerSizes_);
+	for (size_t i = 0; i < this->layers_.size();i++) {
+		this->layers_[i].W = src.layers_[i].W;
+		this->layers_[i].b = src.layers_[i].b;
+	}
+	this->layers_fwd_ = this->layers_;
+}
+
+// Serialization
+
+void NeuralNetwork::save(const std::string& filename) const
+{
+	std::ofstream f(filename, std::ios::binary);
+	if (!f)return;
+
+	//first layer sizes
+	int n = this->layerSizes_.size();
+	f.write(reinterpret_cast<const char*>(&n), sizeof(n));
+	for (int s : this->layerSizes_) {
+		f.write(reinterpret_cast<const char*>(&s), sizeof(s));
+	}
+
+	//then weights and biases
+	for (const Layer& L : this->layers_) {
+		int weightsSize = L.W.data.size();
+		int biasesSize = L.b.data.size();
+		f.write(reinterpret_cast<const char*>(&weightsSize), sizeof(weightsSize));
+		f.write(reinterpret_cast<const char*>(L.W.data.data()), weightsSize * sizeof(float));
+		f.write(reinterpret_cast<const char*>(&biasesSize), sizeof(biasesSize));
+		f.write(reinterpret_cast<const char*>(L.b.data.data()), biasesSize * sizeof(float));
+	}
+	f.write(reinterpret_cast<const char*>(&this->adamT_), sizeof(this->adamT_));
+}
+
+bool NeuralNetwork::load(const std::string& filename)
+{
+	std::ifstream f(filename, std::ios::binary);
+	if (!f)return;
+
+	//first layer sizes
+	int n = this->layerSizes_.size();
+	f.read(reinterpret_cast<char*>(&n), sizeof(n));
+	std::vector<int> sizes(n);
+	for (int& s : sizes) {
+		f.read(reinterpret_cast<char*>(&s), sizeof(s));
+	}
+	if (sizes != this->layerSizes_)return false;
+
+	//then weights and biases
+	for (Layer& L : this->layers_) {
+		int weightsSize;
+		int biasesSize;
+		f.read(reinterpret_cast<char*>(&weightsSize), sizeof(weightsSize));
+		L.W.data.resize(weightsSize);
+		f.read(reinterpret_cast<char*>(L.W.data.data()), weightsSize * sizeof(float));
+		f.read(reinterpret_cast<char*>(&biasesSize), sizeof(biasesSize));
+		L.b.data.resize(biasesSize);
+		f.read(reinterpret_cast<char*>(L.b.data.data()), biasesSize * sizeof(float));
+	}
+	f.read(reinterpret_cast<char*>(&this->adamT_), sizeof(this->adamT_));
+	this->layers_fwd_ = this->layers_;
+	return true;
+}

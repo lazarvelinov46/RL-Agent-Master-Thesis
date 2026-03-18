@@ -101,7 +101,7 @@ public:
 	//Serialization
 
 	void save(const std::string& filename)const;
-	void load(const std::string& filename);
+	bool load(const std::string& filename);
 
 	//Getters
 
