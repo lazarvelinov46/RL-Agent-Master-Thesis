@@ -171,6 +171,7 @@
   <ItemGroup>
     <ClInclude Include="ActionRL.h" />
     <ClInclude Include="AgentRL.h" />
+    <ClInclude Include="DQNAgent.h" />
     <ClInclude Include="DynamicObject.h" />
     <ClInclude Include="EasyLevel.h" />
     <ClInclude Include="Game.h" />
@@ -181,6 +182,7 @@
     <ClInclude Include="Menu.h" />
     <ClInclude Include="NeuralNetwork.h" />
     <ClInclude Include="QTable.h" />
+    <ClInclude Include="ReplayBuffer.h" />
     <ClInclude Include="State.h" />
     <ClInclude Include="StateRL.h" />
     <ClInclude Include="StaticObject.h" />
