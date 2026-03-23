@@ -101,7 +101,7 @@ public:
 	//Serialization
 
 	void save(const std::string& filename)const;
-	void load(const std::string& filename);
+	bool load(const std::string& filename);
 
 	//Getters
 
@@ -126,7 +126,7 @@ private:
 	mutable std::vector<Layer> layers_fwd_;//working copy for const evaluate
 
 	Matrix forwardPass(const Matrix& input);//fills caches
-	void backward(const Matrix& lossGrad);
+	void backward(const Matrix& lossGradient);
 
 	static float ReLU(float x) { return x > 0.f ? x : 0.f; }
 	static float ReLU_derivative(float x) { return x > 0.f ? 1.f : 0.f; }
