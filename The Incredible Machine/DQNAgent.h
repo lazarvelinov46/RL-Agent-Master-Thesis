@@ -92,9 +92,13 @@ public:
 	/// Function called after end of every episode (reaching terminal state)
 	/// Increments episode counter, updates alpha and epsilon
 	/// </summary>
-	void endEpisode();
+	void endEpisode() { this->episodeCount_++; }
 
-	double currentEpsilon()const;
+	double currentEpsilon()const {
+		return this->linearDecay(
+			this->epsilonStart,this->epsilonEnd,this->episodeCount_,this->epsilonDecay
+		);
+	}
 	double currentAlpha()const;
 
 	//serialization

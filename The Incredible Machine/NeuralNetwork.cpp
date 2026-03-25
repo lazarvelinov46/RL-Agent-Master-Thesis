@@ -304,7 +304,7 @@ void NeuralNetwork::save(const std::string& filename) const
 bool NeuralNetwork::load(const std::string& filename)
 {
 	std::ifstream f(filename, std::ios::binary);
-	if (!f)return;
+	if (!f)return false;
 
 	//first layer sizes
 	int n = this->layerSizes_.size();

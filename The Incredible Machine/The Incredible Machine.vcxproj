@@ -145,6 +145,7 @@
   <ItemGroup>
     <ClCompile Include="ActionRL.cpp" />
     <ClCompile Include="AgentRL.cpp" />
+    <ClCompile Include="DQNAgent.cpp" />
     <ClCompile Include="DynamicObject.cpp" />
     <ClCompile Include="EasyLevel.cpp" />
     <ClCompile Include="Game.cpp" />
