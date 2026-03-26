@@ -177,6 +177,7 @@
     <ClInclude Include="EasyLevel.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameAI.h" />
+    <ClInclude Include="GameDQN.h" />
     <ClInclude Include="HardLevel.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="MediumLevel.h" />
