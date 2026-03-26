@@ -40,6 +40,12 @@ public:
 	/// </summary>
 	/// <param name="target">Render target on which render elements are drawn</param>
 	void render(sf::RenderTarget& target)override;
+
+	/// <summary>
+	/// Gets next state to transition to from current one
+	/// </summary>
+	/// <returns>Pointer to the next state or nullptr</returns>
+	State* getNextState()override;
 	/// <summary>
 	/// Updates forbidden actions based on gears and belts placed
 	/// </summary>
