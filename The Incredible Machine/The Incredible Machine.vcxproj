@@ -150,6 +150,7 @@
     <ClCompile Include="EasyLevel.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameAI.cpp" />
+    <ClCompile Include="GameDQN.cpp" />
     <ClCompile Include="HardLevel.cpp" />
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="MediumLevel.cpp" />

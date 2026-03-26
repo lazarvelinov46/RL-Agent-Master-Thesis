@@ -16,6 +16,36 @@
 */
 class GameDQN : public State
 {
+public:
+	/// <summary>
+	/// Initializes everything needed: GameAI state, QTable, level and RLAgent
+	/// </summary>
+	explicit GameDQN(LevelDifficulty difficulty);
+	/// <summary>
+	/// Frees everything from memory
+	/// </summary>
+	~GameDQN();
+	/// <summary>
+	/// Handles keyboard and mouse events
+	/// </summary>
+	/// <param name="window">Window on which events are polled</param>
+	void handleInput(sf::RenderWindow& window)override;
+	/// <summary>
+	/// Updates AI decision making and game simulation (physics)
+	/// </summary>
+	/// <param name="deltaTime">Time since last update</param>
+	void update(float deltaTime = 0)override;
+	/// <summary>
+	/// Renders the game screen
+	/// </summary>
+	/// <param name="target">Render target on which render elements are drawn</param>
+	void render(sf::RenderTarget& target)override;
+	/// <summary>
+	/// Updates forbidden actions based on gears and belts placed
+	/// </summary>
+	/// <param name="gearsPlaced">number of gears placed</param>
+	/// <param name="beltsPlaced">number of belts placed</param>
+	void updateForbiddenActions(int gearsPlaced, int beltsPlaced);
 private:
 	//UI panel on right side on the screen (consists of user action and resource elements
 	sf::RectangleShape panel_;
@@ -97,35 +127,5 @@ private:
 		int win, int steps, double duration);
 
 	static std::string isoNow();
-public:
-	/// <summary>
-	/// Initializes everything needed: GameAI state, QTable, level and RLAgent
-	/// </summary>
-	explicit GameDQN(LevelDifficulty difficulty);
-	/// <summary>
-	/// Frees everything from memory
-	/// </summary>
-	~GameDQN();
-	/// <summary>
-	/// Handles keyboard and mouse events
-	/// </summary>
-	/// <param name="window">Window on which events are polled</param>
-	void handleInput(sf::RenderWindow& window)override;
-	/// <summary>
-	/// Updates AI decision making and game simulation (physics)
-	/// </summary>
-	/// <param name="deltaTime">Time since last update</param>
-	void update(float deltaTime = 0)override;
-	/// <summary>
-	/// Renders the game screen
-	/// </summary>
-	/// <param name="target">Render target on which render elements are drawn</param>
-	void render(sf::RenderTarget& target)override;
-	/// <summary>
-	/// Updates forbidden actions based on gears and belts placed
-	/// </summary>
-	/// <param name="gearsPlaced">number of gears placed</param>
-	/// <param name="beltsPlaced">number of belts placed</param>
-	void updateForbiddenActions(int gearsPlaced, int beltsPlaced);
 };
 
