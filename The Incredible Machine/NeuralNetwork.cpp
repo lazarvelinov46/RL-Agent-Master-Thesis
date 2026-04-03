@@ -70,7 +70,7 @@ Matrix Matrix::Transpose() const
 
 Matrix Matrix::columnSum() const
 {
-	Matrix result(1, this->rows,0.0f);
+	Matrix result(1, this->columns, 0.0f);
 	for (int i = 0; i < this->rows; i++) {
 		for (int j = 0; j < this->columns; j++) {
 			result.at(0, j) += this->at(i, j);
@@ -92,6 +92,7 @@ Layer::Layer(int in, int out, std::mt19937& rng)
 {
 	std::normal_distribution<float> nd(0.f, std::sqrt(2.f / in));
 	W = Matrix(in, out, 0.f);
+	for (float& w : W.data) w = nd(rng);
 	b = Matrix(1, out, 0.f);
 	mW = Matrix(in, out, 0.f);
 	vW = Matrix(in, out, 0.f);

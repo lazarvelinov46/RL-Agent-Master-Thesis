@@ -64,15 +64,16 @@ int DQNAgent::selectAction(const std::vector<float>& stateVector, double epsilon
 	}
 
 	//argmax
-	int bestAction = allowed[0];
-	float bestQ = qValues[allowed[0]];
-	for (int a : allowed) {
-		if (qValues[a] > bestQ) {
-			bestAction = a;
-			bestQ = qValues[a];
-		}
-	}
-	return bestAction;
+	float bestQ = -std::numeric_limits<float>::infinity();
+	for (int a : allowed)
+		if (qValues[a] > bestQ) bestQ = qValues[a];
+
+	std::vector<int> tied;
+	for (int a : allowed)
+		if (qValues[a] >= bestQ - 1e-6f) tied.push_back(a);
+
+	std::uniform_int_distribution<int> pick(0, (int)tied.size() - 1);
+	return tied[pick(this->rng_)];
 }
 
 void DQNAgent::storeTransition(const std::vector<float>& state, int action, float reward, const std::vector<float>& nextState, bool done)
