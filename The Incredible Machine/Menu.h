@@ -2,6 +2,7 @@
 #include "State.h"
 #include "Game.h"
 #include "GameAI.h"
+#include "GameDQN.h"
 
 /// <summary>
 /// Enum which represents menu options
@@ -11,6 +12,8 @@ enum MenuOption{
 	PLAYER,
 	//AI playing the game
 	AI,
+	//DQN agent
+	DQN,
 	//Level selector
 	LEVEL,
 	//Exit

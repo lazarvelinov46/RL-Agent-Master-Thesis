@@ -191,7 +191,7 @@ void GameDQN::initDQNAgent()
 
 	int hiddenSize = 128;
 	int bufferCap = 20000;
-
+	this->agent_ = new DQNAgent(stateSize, actionsNum_, hiddenSize, bufferCap);
 	switch (this->selectedLevel_)
 	{
 	case EASY:

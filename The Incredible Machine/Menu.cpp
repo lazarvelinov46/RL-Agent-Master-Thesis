@@ -19,7 +19,8 @@ void Menu::initText()
 	//Menu option string
 	std::vector<std::string> menuOptions = {
 		"Play as Human",
-		"Play as AI",
+		"Play as AI - Q Learning",
+		"Play as AI - DQN",
 		"Easy",
 		"Quit"
 	};
@@ -78,6 +79,9 @@ void Menu::handleInput(sf::RenderWindow& window)
 				case AI:
 					this->nextState = new GameAI(this->selectedDifficulty);
 					break;
+				case DQN:
+					this->nextState = new GameDQN(this->selectedDifficulty);
+					break;
 				case LEVEL:
 					this->selectedDifficulty = (LevelDifficulty)((this->selectedDifficulty + 1) % LevelDifficulty::NUM);
 					break;
@@ -101,13 +105,13 @@ void Menu::update(float deltaTime)
 	switch (this->selectedDifficulty)
 	{
 	case EASY:
-		this->options[2].setString("Easy");
+		this->options[3].setString("Easy");
 		break;
 	case MEDIUM:
-		this->options[2].setString("Medium");
+		this->options[3].setString("Medium");
 		break;
 	case HARD:
-		this->options[2].setString("Hard");
+		this->options[3].setString("Hard");
 		break;
 	default:
 		break;
