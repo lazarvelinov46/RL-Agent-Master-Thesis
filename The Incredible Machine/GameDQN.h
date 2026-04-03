@@ -111,6 +111,7 @@ private:
 
 	//Logging
 	std::chrono::time_point<std::chrono::system_clock> episodeStart_;
+	int episodeSteps_ = 0;
 	int episodeCount_ = 0;
 
 	// Helpers ----------------------------------------------------------------

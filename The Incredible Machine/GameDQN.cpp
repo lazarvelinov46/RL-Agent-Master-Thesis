@@ -271,6 +271,7 @@ void GameDQN::updateActionState()
 
 		double eps = this->agent_->currentEpsilon();
 		this->actionId_ = this->agent_->selectAction(this->currentStateVector_, eps, forbiddenActions_);
+		this->episodeSteps_++;
 		this->lastExecutedAction_ = this->actionId_;
 		this->episodeStart_ = std::chrono::system_clock::now();
 		this->currentReward_ = 0.0f;
@@ -288,6 +289,7 @@ void GameDQN::updateActionState()
 		);
 		double eps = this->agent_->currentEpsilon();
 		this->actionId_ = agent_->selectAction(currentStateVector_, eps, forbiddenActions_);
+		this->episodeSteps_++;
 		this->stateId_ = this->nextStateId_;
 		this->lastExecutedAction_ = this->actionId_;
 	}
@@ -337,12 +339,13 @@ bool GameDQN::updateState()
 				agent_->currentEpsilon(),
 				cumulativeReward_,
 				win,
-				0,
+				episodeSteps_,
 				duration);
 			if (win) std::cout << "[DQN] WON\n";
 			else     std::cout << "[DQN] LOST\n";
 
 			agent_->endEpisode();
+			this->episodeCount_++;
 			if (episodeCount_ % 100 == 0)
 			{
 				std::string prefix = (selectedLevel_ == EASY ? "easy" :
@@ -353,6 +356,7 @@ bool GameDQN::updateState()
 				nextState_ = new Menu();
 			}
 			this->resetResources();
+			this->episodeSteps_ = 0;
 			this->stateId_ = -1;
 			this->actionId_ = -1;
 			this->nextStateId_ = 1;
