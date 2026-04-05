@@ -99,8 +99,14 @@ public:
 			this->epsilonStart,this->epsilonEnd,this->episodeCount_,this->epsilonDecay
 		);
 	}
-	double currentAlpha()const;
-
+	double currentAlpha()const {
+		return this->linearDecay(
+			this->alphaStart, this->alphaEnd, this->episodeCount_, this->alphaDecay
+		);
+	}
+	std::vector<float> getOnlineQValues(const std::vector<float>& state) const {
+		return this->online_.evaluate(state);
+	}
 	//serialization
 
 	/// <summary>

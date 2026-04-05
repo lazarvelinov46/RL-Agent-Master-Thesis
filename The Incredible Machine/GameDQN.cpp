@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "GameDQN.h"
 
 GameDQN::GameDQN(LevelDifficulty difficulty) : selectedLevel_(difficulty)
@@ -335,17 +335,26 @@ bool GameDQN::updateState()
 
 			auto now = std::chrono::system_clock::now();
 			double duration = std::chrono::duration<double>(now - this->episodeStart_).count();
+
+			std::vector<float> qVals = this->agent_->getOnlineQValues(this->currentStateVector_);
+			float qMax = *std::max_element(qVals.begin(), qVals.end());
+			float qMean = std::accumulate(qVals.begin(), qVals.end(), 0.f) / qVals.size();
+
 			this->appendLog(episodeCount_,
 				agent_->currentEpsilon(),
+				agent_->currentAlpha(),
 				cumulativeReward_,
 				win,
 				episodeSteps_,
-				duration);
+				duration,
+				qMax,
+				qMean);
 			if (win) std::cout << "[DQN] WON\n";
 			else     std::cout << "[DQN] LOST\n";
 
 			agent_->endEpisode();
-			this->episodeCount_++;
+			this->episodeCount_++;      // ← was missing
+			this->episodeSteps_ = 0;    // ← reset for next episode
 			if (episodeCount_ % 100 == 0)
 			{
 				std::string prefix = (selectedLevel_ == EASY ? "easy" :
@@ -367,7 +376,8 @@ bool GameDQN::updateState()
 	return false;
 }
 
-void GameDQN::appendLog(int ep, double eps, float totalReward, int win, int steps, double duration)
+void GameDQN::appendLog(int ep, double eps, double alpha, float totalReward,
+	int win, int steps, double duration, float qMax, float qMean)
 {
 	std::string name = (selectedLevel_ == EASY ? "easy" :
 		selectedLevel_ == MEDIUM ? "medium" : "hard");
@@ -376,11 +386,16 @@ void GameDQN::appendLog(int ep, double eps, float totalReward, int win, int step
 	std::ofstream f(name, std::ios::app);
 	if (!f) return;
 	if (header)
-		f << "episode,timestamp,epsilon,total_reward,win,duration_s\n";
+		f << "episode,timestamp,eps,alphaCap,total_reward,win,steps,episode_duration_s,q_max,q_mean\n";
 	f << ep << "," << isoNow() << ","
 		<< std::fixed << std::setprecision(6) << eps << ","
-		<< totalReward << "," << win << ","
-		<< std::setprecision(3) << duration << "\n";
+		<< alpha << ","
+		<< totalReward << ","
+		<< win << ","
+		<< steps << ","
+		<< std::setprecision(3) << duration << ","
+		<< std::setprecision(6) << qMax << ","
+		<< qMean << "\n";
 }
 
 std::string GameDQN::isoNow()

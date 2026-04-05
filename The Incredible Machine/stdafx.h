@@ -20,6 +20,7 @@
 #include <iomanip>
 #include <cassert>
 #include <algorithm>
+#include <numeric>
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
 #include <SFML/Audio.hpp>

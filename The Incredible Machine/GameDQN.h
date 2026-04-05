@@ -130,8 +130,8 @@ private:
 	/// </summary>
 	bool updateState();
 
-	void appendLog(int ep, double eps, float totalReward,
-		int win, int steps, double duration);
+	void appendLog(int ep, double eps, double alpha, float totalReward,
+		int win, int steps, double duration, float qMax, float qMean);
 
 	static std::string isoNow();
 };
