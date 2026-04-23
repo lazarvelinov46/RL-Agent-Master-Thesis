@@ -30,6 +30,15 @@ public:
 	float epsilonEnd = 0.05f;
 	float epsilonDecay = 5000;
 
+	//Reward system
+
+	static float WRONG_GEAR_PLACEMENT;
+	static float WRONG_BELT_PLACEMENT;
+	static float LOST_GAME_BASE;
+	static float GEAR_ACTIVATED;
+	static float WHEEL_ACTIVATED;
+	static float TARGET_HIT;
+
 	//constructor
 
 	/// <summary>

@@ -4,6 +4,7 @@
 #include "StaticWheel.h"
 #include "StateRL.h"
 #include "ActionRL.h"
+#include "DQNAgent.h"
 
 /// <summary>
 /// Represents game modes in which level could be played

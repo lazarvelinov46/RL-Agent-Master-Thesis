@@ -204,6 +204,7 @@ void GameDQN::initDQNAgent()
 		this->agent_->alphaDecay = 30000;
 		this->agent_->gamma = 0.95f;
 		this->agent_->targetSyncFreq = 150;
+		this->agent_->TARGET_HIT = 20;
 		break;
 	case MEDIUM:
 		this->agent_->epsilonStart = 0.7;
@@ -214,6 +215,7 @@ void GameDQN::initDQNAgent()
 		this->agent_->alphaDecay = 80000;
 		this->agent_->gamma = 0.95f;
 		this->agent_->targetSyncFreq = 200;
+		this->agent_->TARGET_HIT = 20;
 		break;
 	case HARD:
 		this->agent_->epsilonStart = 0.8;
@@ -224,10 +226,16 @@ void GameDQN::initDQNAgent()
 		this->agent_->alphaDecay = 200000;
 		this->agent_->gamma = 0.96f;
 		this->agent_->targetSyncFreq = 300;
+		this->agent_->TARGET_HIT = 25;
 		break;
 	default:
 		break;
 	}
+	this->agent_->WRONG_GEAR_PLACEMENT = -1.0f;
+	this->agent_->WRONG_BELT_PLACEMENT = -0.5f;
+	this->agent_->LOST_GAME_BASE = -1.f;
+	this->agent_->GEAR_ACTIVATED = 3.0;
+	this->agent_->WHEEL_ACTIVATED = 8.0f;
 	std::string prefix = (this->selectedLevel_ == EASY ? "easy" :
 		this->selectedLevel_ == MEDIUM ? "medium" : "hard");
 	prefix += "_dqn";

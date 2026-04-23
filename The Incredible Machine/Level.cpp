@@ -65,7 +65,12 @@ void Level::startPlatform(const StaticObject* object)
 					platform->move(movingSpeed);
 					this->state->setWheelStarted(i, true);
 					this->stateChanged = true;
-					this->reward = QTable::GetWheelActivatedReward();
+					if (this->gameMode == GameModes::Q_AGENT_MODE) {
+						this->reward = QTable::GetWheelActivatedReward();
+					}
+					else {
+						this->reward = DQNAgent::WHEEL_ACTIVATED;
+					}
 
 				}
 				if (platform->getObjectType() == StaticObjectType::PLATFORM_RIGHT||
@@ -214,7 +219,13 @@ void Level::updateBalls(float deltaTime)
 						if (!this->state->getTargetHit()) {
 							this->state->setTargetHit(true);
 							this->stateChanged = true;
-							this->reward = QTable::GetWonGameBaseReward()*(this->startingNumberOfGears+this->startingNumberOfBelts);
+							if (this->gameMode == GameModes::Q_AGENT_MODE) {
+								this->reward = QTable::GetWonGameBaseReward() * (this->startingNumberOfGears + this->startingNumberOfBelts);
+							}
+							else {
+								this->reward = DQNAgent::TARGET_HIT;
+							}
+							
 							std::cout << "cilj" << std::endl;
 						}
 					}
@@ -271,7 +282,13 @@ void Level::updateBalls(float deltaTime)
 						this->state->setGearStarted(gears, true);
 						this->stateChanged = true;
 						std::cout << this->state->getStateId() << std::endl;
-						this->reward = QTable::GetGearActivatedReward();
+						if (this->gameMode == GameModes::Q_AGENT_MODE) {
+							this->reward = QTable::GetGearActivatedReward();
+						}
+						else {
+							this->reward = DQNAgent::GEAR_ACTIVATED;
+						}
+						
 						this->startPlatform(object);
 					}
 				}
@@ -407,9 +424,15 @@ void Level::updateBalls(float deltaTime)
 	if (this->state->getBallMoving() != ballsMovingPreUpdate) {
 		this->stateChanged = true;
 		if (!this->state->getBallMoving() && !this->state->getTargetHit()) {
-			this->reward += QTable::GetLostGameBaseReward() - ((this->startingNumberOfGears - this->currentNumberOfGears)
-				+ (this->startingNumberOfBelts - this->currentNumberOfBelts)+
-				(this->startingNumberOfBoxes-this->currentNumberOfBoxes)) * this->penaltyPerPlacedResource;
+			if (this->gameMode == GameModes::Q_AGENT_MODE) {
+				this->reward += QTable::GetLostGameBaseReward() - ((this->startingNumberOfGears - this->currentNumberOfGears)
+					+ (this->startingNumberOfBelts - this->currentNumberOfBelts) +
+					(this->startingNumberOfBoxes - this->currentNumberOfBoxes)) * this->penaltyPerPlacedResource;
+			}else{
+				this->reward += DQNAgent::LOST_GAME_BASE - ((this->startingNumberOfGears - this->currentNumberOfGears)
+					+ (this->startingNumberOfBelts - this->currentNumberOfBelts) +
+					(this->startingNumberOfBoxes - this->currentNumberOfBoxes)) * this->penaltyPerPlacedResource;
+			}
 		}
 	}
 }
