@@ -646,6 +646,7 @@ void Level::handleClick(sf::Vector2f& mousePosition)
 				updating variables and UI elements
 				*/
 				if (alignedPosition.x < 900 && alignedPosition.y < 700) {
+					std::cout << "x " << alignedPosition.x << " y " << alignedPosition.y << std::endl;
 					this->staticObjects.push_back(new StaticObject(*this->selectedResource, this->selectedResoureceIndex == 1 ? StaticObjectType::GEAR : StaticObjectType::BOX));
 					this->resourceNumbersText[this->selectedResoureceIndex].setString(std::to_string(--this->resourceNumbers[this->selectedResoureceIndex]));
 				}

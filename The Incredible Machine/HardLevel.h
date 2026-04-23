@@ -25,7 +25,7 @@ private:
 	void initResources()override;
 
 public:
-	HardLevel(bool mode = false);
+	HardLevel(GameModes mode = GameModes::PLAYER_MODE);
 
 	virtual ~HardLevel() override;
 

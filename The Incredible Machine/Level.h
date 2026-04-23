@@ -6,6 +6,15 @@
 #include "ActionRL.h"
 
 /// <summary>
+/// Represents game modes in which level could be played
+/// </summary>
+enum GameModes {
+	PLAYER_MODE,
+	Q_AGENT_MODE,
+	DQN_AGENT_MODE
+};
+
+/// <summary>
 /// Represents resources which user/agent can place on the level screen
 /// </summary>
 typedef struct Resource {
@@ -87,7 +96,7 @@ protected:
 	bool isPlaying = false;
 
 	//AI
-	bool modeAI = false;
+	GameModes gameMode = GameModes::PLAYER_MODE;
 	/* Tracking in which state agent currently is */
 	StateRL* state;
 	double reward;

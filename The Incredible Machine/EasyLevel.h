@@ -18,7 +18,7 @@ private:
 	void initResources()override;
 
 public:
-	EasyLevel(bool mode = false);
+	EasyLevel(GameModes mode = GameModes::PLAYER_MODE);
 
 	virtual ~EasyLevel() override;
 

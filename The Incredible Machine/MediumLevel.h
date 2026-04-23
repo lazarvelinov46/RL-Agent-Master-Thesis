@@ -18,7 +18,7 @@ private:
 	void initResources()override;
 
 public:
-	MediumLevel(bool mode=false);
+	MediumLevel(GameModes mode=GameModes::PLAYER_MODE);
 	
 	virtual ~MediumLevel() override;
 

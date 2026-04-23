@@ -10,7 +10,7 @@ void HardLevel::initState()
 void HardLevel::initTextures()
 {
 	Level::initTextures();
-	if (this->modeAI) {
+	if (this->gameMode==GameModes::PLAYER_MODE) {
 		if (!this->boxTexture.loadFromFile("assets/Textures/box_ai.png")) {
 			std::cout << "ERROR: Could not load texture" << std::endl;
 		}
@@ -112,9 +112,9 @@ void HardLevel::initResources()
 	}
 }
 
-HardLevel::HardLevel(bool mode) :Level(5, 4,4,4,250.f,1)
+HardLevel::HardLevel(GameModes mode) :Level(5, 4,4,4,250.f,1)
 {
-	this->modeAI = mode;
+	this->gameMode = mode;
 }
 
 HardLevel::~HardLevel()

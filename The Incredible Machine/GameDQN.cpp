@@ -6,19 +6,19 @@ GameDQN::GameDQN(LevelDifficulty difficulty) : selectedLevel_(difficulty)
 	switch (selectedLevel_)
 	{
 	case EASY:
-		this->level_ = new EasyLevel(true);
+		this->level_ = new EasyLevel(GameModes::DQN_AGENT_MODE);
 		this->level_->setPenaltyPerPlacedResource(0.6);
 		break;
 	case MEDIUM:
-		this->level_ = new MediumLevel(true);
+		this->level_ = new MediumLevel(GameModes::DQN_AGENT_MODE);
 		this->level_->setPenaltyPerPlacedResource(0.6);
 		break;
 	case HARD:
-		this->level_ = new HardLevel(true);
+		this->level_ = new HardLevel(GameModes::DQN_AGENT_MODE);
 		this->level_->setPenaltyPerPlacedResource(0.8);
 		break;
 	default:
-		this->level_ = new MediumLevel(true);
+		this->level_ = new MediumLevel(GameModes::DQN_AGENT_MODE);
 		this->level_->setPenaltyPerPlacedResource(0.6);
 		break;
 	}
@@ -198,6 +198,7 @@ void GameDQN::initDQNAgent()
 		this->agent_->epsilonStart = 0.6;
 		this->agent_->epsilonEnd = 0.05;
 		this->agent_->epsilonDecay = 2000;
+		this->agent_->minBufferSize = 200;
 		this->agent_->alphaStart = 1e-3f;
 		this->agent_->alphaEnd = 2e-4f;
 		this->agent_->alphaDecay = 30000;
@@ -240,16 +241,16 @@ void GameDQN::resetResources()
 	switch (this->selectedLevel_)
 	{
 	case LevelDifficulty::EASY:
-		this->level_ = new EasyLevel(true);
+		this->level_ = new EasyLevel(GameModes::DQN_AGENT_MODE);
 		break;
 	case LevelDifficulty::MEDIUM:
-		this->level_ = new MediumLevel(true);
+		this->level_ = new MediumLevel(GameModes::DQN_AGENT_MODE);
 		break;
 	case LevelDifficulty::HARD:
-		this->level_ = new HardLevel(true);
+		this->level_ = new HardLevel(GameModes::DQN_AGENT_MODE);
 		break;
 	default:
-		this->level_ = new MediumLevel(true);
+		this->level_ = new MediumLevel(GameModes::DQN_AGENT_MODE);
 		break;
 	}
 	this->level_->initLevel();

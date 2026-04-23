@@ -73,9 +73,9 @@ void EasyLevel::initResources()
 	}
 }
 
-EasyLevel::EasyLevel(bool mode) :Level(3, 2, 2, 2,500.f)
+EasyLevel::EasyLevel(GameModes mode) :Level(3, 2, 2, 2,500.f)
 {
-	this->modeAI = mode;
+	this->gameMode = mode;
 }
 
 EasyLevel::~EasyLevel()

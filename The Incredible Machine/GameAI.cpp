@@ -322,16 +322,16 @@ void GameAI::resetResources()
 	switch (this->selectedLevel)
 	{
 	case LevelDifficulty::EASY:
-		this->level = new EasyLevel(true);
+		this->level = new EasyLevel(GameModes::Q_AGENT_MODE);
 		break;
 	case LevelDifficulty::MEDIUM:
-		this->level = new MediumLevel(true);
+		this->level = new MediumLevel(GameModes::Q_AGENT_MODE);
 		break;
 	case LevelDifficulty::HARD:
-		this->level = new HardLevel(true);
+		this->level = new HardLevel(GameModes::Q_AGENT_MODE);
 		break;
 	default:
-		this->level = new MediumLevel(true);
+		this->level = new MediumLevel(GameModes::Q_AGENT_MODE);
 		break;
 	}
 	this->level->initLevel();
@@ -350,7 +350,7 @@ GameAI::GameAI(LevelDifficulty difficulty)
 	switch (this->selectedLevel)
 	{
 	case LevelDifficulty::EASY:
-		this->level = new EasyLevel(true);
+		this->level = new EasyLevel(GameModes::Q_AGENT_MODE);
 		this->level->setPenaltyPerPlacedResource(0.6);
 		this->E_START = 0.5;
 		this->E_END = 0.05;
@@ -362,7 +362,7 @@ GameAI::GameAI(LevelDifficulty difficulty)
 		break;
 	//OPTIMAL
 	case LevelDifficulty::MEDIUM:
-		this->level = new MediumLevel(true);
+		this->level = new MediumLevel(GameModes::Q_AGENT_MODE);
 		this->level->setPenaltyPerPlacedResource(0.6);
 		this->E_START = 0.6;
 		this->E_END = 0.05;
@@ -387,7 +387,7 @@ GameAI::GameAI(LevelDifficulty difficulty)
 		break;
 		*/
 	case LevelDifficulty::HARD:
-		this->level = new HardLevel(true);
+		this->level = new HardLevel(GameModes::Q_AGENT_MODE);
 		this->level->setPenaltyPerPlacedResource(0.8);
 		this->E_START = 0.6;
 		this->E_END = 0.05;
@@ -398,7 +398,7 @@ GameAI::GameAI(LevelDifficulty difficulty)
 		this->GAMMA = 0.96;
 		break;
 	default:
-		this->level = new MediumLevel(true);
+		this->level = new MediumLevel(GameModes::Q_AGENT_MODE);
 		break;
 	}
 	this->initQTable();

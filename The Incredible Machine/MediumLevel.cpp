@@ -78,9 +78,9 @@ void MediumLevel::initResources()
 	}
 }
 
-MediumLevel::MediumLevel(bool mode):Level(4,3,3,3,350.f)
+MediumLevel::MediumLevel(GameModes mode):Level(4,3,3,3,350.f)
 {
-	this->modeAI = mode;
+	this->gameMode = mode;
 }
 
 MediumLevel::~MediumLevel()
