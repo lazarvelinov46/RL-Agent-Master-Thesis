@@ -1,6 +1,13 @@
 #include "stdafx.h"
 #include "DQNAgent.h"
 
+float DQNAgent::WRONG_GEAR_PLACEMENT = -1.0f;
+float DQNAgent::WRONG_BELT_PLACEMENT = -0.5f;
+float DQNAgent::GEAR_ACTIVATED = 3.0f;
+float DQNAgent::WHEEL_ACTIVATED = 8.0f;
+float DQNAgent::TARGET_HIT = 20.0f;
+float DQNAgent::LOST_GAME_BASE = -1.0f;
+
 DQNAgent::DQNAgent(int stateSize, int numActions, int hiddenSize, int bufferCap, unsigned seed)
 	:stateSize_(stateSize),
 	numActions_(numActions),

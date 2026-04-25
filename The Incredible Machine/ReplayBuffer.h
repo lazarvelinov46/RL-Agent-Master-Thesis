@@ -52,7 +52,7 @@ public:
 		if (this->buffer_.size() < batchSize) {
 			throw std::runtime_error("ReplayBuffer error: not enough samples");
 		}
-		std::uniform_int_distribution<int> dist(0, this->buffer_.size());
+		std::uniform_int_distribution<int> dist(0, this->buffer_.size()-1);
 		std::vector<DQNTransition> batch;
 		batch.reserve(batchSize);
 		for (int i = 0; i < batchSize; i++) {
