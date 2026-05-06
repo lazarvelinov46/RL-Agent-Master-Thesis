@@ -52,6 +52,8 @@ public:
 	/// <param name="gearsPlaced">number of gears placed</param>
 	/// <param name="beltsPlaced">number of belts placed</param>
 	void updateForbiddenActions(int gearsPlaced, int beltsPlaced);
+
+	
 private:
 	//UI panel on right side on the screen (consists of user action and resource elements
 	sf::RectangleShape panel_;
@@ -114,6 +116,19 @@ private:
 	int episodeSteps_ = 0;
 	int episodeCount_ = 0;
 
+	/// <summary>
+	/// Section used for multithread logic
+	/// One thread is tasked with game logic
+	/// Other for network training
+	/// So that game wouldn't be interrupted
+	/// </summary>
+	std::thread trainThread_;
+	std::mutex agentMutex_;
+	std::condition_variable trainCV_;
+	std::atomic<bool> trainRunning_{false};
+	bool trainPending_ = false;
+
+	void trainLoop();
 	// Helpers ----------------------------------------------------------------
 	void initUI();
 	void initTextures();

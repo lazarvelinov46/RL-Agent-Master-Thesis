@@ -21,6 +21,7 @@
 #include <cassert>
 #include <algorithm>
 #include <numeric>
+#include <mutex>
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
 #include <SFML/Audio.hpp>

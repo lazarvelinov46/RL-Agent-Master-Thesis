@@ -35,10 +35,17 @@ GameDQN::GameDQN(LevelDifficulty difficulty) : selectedLevel_(difficulty)
 	this->actionFunctions_ = new ActionRL(this->level_->getNumberOfWheels(), 
 		this->level_->getStartingNumberOfGears());
 	this->initDQNAgent();
+	this->trainRunning_ = true;
+	this->trainThread_ = std::thread(&GameDQN::trainLoop, this);
 }
 
 GameDQN::~GameDQN()
 {
+	this->trainRunning_ = false;
+	this->trainCV_.notify_all();
+	if (this->trainThread_.joinable()) {
+		this->trainThread_.join();
+	}
 	delete this->nextState_;
 	delete this->agent_;
 	delete this->actionFunctions_;
@@ -60,6 +67,7 @@ void GameDQN::handleInput(sf::RenderWindow& window)
 
 void GameDQN::update(float deltaTime)
 {
+	deltaTime = std::min(deltaTime, 1.0f / 30.0f);
 	this->updateActionState();
 	if ((level_->getNumberOfBelts() + level_->getNumberOfGears() + this->level_->getNumberOfBoxes()) == 0) {
 		this->actionId_ = -1;
@@ -141,6 +149,19 @@ void GameDQN::render(sf::RenderTarget& target)
 State* GameDQN::getNextState()
 {
 	return this->nextState_;
+}
+
+void GameDQN::trainLoop()
+{
+	while (true) {
+		std::unique_lock<std::mutex> lk(this->agentMutex_);
+		this->trainCV_.wait(lk, [this] {
+			return trainPending_ || !trainRunning_.load();
+		});
+		if (!this->trainRunning_)break;
+		this->trainPending_ = false;
+		this->agent_->trainStep();
+	}
 }
 
 void GameDQN::initUI()
@@ -279,7 +300,10 @@ void GameDQN::updateActionState()
 		);
 
 		double eps = this->agent_->currentEpsilon();
-		this->actionId_ = this->agent_->selectAction(this->currentStateVector_, eps, forbiddenActions_);
+		{
+			std::lock_guard<std::mutex> lk(this->agentMutex_);
+			this->actionId_ = this->agent_->selectAction(this->currentStateVector_, eps, forbiddenActions_);
+		}
 		this->episodeSteps_++;
 		this->lastExecutedAction_ = this->actionId_;
 		this->episodeStart_ = std::chrono::system_clock::now();
@@ -323,6 +347,8 @@ bool GameDQN::updateState()
 				level_->getNumberOfWheels()
 			);
 			bool terminalState = this->nextStateId_ % 2 == 0 || this->nextStateId_ >= (this->statesNum_ / 2);
+			/*
+			* //OLD (one thread)
 			this->agent_->storeTransition(
 				currentStateVector_,
 				lastExecutedAction_,
@@ -334,6 +360,20 @@ bool GameDQN::updateState()
 			if (loss >= 0.f) {
 				std::cout << "[DQN] train loss=" << loss << "\n";
 			}
+			*/
+			//NEW two threads
+			{
+				std::lock_guard<std::mutex> lk(this->agentMutex_);
+				this->agent_->storeTransition(
+					currentStateVector_,
+					lastExecutedAction_,
+					currentReward_,
+					nextStateVector,
+					terminalState
+				);
+				this->trainPending_ = true;
+			}
+			this->trainCV_.notify_all();
 			this->cumulativeReward_ += this->currentReward_;
 			this->currentReward_ = 0;
 		}
