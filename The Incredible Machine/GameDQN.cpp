@@ -231,6 +231,7 @@ void GameDQN::initDQNAgent()
 		this->agent_->epsilonStart = 0.7;
 		this->agent_->epsilonEnd = 0.05;
 		this->agent_->epsilonDecay = 5000;
+		this->agent_->minBufferSize = 400;
 		this->agent_->alphaStart = 1e-3f;
 		this->agent_->alphaEnd = 1e-4f;
 		this->agent_->alphaDecay = 80000;
@@ -242,6 +243,7 @@ void GameDQN::initDQNAgent()
 		this->agent_->epsilonStart = 0.8;
 		this->agent_->epsilonEnd = 0.05;
 		this->agent_->epsilonDecay = 15000;
+		this->agent_->minBufferSize = 600;
 		this->agent_->alphaStart = 5e-4f;
 		this->agent_->alphaEnd = 5e-5f;
 		this->agent_->alphaDecay = 200000;
