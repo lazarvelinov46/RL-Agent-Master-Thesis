@@ -264,6 +264,19 @@ void GameDQN::initDQNAgent()
 	prefix += "_dqn";
 	if (!this->agent_->load(prefix))
 		std::cout << "[DQN] Starting fresh (no saved network found)\n";
+	else {
+		std::string logName = prefix + "_training_log.csv";
+		std::ifstream log(logName);
+		if (log.good()) {
+			std::string line, lastLine;
+			while (std::getline(log, line))
+				if (!line.empty()) lastLine = line;
+			if (!lastLine.empty()) {
+				episodeCount_ = std::stoi(lastLine.substr(0, lastLine.find(','))) + 1;
+				std::cout << "[DQN] Resuming GameDQN from episode " << episodeCount_ << "\n";
+			}
+		}
+	}
 }
 
 void GameDQN::resetResources()
@@ -306,6 +319,8 @@ void GameDQN::updateActionState()
 			std::lock_guard<std::mutex> lk(this->agentMutex_);
 			this->actionId_ = this->agent_->selectAction(this->currentStateVector_, eps, forbiddenActions_);
 		}
+		//TEST
+		//this->actionId_ = 228;
 		this->episodeSteps_++;
 		this->lastExecutedAction_ = this->actionId_;
 		this->episodeStart_ = std::chrono::system_clock::now();
@@ -317,11 +332,47 @@ void GameDQN::updateActionState()
 
 		//FORBIDDEN ACTION
 		this->forbiddenActions_ = this->level_->getBallZonesPassed();
+		
+		
 		this->currentStateVector_ = DQNAgent::buildStateVector(
 			this->level_->getStatusChange(),
 			this->level_->getStartingNumberOfGears(),
 			this->level_->getNumberOfWheels()
 		);
+		/*
+		//HARD
+		switch (this->nextStateId_) {
+		case 3:
+			this->actionId_ = 266;
+			break;
+		case 35:
+			this->actionId_ = 235;
+			break;
+		case 39:
+			this->actionId_ = 271;
+			//this->actionId = 252;
+			break;
+		case 103:
+			this->actionId_ = 155;
+			break;
+		case 111:
+			this->actionId_ = 276;
+			break;
+		case 239:
+			this->actionId_ = 83;
+			break;
+		case 255:
+			this->actionId_ = 281;
+			break;
+		case 511:
+			//this->actionId_ = 313;
+			this->actionId_ = agent_->selectAction(currentStateVector_, 0.1, forbiddenActions_);
+			break;
+		default:
+			//this->actionId_ = agent_->selectAction(currentStateVector_, 0.1, forbiddenActions_);
+			break;
+		}
+		*/
 		double eps = this->agent_->currentEpsilon();
 		this->actionId_ = agent_->selectAction(currentStateVector_, eps, forbiddenActions_);
 		this->episodeSteps_++;

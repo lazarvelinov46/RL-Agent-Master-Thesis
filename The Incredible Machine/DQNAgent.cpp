@@ -141,7 +141,11 @@ void DQNAgent::save(const std::string& network) const
 {
 	this->online_.save(network + "_online.bin");
 	this->target_.save(network + "_target.bin");
-	std::cout << "[DQN] Saved networks to " << network << "_*.bin" << std::endl;
+
+	std::ofstream f(network + "_meta.txt");
+	f << episodeCount_ << "\n"
+		<< trainStepCount_ << "\n";
+	std::cout << "[DQN] Saved to " << network << "\n";
 }
 
 bool DQNAgent::load(const std::string& network)
@@ -150,7 +154,18 @@ bool DQNAgent::load(const std::string& network)
 		&& target_.load(network + "_target.bin");
 	if (ok)
 		std::cout << "[DQN] Loaded networks from " << network << "_*.bin" << std::endl;
-	return ok;
+	else return false;
+	std::ifstream f(network + "_meta.txt");
+	if (f) {
+		f >> episodeCount_ >> trainStepCount_;
+		float restoredAlpha = (float)linearDecay(alphaStart, alphaEnd,
+			trainStepCount_, alphaDecay);
+		online_.setLearningRate(restoredAlpha);
+		std::cout << "[DQN] Restored episodeCount=" << episodeCount_
+			<< "  trainStep=" << trainStepCount_
+			<< "  alpha=" << restoredAlpha << "\n";
+	}
+	return true;
 }
 
 double DQNAgent::linearDecay(double start, double end, int current, int total)
