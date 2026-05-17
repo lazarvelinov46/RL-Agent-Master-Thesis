@@ -1050,7 +1050,7 @@ bool Level::placeBelt(sf::Vector2f start, sf::Vector2f end, bool startBeltGear)
 			object->setAttached(true);
 		}
 	}
-	if (this->currentNumberOfBelts == 0) {
+	if (this->currentNumberOfBelts == 0 && this->startingNumberOfBoxes>0) {
 		int numActions = this->startingNumberOfGears * Level::getNumberOfWheels() + ActionRL::combination(Level::getNumberOfWheels(), 2);
 		for (int i = ActionRL::getGridHeight() * ActionRL::getGridWidth(); 
 			i < ActionRL::getGridHeight() * ActionRL::getGridWidth()+numActions; i++) {
