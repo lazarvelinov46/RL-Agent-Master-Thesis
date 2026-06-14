@@ -144,6 +144,7 @@ private:
 	/// Updates nextStateId if environment state changes
 	/// </summary>
 	bool updateState();
+	void tick(float deltaTime);
 
 	void appendLog(int ep, double eps, double alpha, float totalReward,
 		int win, int steps, double duration, float qMax, float qMean);

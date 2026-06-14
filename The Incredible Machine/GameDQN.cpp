@@ -67,6 +67,14 @@ void GameDQN::handleInput(sf::RenderWindow& window)
 
 void GameDQN::update(float deltaTime)
 {
+	const int steps = (this->selectedLevel_ == HARD) ? 5 : 1;
+	for (int i = 0; i < steps; ++i) {
+		this->tick(1.0f / 60.0f);
+	}
+}
+
+void GameDQN::tick(float deltaTime)
+{
 	deltaTime = std::min(deltaTime, 1.0f / 30.0f);
 	this->updateActionState();
 	if ((level_->getNumberOfBelts() + level_->getNumberOfGears() + this->level_->getNumberOfBoxes()) == 0) {
@@ -212,7 +220,7 @@ void GameDQN::initDQNAgent()
 
 	int hiddenSize = 128;
 	int bufferCap = 20000;
-	this->agent_ = new DQNAgent(stateSize, actionsNum_, hiddenSize, bufferCap);
+	this->agent_ = new DQNAgent(stateSize, actionsNum_, hiddenSize, bufferCap,13);
 	switch (this->selectedLevel_)
 	{
 	case EASY:
@@ -226,6 +234,7 @@ void GameDQN::initDQNAgent()
 		this->agent_->gamma = 0.95f;
 		this->agent_->targetSyncFreq = 150;
 		this->agent_->TARGET_HIT = 20;
+		this->agent_->LOST_GAME_BASE = -1.f;
 		break;
 	case MEDIUM:
 		this->agent_->epsilonStart = 0.7;
@@ -238,10 +247,11 @@ void GameDQN::initDQNAgent()
 		this->agent_->gamma = 0.95f;
 		this->agent_->targetSyncFreq = 200;
 		this->agent_->TARGET_HIT = 20;
+		this->agent_->LOST_GAME_BASE = -1.f;
 		break;
 	case HARD:
-		this->agent_->epsilonStart = 0.8;
-		this->agent_->epsilonEnd = 0.05;
+		this->agent_->epsilonStart = 0.7;
+		this->agent_->epsilonEnd = 0.1;
 		this->agent_->epsilonDecay = 15000;
 		this->agent_->minBufferSize = 600;
 		this->agent_->alphaStart = 5e-4f;
@@ -250,13 +260,13 @@ void GameDQN::initDQNAgent()
 		this->agent_->gamma = 0.96f;
 		this->agent_->targetSyncFreq = 300;
 		this->agent_->TARGET_HIT = 25;
+		this->agent_->LOST_GAME_BASE = -2.f;
 		break;
 	default:
 		break;
 	}
 	this->agent_->WRONG_GEAR_PLACEMENT = -1.0f;
 	this->agent_->WRONG_BELT_PLACEMENT = -0.5f;
-	this->agent_->LOST_GAME_BASE = -1.f;
 	this->agent_->GEAR_ACTIVATED = 3.0;
 	this->agent_->WHEEL_ACTIVATED = 8.0f;
 	std::string prefix = (this->selectedLevel_ == EASY ? "easy" :
