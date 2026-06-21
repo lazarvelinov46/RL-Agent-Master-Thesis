@@ -111,7 +111,7 @@ NeuralNetwork::NeuralNetwork(const std::vector<int>& layerSizes, unsigned seed)
 	for (size_t i = 0; i < layerSizes.size()-1; i++) {
 		this->layers_.emplace_back(layerSizes[i], layerSizes[i + 1], rng_);
 	}
-	this->layers_fwd_ = this->layers_;
+	//this->layers_fwd_ = this->layers_;
 }
 
 // Static functions for applying ReLU
@@ -164,16 +164,16 @@ Matrix NeuralNetwork::forwardPass(const Matrix& input)
 
 std::vector<float> NeuralNetwork::evaluate(const std::vector<float>& input) const
 {
-	this->layers_fwd_ = this->layers_;
-
+	// evaluate only READS W and b and writes no caches, so reading
+	// layers_ directly avoids copying the whole network every call.
 	Matrix a = Matrix::createFromVector(input);
-	for (size_t i = 0; i < this->layers_fwd_.size(); i++) {
-		const Layer& L = this->layers_fwd_[i];
+	for (size_t i = 0; i < this->layers_.size(); i++) {
+		const Layer& L = this->layers_[i];
 		Matrix z = a.dotProduct(L.W);
-		for (int i = 0; i < z.columns; i++) {
-			z.at(0, i) += L.b.at(0, i);
+		for (int j = 0; j < z.columns; j++) {        // was shadowing 'i'; renamed to 'j'
+			z.at(0, j) += L.b.at(0, j);
 		}
-		bool isLast = (i == this->layers_fwd_.size() - 1);
+		bool isLast = (i == this->layers_.size() - 1);
 		a = isLast ? z : NeuralNetwork::applyReLU(z);
 	}
 	return a.matrixToVector();
@@ -273,7 +273,7 @@ void NeuralNetwork::copyWeightsFrom(const NeuralNetwork& src)
 		this->layers_[i].W = src.layers_[i].W;
 		this->layers_[i].b = src.layers_[i].b;
 	}
-	this->layers_fwd_ = this->layers_;
+	//this->layers_fwd_ = this->layers_;
 }
 
 // Serialization
@@ -328,6 +328,6 @@ bool NeuralNetwork::load(const std::string& filename)
 		f.read(reinterpret_cast<char*>(L.b.data.data()), biasesSize * sizeof(float));
 	}
 	f.read(reinterpret_cast<char*>(&this->adamT_), sizeof(this->adamT_));
-	this->layers_fwd_ = this->layers_;
+	//this->layers_fwd_ = this->layers_;
 	return true;
 }
